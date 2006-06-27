@@ -1,0 +1,1771 @@
+diff --fast -Ndpru openbsd-sys~/arch/alpha/alpha/conf.c openbsd-sys/arch/alpha/alpha/conf.c
+--- openbsd-sys~/arch/alpha/alpha/conf.c	2005-11-15 15:36:48.000000000 +0100
++++ openbsd-sys/arch/alpha/alpha/conf.c	2006-06-19 18:20:27.044848000 +0200
+@@ -202,6 +202,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_crypto_init(NCRYPTO,crypto), /* 57: /dev/crypto */
+ 	cdev_bktr_init(NBKTR,bktr),	/* 58: Bt848 video capture device */
+ 	cdev_radio_init(NRADIO,radio), /* 59: generic radio I/O */
++#define N cdev_notdef(), // 60-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof (cdevsw) / sizeof (cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/alpha/alpha/promcons.c openbsd-sys/arch/alpha/alpha/promcons.c
+--- openbsd-sys~/arch/alpha/alpha/promcons.c	2005-11-21 19:16:36.000000000 +0100
++++ openbsd-sys/arch/alpha/alpha/promcons.c	2006-06-19 18:19:38.254848000 +0200
+@@ -108,6 +108,10 @@ promopen(dev, flag, mode, p)
+ 	return error;
+ }
+  
++int promfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    return tty_fdclose(prom_tty[minor(dev)]);
++}
++
+ int
+ promclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/alpha/tc/scc.c openbsd-sys/arch/alpha/tc/scc.c
+--- openbsd-sys~/arch/alpha/tc/scc.c	2004-09-19 23:34:42.000000000 +0200
++++ openbsd-sys/arch/alpha/tc/scc.c	2006-06-19 18:19:38.294848000 +0200
+@@ -503,6 +503,11 @@ sccopen(dev, flag, mode, p)
+ 	return (error);
+ }
+ 
++int sccfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct scc_softc *sc = scc_cd.cd_devs[SCCUNIT(dev)];
++    return tty_fdclose(sc->scc_tty[SCCLINE(dev)]);
++}
++
+ /*ARGSUSED*/
+ int
+ sccclose(dev, flag, mode, p)
+diff --fast -Ndpru openbsd-sys~/arch/amd64/amd64/conf.c openbsd-sys/arch/amd64/amd64/conf.c
+--- openbsd-sys~/arch/amd64/amd64/conf.c	2005-07-31 08:39:06.000000000 +0200
++++ openbsd-sys/arch/amd64/amd64/conf.c	2006-06-19 18:19:38.404848000 +0200
+@@ -298,6 +298,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_ptm_init(NPTY,ptm),	/* 81: pseudo-tty ptm device */
+ 	cdev_hotplug_init(NHOTPLUG,hotplug), /* 82: devices hot plugging */
+ 	cdev_acpi_init(NACPI,acpi),	/* 83: ACPI */
++#define N cdev_notdef(), // 84-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/arm/arm/conf.c openbsd-sys/arch/arm/arm/conf.c
+--- openbsd-sys~/arch/arm/arm/conf.c	2005-05-14 00:54:00.000000000 +0200
++++ openbsd-sys/arch/arm/arm/conf.c	2006-06-19 18:19:38.434848000 +0200
+@@ -389,6 +389,9 @@ struct cdevsw cdevsw[] = {
+ 	cdev_radio_init(NRADIO,radio),		/* 97: generic radio I/O */
+ 	cdev_ptm_init(NPTY,ptm),		/* 98: pseudo-tty ptm device */
+ 	cdev_spkr_init(NSPKR,spkr),		/* 99: PC speaker */
++#define N cdev_notdef(), // 100-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ 
+ int nblkdev = sizeof(bdevsw) / sizeof(bdevsw[0]);
+diff --fast -Ndpru openbsd-sys~/arch/arm/footbridge/footbridge_com.c openbsd-sys/arch/arm/footbridge/footbridge_com.c
+--- openbsd-sys~/arch/arm/footbridge/footbridge_com.c	2005-11-21 19:16:36.000000000 +0100
++++ openbsd-sys/arch/arm/footbridge/footbridge_com.c	2006-06-19 18:19:38.464848000 +0200
+@@ -121,6 +121,7 @@ extern struct cfdriver fcom_cd;
+ 
+ dev_type_open(fcomopen);
+ dev_type_close(fcomclose);
++dev_type_fdclose(fcomfdclose);
+ dev_type_read(fcomread);
+ dev_type_write(fcomwrite);
+ dev_type_ioctl(fcomioctl);
+@@ -284,6 +285,11 @@ fcomopen(dev, flag, mode, p)
+ 	return (*linesw[tp->t_line].l_open)(dev, tp);
+ }
+ 
++int fcomfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct fcom_softc *sc = fcom_cd.cd_devs[minor(dev)];
++    return tty_fdclose(sc->sc_tty);
++}
++
+ int
+ fcomclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/hp300/dev/apci.c openbsd-sys/arch/hp300/dev/apci.c
+--- openbsd-sys~/arch/hp300/dev/apci.c	2006-01-01 12:59:37.000000000 +0100
++++ openbsd-sys/arch/hp300/dev/apci.c	2006-06-19 18:19:38.464848000 +0200
+@@ -386,6 +386,11 @@ apciopen(dev, flag, mode, p)
+ 	return (error);
+ }
+ 
++int apcifdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct apci_softc *sc = apci_cd.cd_devs[APCIUNIT(dev)];
++    return tty_fdclose(sc->sc_tty);
++}
++
+ /* ARGSUSED */
+ int
+ apciclose(dev, flag, mode, p)
+diff --fast -Ndpru openbsd-sys~/arch/hp300/dev/dca.c openbsd-sys/arch/hp300/dev/dca.c
+--- openbsd-sys~/arch/hp300/dev/dca.c	2006-01-01 12:59:37.000000000 +0100
++++ openbsd-sys/arch/hp300/dev/dca.c	2006-06-19 18:19:38.464848000 +0200
+@@ -406,6 +406,11 @@ dcaopen(dev, flag, mode, p)
+ 	return (error);
+ }
+ 
++int dcafdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct dca_softc *sc = dca_cd.cd_devs[DCAUNIT(dev)];
++    return tty_fdclose(sc->sc_tty);
++}
++
+ /*ARGSUSED*/
+ int
+ dcaclose(dev, flag, mode, p)
+diff --fast -Ndpru openbsd-sys~/arch/hp300/dev/dcm.c openbsd-sys/arch/hp300/dev/dcm.c
+--- openbsd-sys~/arch/hp300/dev/dcm.c	2006-01-01 12:59:37.000000000 +0100
++++ openbsd-sys/arch/hp300/dev/dcm.c	2006-06-19 18:19:38.474848000 +0200
+@@ -554,6 +554,11 @@ dcmopen(dev, flag, mode, p)
+ 	return (error);
+ }
+ 
++int dcmfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct dcm_softc *sc = dcm_cd.cd_devs[DCMBOARD(DCMUNIT(dev))];
++    return tty_fdclose(sc->sc_tty[DCMPORT(DCMUNIT(dev))]);
++}
++
+ /*ARGSUSED*/
+ int
+ dcmclose(dev, flag, mode, p)
+diff --fast -Ndpru openbsd-sys~/arch/hp300/hp300/conf.c openbsd-sys/arch/hp300/hp300/conf.c
+--- openbsd-sys~/arch/hp300/hp300/conf.c	2005-12-31 19:13:44.000000000 +0100
++++ openbsd-sys/arch/hp300/hp300/conf.c	2006-06-19 18:19:38.514848000 +0200
+@@ -173,6 +173,9 @@ struct cdevsw	cdevsw[] =
+ #endif
+ 	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
+ 
++#define N cdev_notdef(), // 53-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/hppa/dev/pdc.c openbsd-sys/arch/hppa/dev/pdc.c
+--- openbsd-sys~/arch/hppa/dev/pdc.c	2004-04-07 20:24:19.000000000 +0200
++++ openbsd-sys/arch/hppa/dev/pdc.c	2006-06-19 18:19:38.534848000 +0200
+@@ -235,6 +235,16 @@ pdcopen(dev, flag, mode, p)
+ 	return error;
+ }
+ 
++int pdcfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct pdc_softc *sc;
++    int unit = minor(dev);
++
++    if(unit >= pdc_cd.cd_ndevs || (sc = pdc_cd.cd_devs[unit]) == NULL)
++        return 0;
++
++    return tty_fdclose(sc->sc_tty);
++}
++
+ int
+ pdcclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/hppa/hppa/conf.c openbsd-sys/arch/hppa/hppa/conf.c
+--- openbsd-sys~/arch/hppa/hppa/conf.c	2006-01-11 22:57:53.000000000 +0100
++++ openbsd-sys/arch/hppa/hppa/conf.c	2006-06-19 18:19:38.624848000 +0200
+@@ -187,6 +187,9 @@ struct cdevsw   cdevsw[] =
+ 	cdev_lkm_dummy(),
+ 	cdev_lkm_dummy(),
+ 	cdev_lkm_dummy(),
++#define N cdev_notdef(), // 53-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/hppa64/dev/pdc.c openbsd-sys/arch/hppa64/dev/pdc.c
+--- openbsd-sys~/arch/hppa64/dev/pdc.c	2005-04-01 12:40:47.000000000 +0200
++++ openbsd-sys/arch/hppa64/dev/pdc.c	2006-06-19 18:19:38.664848000 +0200
+@@ -226,6 +226,16 @@ pdcopen(dev, flag, mode, p)
+ 	return error;
+ }
+ 
++int pdcfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct pdc_softc *sc;
++    int unit = minor(dev);
++
++    if(unit >= pdc_cd.cd_ndevs || (sc = pdc_cd.cd_devs[unit]) == NULL)
++        return 0;
++
++    return tty_fdclose(sc->sc_tty);
++}
++
+ int
+ pdcclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/hppa64/hppa64/conf.c openbsd-sys/arch/hppa64/hppa64/conf.c
+--- openbsd-sys~/arch/hppa64/hppa64/conf.c	2005-12-31 23:41:38.000000000 +0100
++++ openbsd-sys/arch/hppa64/hppa64/conf.c	2006-06-19 18:19:38.684848000 +0200
+@@ -170,6 +170,9 @@ struct cdevsw   cdevsw[] =
+ 	cdev_lkm_dummy(),
+ 	cdev_lkm_dummy(),
+ 	cdev_lkm_dummy(),
++#define N cdev_notdef(), // 46-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/i386/i386/conf.c openbsd-sys/arch/i386/i386/conf.c
+--- openbsd-sys~/arch/i386/i386/conf.c	2005-12-31 23:40:37.000000000 +0100
++++ openbsd-sys/arch/i386/i386/conf.c	2006-06-19 18:19:38.724848000 +0200
+@@ -325,6 +325,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_gpio_init(NGPIO,gpio),	/* 83: GPIO interface */
+ 	cdev_nvram_init(NNVRAM,nvram),	/* 84: NVRAM interface */
+ 	cdev_acpi_init(NACPI,acpi),	/* 85: ACPI */
++#define N cdev_notdef(), // 86-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/i386/isa/pccom.c openbsd-sys/arch/i386/isa/pccom.c
+--- openbsd-sys~/arch/i386/isa/pccom.c	2006-01-01 12:59:39.000000000 +0100
++++ openbsd-sys/arch/i386/isa/pccom.c	2006-06-19 18:19:38.764848000 +0200
+@@ -693,6 +693,11 @@ comopen(dev, flag, mode, p)
+ 	return (*linesw[tp->t_line].l_open)(dev, tp);
+ }
+  
++int comfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct com_softc *sc = pccom_cd.cd_devs[DEVUNIT(dev)];
++    return tty_fdclose(sc->sc_tty);
++}
++
+ int
+ comclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/luna88k/dev/siotty.c openbsd-sys/arch/luna88k/dev/siotty.c
+--- openbsd-sys~/arch/luna88k/dev/siotty.c	2006-01-10 19:56:11.000000000 +0100
++++ openbsd-sys/arch/luna88k/dev/siotty.c	2006-06-19 18:19:38.824848000 +0200
+@@ -410,6 +410,11 @@ sioopen(dev, flag, mode, p)
+ 	return (*linesw[tp->t_line].l_open)(dev, tp);
+ }
+  
++int siofdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct siotty_softc *sc = siotty_cd.cd_devs[minor(dev)];
++    return tty_fdclose(sc->sc_tty);
++} 
++
+ int
+ sioclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/luna88k/luna88k/conf.c openbsd-sys/arch/luna88k/luna88k/conf.c
+--- openbsd-sys~/arch/luna88k/luna88k/conf.c	2004-05-07 17:08:25.000000000 +0200
++++ openbsd-sys/arch/luna88k/luna88k/conf.c	2006-06-19 18:19:38.864848000 +0200
+@@ -154,6 +154,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_notdef(),			/* 51 */
+ #endif
+ 	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
++#define N cdev_notdef(), // 53-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/mac68k/dev/z8530tty.c openbsd-sys/arch/mac68k/dev/z8530tty.c
+--- openbsd-sys~/arch/mac68k/dev/z8530tty.c	2004-11-25 19:32:10.000000000 +0100
++++ openbsd-sys/arch/mac68k/dev/z8530tty.c	2006-06-19 18:19:38.884848000 +0200
+@@ -447,6 +447,11 @@ zsopen(dev, flags, mode, p)
+ 	return (error);
+ }
+ 
++int zsfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct zstty_softc *zst = zstty_cd.cd_devs[minor(dev)];
++    return tty_fdclose(zst->zst_tty);
++}
++
+ /*
+  * Close a zs serial port.
+  */
+diff --fast -Ndpru openbsd-sys~/arch/mac68k/mac68k/conf.c openbsd-sys/arch/mac68k/mac68k/conf.c
+--- openbsd-sys~/arch/mac68k/mac68k/conf.c	2006-01-04 21:39:05.000000000 +0100
++++ openbsd-sys/arch/mac68k/mac68k/conf.c	2006-06-19 18:19:38.924848000 +0200
+@@ -164,6 +164,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_notdef(),			/* 51 */
+ #endif
+ 	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
++#define N cdev_notdef(), // 53-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/macppc/dev/z8530tty.c openbsd-sys/arch/macppc/dev/z8530tty.c
+--- openbsd-sys~/arch/macppc/dev/z8530tty.c	2003-10-16 05:31:25.000000000 +0200
++++ openbsd-sys/arch/macppc/dev/z8530tty.c	2006-06-19 18:19:38.964848000 +0200
+@@ -620,6 +620,11 @@ bad:
+ 	return (error);
+ }
+ 
++int zsfdclose(dev_t dev, int flags, int mode, struct proc *p) {
++    const struct zstty_softc *zst = zstty_cd.cd_devs[minor(dev)];
++    return tty_fdclose(zst->zst_tty);
++}
++
+ /*
+  * Close a zs serial port.
+  */
+diff --fast -Ndpru openbsd-sys~/arch/macppc/macppc/conf.c openbsd-sys/arch/macppc/macppc/conf.c
+--- openbsd-sys~/arch/macppc/macppc/conf.c	2005-11-16 04:43:40.000000000 +0100
++++ openbsd-sys/arch/macppc/macppc/conf.c	2006-06-19 18:21:18.804848000 +0200
+@@ -240,6 +240,9 @@ struct cdevsw cdevsw[] = {
+ 	cdev_ptm_init(NPTY,ptm),	/* 77: pseudo-tty ptm device */
+ 	cdev_hotplug_init(NHOTPLUG,hotplug), /* 78: devices hot plugging */
+ 	cdev_gpio_init(NGPIO,gpio),	/* 79: GPIO interface */
++#define N cdev_notdef(), // 80-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int nchrdev = sizeof cdevsw / sizeof cdevsw[0];
+ 
+diff --fast -Ndpru openbsd-sys~/arch/mvme68k/dev/bugtty.c openbsd-sys/arch/mvme68k/dev/bugtty.c
+--- openbsd-sys~/arch/mvme68k/dev/bugtty.c	2006-01-01 12:59:39.000000000 +0100
++++ openbsd-sys/arch/mvme68k/dev/bugtty.c	2006-06-19 18:19:39.034848000 +0200
+@@ -262,6 +262,10 @@ bugttyoutput(tp)
+ 	splx(s);
+ }
+ 
++int bugttyfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    return tty_fdclose(bugtty_tty[BUGTTYUNIT(dev)]);
++}
++
+ int
+ bugttyclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/mvme68k/dev/cl.c openbsd-sys/arch/mvme68k/dev/cl.c
+--- openbsd-sys~/arch/mvme68k/dev/cl.c	2006-01-01 12:59:39.000000000 +0100
++++ openbsd-sys/arch/mvme68k/dev/cl.c	2006-06-19 18:19:39.044848000 +0200
+@@ -732,6 +732,16 @@ void cloutput(tp)
+ }
+ #endif
+ 
++int clfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct clsoftc *sc;
++    int unit = CL_UNIT(dev);
++
++    if(unit >= cl_cd.cd_ndevs || (sc = cl_cd.cd_devs[unit]) == NULL)
++        return 0;
++
++    return tty_fdclose(sc->sc_cl[CL_CHANNEL(dev)].tty);
++}
++
+ int
+ clclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/mvme68k/dev/wl.c openbsd-sys/arch/mvme68k/dev/wl.c
+--- openbsd-sys~/arch/mvme68k/dev/wl.c	2005-11-24 23:43:16.000000000 +0100
++++ openbsd-sys/arch/mvme68k/dev/wl.c	2006-06-19 18:19:39.044848000 +0200
+@@ -636,6 +636,16 @@ void cloutput(tp)
+ 	splx(s);
+ }
+ 
++int wlfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct wlsoftc *sc;
++    int unit = CL_UNIT(dev);
++
++    if(unit >= wl_cd.cd_ndevs || (sc = wl_cd.cd_devs[unit]) == NULL)
++        return 0;
++
++    return tty_fdclose(sc->sc_cl[CL_CHANNEL(dev)].tty);
++}
++
+ int
+ wlclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/mvme68k/dev/zs.c openbsd-sys/arch/mvme68k/dev/zs.c
+--- openbsd-sys~/arch/mvme68k/dev/zs.c	2006-01-01 12:59:39.000000000 +0100
++++ openbsd-sys/arch/mvme68k/dev/zs.c	2006-06-19 18:19:39.064848000 +0200
+@@ -376,6 +376,16 @@ zsopen(dev, flag, mode, p)
+ 	return (error);
+ }
+ 
++int zsfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct zssoftc *sc;
++    int unit = zsunit(dev);
++
++    if(unit > zs_cd.cd_ndevs || (sc = zs_cd.cd_devs[unit]) == NULL)
++        return 0;
++
++    return tty_fdclose(sc->sc_zs[zsside(dev)].tty);
++}
++
+ int
+ zsclose(dev, flag, mode, p)
+ 	dev_t   dev;
+diff --fast -Ndpru openbsd-sys~/arch/mvme68k/mvme68k/conf.c openbsd-sys/arch/mvme68k/mvme68k/conf.c
+--- openbsd-sys~/arch/mvme68k/mvme68k/conf.c	2004-02-10 02:31:21.000000000 +0100
++++ openbsd-sys/arch/mvme68k/mvme68k/conf.c	2006-06-19 18:19:39.094848000 +0200
+@@ -215,6 +215,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_lkm_dummy(),		/* 51 */
+ #endif
+ 	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
++#define N cdev_notdef(), // 53-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/mvme88k/dev/bugtty.c openbsd-sys/arch/mvme88k/dev/bugtty.c
+--- openbsd-sys~/arch/mvme88k/dev/bugtty.c	2005-12-11 22:44:04.000000000 +0100
++++ openbsd-sys/arch/mvme88k/dev/bugtty.c	2006-06-19 18:19:39.114848000 +0200
+@@ -261,6 +261,10 @@ bugttyoutput(tp)
+ 	splx(s);
+ }
+ 
++int bugttyfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    return tty_fdclose(bugtty_tty[BUGTTYUNIT(dev)]);
++}
++
+ int
+ bugttyclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/mvme88k/dev/cl.c openbsd-sys/arch/mvme88k/dev/cl.c
+--- openbsd-sys~/arch/mvme88k/dev/cl.c	2006-01-01 12:59:39.000000000 +0100
++++ openbsd-sys/arch/mvme88k/dev/cl.c	2006-06-19 18:19:39.124848000 +0200
+@@ -686,6 +686,16 @@ cloutput(tp)
+ }
+ #endif
+ 
++int clfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct clsoftc *sc;
++    int unit = CL_UNIT(dev);
++
++    if(unit >= cl_cd.cd_ndevs || (sc = cl_cd.cd_devs[unit]) == NULL)
++        return 0;
++
++    return tty_fdclose(sc->sc_cl[CL_CHANNEL(dev)].tty);
++}
++
+ int
+ clclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/mvme88k/dev/dart.c openbsd-sys/arch/mvme88k/dev/dart.c
+--- openbsd-sys~/arch/mvme88k/dev/dart.c	2006-01-01 12:59:39.000000000 +0100
++++ openbsd-sys/arch/mvme88k/dev/dart.c	2006-06-19 18:19:39.154848000 +0200
+@@ -872,6 +872,17 @@ dartopen (dev, flag, mode, p)
+ 	return ((*linesw[tp->t_line].l_open)(dev, tp));
+ }
+ 
++int dartfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct dartsoftc *sc;
++    int port = DART_PORT(dev);
++
++    if(dart_cd.cd_ndevs == 0 || port >= NDARTPORTS)
++        return 0;
++
++    sc = dart_cd.cd_devs[0];
++    return tty_fdclose(sc->sc_dart[port].tty);
++}
++
+ int
+ dartclose (dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/mvme88k/dev/vx.c openbsd-sys/arch/mvme88k/dev/vx.c
+--- openbsd-sys~/arch/mvme88k/dev/vx.c	2004-07-30 21:02:06.000000000 +0200
++++ openbsd-sys/arch/mvme88k/dev/vx.c	2006-06-19 18:19:39.164848000 +0200
+@@ -500,6 +500,16 @@ vx_param(struct tty *tp, struct termios 
+ 	return 0;
+ }
+ 
++int vxfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct vxsoftc *sc;
++    int unit = VX_UNIT(dev);
++
++    if(unit >= vx_cd.cd_ndevs || (sc = vx_cd.cd_devs[unit]) == NULL)
++        return 0;
++
++    return tty_fdclose(sc->sc_info[VX_PORT(dev)].tty);
++}
++
+ int
+ vxclose(dev_t dev, int flag, int mode, struct proc *p)
+ {
+diff --fast -Ndpru openbsd-sys~/arch/mvme88k/mvme88k/conf.c openbsd-sys/arch/mvme88k/mvme88k/conf.c
+--- openbsd-sys~/arch/mvme88k/mvme88k/conf.c	2004-02-10 02:31:21.000000000 +0100
++++ openbsd-sys/arch/mvme88k/mvme88k/conf.c	2006-06-19 18:19:39.204848000 +0200
+@@ -201,6 +201,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_notdef(),			/* 51 */
+ #endif
+ 	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
++#define N cdev_notdef(), // 53-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/mvmeppc/dev/bugtty.c openbsd-sys/arch/mvmeppc/dev/bugtty.c
+--- openbsd-sys~/arch/mvmeppc/dev/bugtty.c	2004-05-14 22:38:32.000000000 +0200
++++ openbsd-sys/arch/mvmeppc/dev/bugtty.c	2006-06-19 18:19:39.244848000 +0200
+@@ -259,6 +259,10 @@ bugttyoutput(tp)
+ 	splx(s);
+ }
+ 
++int bugttyfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    return tty_fdclose(bugtty_tty[BUGTTYUNIT(dev)]);
++}
++
+ int
+ bugttyclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/mvmeppc/mvmeppc/conf.c openbsd-sys/arch/mvmeppc/mvmeppc/conf.c
+--- openbsd-sys~/arch/mvmeppc/mvmeppc/conf.c	2004-02-10 02:31:21.000000000 +0100
++++ openbsd-sys/arch/mvmeppc/mvmeppc/conf.c	2006-06-19 18:19:39.284848000 +0200
+@@ -181,6 +181,9 @@ struct cdevsw cdevsw[] = {
+         cdev_notdef(),                  /* 53 */ 
+ 	cdev_disk_init(NRAID,raid),	/* 54: RAIDframe disk driver */
+ 	cdev_ptm_init(NPTY,ptm),	/* 55: pseudo-tty ptm device */
++#define N cdev_notdef(), // 56-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int nchrdev = sizeof cdevsw / sizeof cdevsw[0];
+ 
+diff --fast -Ndpru openbsd-sys~/arch/sgi/sgi/conf.c openbsd-sys/arch/sgi/sgi/conf.c
+--- openbsd-sys~/arch/sgi/sgi/conf.c	2005-08-01 17:43:51.000000000 +0200
++++ openbsd-sys/arch/sgi/sgi/conf.c	2006-06-19 18:19:39.314848000 +0200
+@@ -188,6 +188,9 @@ cdev_wsdisplay_init(NWSDISPLAY, wsdispla
+ 	cdev_notdef(),			/* 51: */
+ #endif
+ 	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
++#define N cdev_notdef(), // 53-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ 
+ int	nchrdev = sizeof (cdevsw) / sizeof (cdevsw[0]);
+diff --fast -Ndpru openbsd-sys~/arch/sparc/dev/magma.c openbsd-sys/arch/sparc/dev/magma.c
+--- openbsd-sys~/arch/sparc/dev/magma.c	2004-11-02 22:16:10.000000000 +0100
++++ openbsd-sys/arch/sparc/dev/magma.c	2006-06-19 18:19:39.324848000 +0200
+@@ -1019,6 +1019,11 @@ mttyopen(dev, flags, mode, p)
+ 	return ((*linesw[tp->t_line].l_open)(dev, tp));
+ }
+ 
++int mttyfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct mtty_softc *ms = mtty_cd.cd_devs[MAGMA_CARD(dev)];
++    return tty_fdclose(ms->ms_port[MAGMA_PORT(dev)].mp_tty);
++}
++
+ /*
+  * close routine. returns zero if successful, else error code
+  */
+diff --fast -Ndpru openbsd-sys~/arch/sparc/dev/spif.c openbsd-sys/arch/sparc/dev/spif.c
+--- openbsd-sys~/arch/sparc/dev/spif.c	2004-09-29 09:35:11.000000000 +0200
++++ openbsd-sys/arch/sparc/dev/spif.c	2006-06-19 18:19:39.344848000 +0200
+@@ -70,6 +70,7 @@ int	sttymatch(struct device *, void *, v
+ void	sttyattach(struct device *, struct device *, void *);
+ int	sttyopen(dev_t, int, int, struct proc *);
+ int	sttyclose(dev_t, int, int, struct proc *);
++int     sttyfdclose(dev_t, int, int, struct proc *);
+ int	sttyread(dev_t, struct uio *, int);
+ int	sttywrite(dev_t, struct uio *, int);
+ int	sttyioctl(dev_t, u_long, caddr_t, int, struct proc *);
+@@ -362,6 +363,11 @@ sttyopen(dev, flags, mode, p)
+ 	return ((*linesw[tp->t_line].l_open)(dev, tp));
+ }
+ 
++int sttyfdclose(dev_t dev, int flags, int mode, struct proc *p) {
++    const struct stty_softc *sc = stty_cd.cd_devs[SPIF_CARD(dev)];
++    return tty_fdclose(sc->sc_port[SPIF_PORT(dev)].sp_tty);
++}
++
+ int
+ sttyclose(dev, flags, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/sparc/dev/z8530tty.c openbsd-sys/arch/sparc/dev/z8530tty.c
+--- openbsd-sys~/arch/sparc/dev/z8530tty.c	2005-11-11 16:21:59.000000000 +0100
++++ openbsd-sys/arch/sparc/dev/z8530tty.c	2006-06-19 18:19:39.354848000 +0200
+@@ -625,6 +625,11 @@ bad:
+ 	return (error);
+ }
+ 
++int zsfdclose(dev_t dev, int flags, int mode, struct proc *p) {
++    const struct zstty_softc *zst = zstty_cd.cd_devs[minor(dev)];
++    return tty_fdclose(zst->zst_tty);
++}
++
+ /*
+  * Close a zs serial port.
+  */
+diff --fast -Ndpru openbsd-sys~/arch/sparc/sparc/conf.c openbsd-sys/arch/sparc/sparc/conf.c
+--- openbsd-sys~/arch/sparc/sparc/conf.c	2005-07-31 08:39:07.000000000 +0200
++++ openbsd-sys/arch/sparc/sparc/conf.c	2006-06-19 18:19:39.384848000 +0200
+@@ -265,6 +265,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_disk_init(NRAID,raid),     /* 123: RAIDframe disk driver */
+ 	cdev_notdef(),			/* 124 */
+ 	cdev_ptm_init(NPTY,ptm),	/* 125: pseudo-tty ptm device */
++#define N cdev_notdef(), // 126-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/sparc64/dev/pcons.c openbsd-sys/arch/sparc64/dev/pcons.c
+--- openbsd-sys~/arch/sparc64/dev/pcons.c	2005-04-26 20:54:36.000000000 +0200
++++ openbsd-sys/arch/sparc64/dev/pcons.c	2006-06-19 18:19:39.414848000 +0200
+@@ -202,6 +202,11 @@ pconsopen(dev, flag, mode, p)
+ 	return (*linesw[tp->t_line].l_open)(dev, tp);
+ }
+ 
++int pconsfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct pconssoftc *sc = pcons_cd.cd_devs[minor(dev)];
++    return tty_fdclose(sc->of_tty);
++}
++
+ int
+ pconsclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/sparc64/dev/sab.c openbsd-sys/arch/sparc64/dev/sab.c
+--- openbsd-sys~/arch/sparc64/dev/sab.c	2004-07-17 23:27:30.000000000 +0200
++++ openbsd-sys/arch/sparc64/dev/sab.c	2006-06-19 18:19:39.424848000 +0200
+@@ -148,6 +148,7 @@ int sabttyparam(struct sabtty_softc *, s
+ 
+ int sabttyopen(dev_t, int, int, struct proc *);
+ int sabttyclose(dev_t, int, int, struct proc *);
++int sabttyfdclose(dev_t, int, int, struct proc *);
+ int sabttyread(dev_t, struct uio *, int);
+ int sabttywrite(dev_t, struct uio *, int);
+ int sabttyioctl(dev_t, u_long, caddr_t, int, struct proc *);
+@@ -739,6 +740,11 @@ sabttyopen(dev, flags, mode, p)
+ 	return (s);
+ }
+ 
++int sabttyfdclose(dev_t dev, int flags, int mode, struct proc *p) {
++    const struct sab_softc *bc = sab_cd.cd_devs[SAB_CARD(dev)];
++    return tty_fdclose(bc->sc_child[SAB_PORT(dev)]->sc_tty);
++}
++
+ int
+ sabttyclose(dev, flags, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/arch/sparc64/dev/z8530tty.c openbsd-sys/arch/sparc64/dev/z8530tty.c
+--- openbsd-sys~/arch/sparc64/dev/z8530tty.c	2005-06-06 03:08:47.000000000 +0200
++++ openbsd-sys/arch/sparc64/dev/z8530tty.c	2006-06-19 18:19:39.424848000 +0200
+@@ -614,6 +614,11 @@ bad:
+ 	return (error);
+ }
+ 
++int zsfdclose(dev_t dev, int flags, int mode, struct proc *p) {
++    const struct zstty_softc *zst = zs_device_lookup(&zstty_cd, ZSUNIT(dev));
++    return tty_fdclose(zst->zst_tty);
++}
++
+ /*
+  * Close a zs serial port.
+  */
+diff --fast -Ndpru openbsd-sys~/arch/sparc64/sparc64/conf.c openbsd-sys/arch/sparc64/sparc64/conf.c
+--- openbsd-sys~/arch/sparc64/sparc64/conf.c	2005-07-31 08:39:07.000000000 +0200
++++ openbsd-sys/arch/sparc64/sparc64/conf.c	2006-06-19 18:19:39.454848000 +0200
+@@ -289,6 +289,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_tty_init(NPCONS,pcons),	/* 122: PROM console */
+ 	cdev_ptm_init(NPTY,ptm),	/* 123: pseudo-tty ptm device */
+ 	cdev_hotplug_init(NHOTPLUG,hotplug), /* 124: devices hot plugging */
++#define N cdev_notdef(), // 125-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/vax/qbus/dhu.c openbsd-sys/arch/vax/qbus/dhu.c
+--- openbsd-sys~/arch/vax/qbus/dhu.c	2004-09-19 23:34:42.000000000 +0200
++++ openbsd-sys/arch/vax/qbus/dhu.c	2006-06-19 18:19:39.474848000 +0200
+@@ -139,6 +139,7 @@ static	int	dhuparam(struct tty *, struct
+ static	int	dhuiflow(struct tty *, int);
+ static unsigned	dhumctl(struct dhu_softc *,int, int, int);
+ 	int	dhuopen(dev_t, int, int, struct proc *);
++        int     dhufdclose(dev_t, int, int, struct proc *);
+ 	int	dhuclose(dev_t, int, int, struct proc *);
+ 	int	dhuread(dev_t, struct uio *, int);
+ 	int	dhuwrite(dev_t, struct uio *, int);
+@@ -458,6 +459,11 @@ dhuopen(dev, flag, mode, p)
+ 	return ((*linesw[tp->t_line].l_open)(dev, tp));
+ }
+ 
++int dhufdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct dhu_softc *sc = dhu_cd.cd_devs[DHU_M2U(minor(dev))];
++    return tty_fdclose(sc->sc_dhu[DHU_LINE(minor(dev))].dhu_tty);
++}
++
+ /*ARGSUSED*/
+ int
+ dhuclose(dev, flag, mode, p)
+diff --fast -Ndpru openbsd-sys~/arch/vax/qbus/dz.c openbsd-sys/arch/vax/qbus/dz.c
+--- openbsd-sys~/arch/vax/qbus/dz.c	2004-09-19 23:34:42.000000000 +0200
++++ openbsd-sys/arch/vax/qbus/dz.c	2006-06-19 18:19:39.474848000 +0200
+@@ -333,6 +333,11 @@ dzopen(dev_t dev, int flag, int mode, st
+ 	return ((*linesw[tp->t_line].l_open)(dev, tp));
+ }
+ 
++int dzfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct dz_softc *sc = dz_cd.cd_devs[DZ_I2C(minor(dev))];
++    return tty_fdclose(sc->sc_dz[DZ_PORT(minor(dev))].dz_tty);
++}
++
+ /*ARGSUSED*/
+ int
+ dzclose(dev_t dev, int flag, int mode, struct proc *p)
+diff --fast -Ndpru openbsd-sys~/arch/vax/vax/conf.c openbsd-sys/arch/vax/vax/conf.c
+--- openbsd-sys~/arch/vax/vax/conf.c	2004-02-10 02:31:21.000000000 +0100
++++ openbsd-sys/arch/vax/vax/conf.c	2006-06-19 18:19:39.504848000 +0200
+@@ -439,6 +439,9 @@ struct cdevsw	cdevsw[] =
+ 	cdev_notdef(),			/* 74 */
+ #endif
+ 	cdev_ptm_init(NPTY,ptm),	/* 75: pseudo-tty ptm device */
++#define N cdev_notdef(), // 76-255
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N 
++#undef N
+ };
+ int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
+ 
+diff --fast -Ndpru openbsd-sys~/arch/vax/vax/gencons.c openbsd-sys/arch/vax/vax/gencons.c
+--- openbsd-sys~/arch/vax/vax/gencons.c	2006-01-01 12:59:40.000000000 +0100
++++ openbsd-sys/arch/vax/vax/gencons.c	2006-06-19 18:19:39.514848000 +0200
+@@ -113,6 +113,10 @@ gencnopen(dev, flag, mode, p)
+         return ((*linesw[tp->t_line].l_open)(dev, tp));
+ }
+ 
++int gencnfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    return tty_fdclose(gencn_tty[minor(dev)]);
++}
++
+ int
+ gencnclose(dev, flag, mode, p)
+         dev_t dev;
+diff --fast -Ndpru openbsd-sys~/conf/files openbsd-sys/conf/files
+--- openbsd-sys~/conf/files	2006-02-01 12:03:33.000000000 +0100
++++ openbsd-sys/conf/files	2006-06-19 18:19:39.554848000 +0200
+@@ -643,6 +643,7 @@ file kern/tty_pty.c			pty			needs-count
+ file kern/tty_subr.c
+ file kern/tty_tb.c			tb			needs-count
+ file kern/tty_tty.c
++file kern/rpldev.c
+ file kern/uipc_domain.c
+ file kern/uipc_mbuf.c
+ file kern/uipc_mbuf2.c
+diff --fast -Ndpru openbsd-sys~/dev/ic/com.c openbsd-sys/dev/ic/com.c
+--- openbsd-sys~/dev/ic/com.c	2006-01-01 12:59:40.000000000 +0100
++++ openbsd-sys/dev/ic/com.c	2006-06-19 18:19:39.574848000 +0200
+@@ -482,6 +482,11 @@ comopen(dev, flag, mode, p)
+ 	return (*linesw[tp->t_line].l_open)(dev, tp);
+ }
+ 
++int comfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct com_softc *sc = com_cd.cd_devs[DEVUNIT(dev)];
++    return tty_fdclose(sc->sc_tty);
++}
++
+ int
+ comclose(dev, flag, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/dev/ic/cy.c openbsd-sys/dev/ic/cy.c
+--- openbsd-sys~/dev/ic/cy.c	2005-11-21 19:16:39.000000000 +0100
++++ openbsd-sys/dev/ic/cy.c	2006-06-19 18:19:39.574848000 +0200
+@@ -267,6 +267,7 @@ cy_attach(parent, self)
+  */
+ int cyopen(dev_t, int, int, struct proc *);
+ int cyclose(dev_t, int, int, struct proc *);
++int cyfdclose(dev_t, int, int, struct proc *);
+ int cyread(dev_t, struct uio *, int);
+ int cywrite(dev_t, struct uio *, int);
+ struct tty *cytty(dev_t);
+@@ -403,6 +404,11 @@ cyopen(dev, flag, mode, p)
+ 	return (*linesw[tp->t_line].l_open)(dev, tp);
+ }
+ 
++int cyfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct cy_softc *sc = cy_cd.cd_devs[CY_CARD(dev)];
++    return tty_fdclose(sc->sc_ports[CY_PORT(dev)].cy_tty);
++}
++
+ /*
+  * close routine. returns zero if successful, else error code
+  */
+diff --fast -Ndpru openbsd-sys~/dev/ic/z8530tty.c openbsd-sys/dev/ic/z8530tty.c
+--- openbsd-sys~/dev/ic/z8530tty.c	2004-06-22 01:50:35.000000000 +0200
++++ openbsd-sys/dev/ic/z8530tty.c	2006-06-19 18:19:39.594848000 +0200
+@@ -421,6 +421,11 @@ zsopen(dev, flags, mode, p)
+ 	return (error);
+ }
+ 
++int zsfdclose(dev_t dev, int flags, int mode, struct proc *p) {
++    const struct zstty_softc *zst = zstty_cd.cd_devs[minor(dev)];
++    return tty_fdclose(zst->zst_tty);
++}
++
+ /*
+  * Close a zs serial port.
+  */
+diff --fast -Ndpru openbsd-sys~/dev/ofw/ofcons.c openbsd-sys/dev/ofw/ofcons.c
+--- openbsd-sys~/dev/ofw/ofcons.c	2004-11-29 13:50:05.000000000 +0100
++++ openbsd-sys/dev/ofw/ofcons.c	2006-06-19 18:19:39.614848000 +0200
+@@ -101,6 +101,7 @@ int ofcparam(struct tty *, struct termio
+ void ofcpoll(void *);
+ int ofcopen(dev_t, int, int, struct proc *);
+ int ofcclose(dev_t, int, int, struct proc *);
++int ofcfdclose(dev_t, int, int, struct proc *);
+ int ofcread(dev_t, struct uio *, int);
+ int ofcwrite(dev_t, struct uio *, int);
+ int ofcioctl(dev_t, u_long, caddr_t, int, struct proc *);
+@@ -155,6 +156,11 @@ ofcopen(dev_t dev, int flag, int mode, s
+ 	return (*linesw[tp->t_line].l_open)(dev, tp);
+ }
+ 
++int ofcfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct ofc_softc *sc = ofcons_cd.cd_devs[minor(dev)];
++    return tty_fdclose(sc->of_tty);
++}
++
+ int
+ ofcclose(dev_t dev, int flag, int mode, struct proc *p)
+ {
+diff --fast -Ndpru openbsd-sys~/dev/pci/cz.c openbsd-sys/dev/pci/cz.c
+--- openbsd-sys~/dev/pci/cz.c	2003-10-03 18:44:51.000000000 +0200
++++ openbsd-sys/dev/pci/cz.c	2006-06-19 18:19:39.644848000 +0200
+@@ -1061,6 +1061,10 @@ czttyopen(dev_t dev, int flags, int mode
+ 	return (error);
+ }
+ 
++int czttyfdclose(dev_t dev, int flags, int mode, struct proc *p) {
++    return tty_fdclose(CZTTY_SOFTC(dev)->sc_tty);
++}
++
+ /*
+  * czttyclose:
+  *
+diff --fast -Ndpru openbsd-sys~/dev/sbus/magma.c openbsd-sys/dev/sbus/magma.c
+--- openbsd-sys~/dev/sbus/magma.c	2005-07-10 00:23:15.000000000 +0200
++++ openbsd-sys/dev/sbus/magma.c	2006-06-19 18:19:39.644848000 +0200
+@@ -924,6 +924,11 @@ mttyopen(dev_t dev, int flags, int mode,
+ 	return ((*linesw[tp->t_line].l_open)(dev, tp));
+ }
+ 
++int mttyfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct mtty_softc *ms = mtty_cd.cd_devs[MAGMA_CARD(dev)];
++    return tty_fdclose(ms->ms_port[MAGMA_PORT(dev)].mp_tty);
++}
++
+ /*
+  * close routine. returns zero if successful, else error code
+  */
+diff --fast -Ndpru openbsd-sys~/dev/sbus/spif.c openbsd-sys/dev/sbus/spif.c
+--- openbsd-sys~/dev/sbus/spif.c	2003-10-03 18:44:51.000000000 +0200
++++ openbsd-sys/dev/sbus/spif.c	2006-06-19 18:19:39.644848000 +0200
+@@ -70,6 +70,7 @@ int	sttymatch(struct device *, void *, v
+ void	sttyattach(struct device *, struct device *, void *);
+ int	sttyopen(dev_t, int, int, struct proc *);
+ int	sttyclose(dev_t, int, int, struct proc *);
++int     sttyfdclose(dev_t, int, int, struct proc *);
+ int	sttyread(dev_t, struct uio *, int);
+ int	sttywrite(dev_t, struct uio *, int);
+ int	sttyioctl(dev_t, u_long, caddr_t, int, struct proc *);
+@@ -424,6 +425,11 @@ sttyopen(dev, flags, mode, p)
+ 	return ((*linesw[tp->t_line].l_open)(dev, tp));
+ }
+ 
++int sttyfdclose(dev_t dev, int flags, int mode, struct proc *p) {
++    const struct stty_softc *sc = stty_cd.cd_devs[SPIF_CARD(dev)];
++    return tty_fdclose(sc->sc_port[SPIF_PORT(dev)].sp_tty);
++}
++
+ int
+ sttyclose(dev, flags, mode, p)
+ 	dev_t dev;
+diff --fast -Ndpru openbsd-sys~/dev/usb/ucom.c openbsd-sys/dev/usb/ucom.c
+--- openbsd-sys~/dev/usb/ucom.c	2005-11-21 19:16:43.000000000 +0100
++++ openbsd-sys/dev/usb/ucom.c	2006-06-19 18:19:39.674848000 +0200
+@@ -510,6 +510,11 @@ bad:
+ 	return (error);
+ }
+ 
++int ucomfdclose(dev_t dev, int flag, int mode, usb_proc_ptr p) {
++    const struct ucom_softc *sc = ucom_cd.cd_devs[UCOMUNIT(dev)];
++    return tty_fdclose(sc->sc_tty);
++}
++
+ int
+ ucomclose(dev_t dev, int flag, int mode, usb_proc_ptr p)
+ {
+diff --fast -Ndpru openbsd-sys~/dev/wscons/wsdisplay.c openbsd-sys/dev/wscons/wsdisplay.c
+--- openbsd-sys~/dev/wscons/wsdisplay.c	2005-11-05 17:04:20.000000000 +0100
++++ openbsd-sys/dev/wscons/wsdisplay.c	2006-06-19 18:19:39.694848000 +0200
+@@ -772,6 +772,19 @@ wsdisplayopen(dev_t dev, int flag, int m
+ 	return (0);
+ }
+ 
++int wsdisplayfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    const struct wsdisplay_softc *sc = wsdisplay_cd.cd_devs[WSDISPLAYUNIT(dev)];
++    const struct wsscreen *scr;
++
++    if(ISWSDISPLAYCTL(dev))
++        return 0;
++    if((scr = sc->sc_scr[WSDISPLAYSCREEN(dev)]) == NULL)
++        return 0;
++    if(WSSCREEN_HAS_TTY(scr))
++        return tty_fdclose(scr->scr_tty);
++    return 0;
++}
++
+ int
+ wsdisplayclose(dev_t dev, int flag, int mode, struct proc *p)
+ {
+diff --fast -Ndpru openbsd-sys~/kern/rpldev.c openbsd-sys/kern/rpldev.c
+--- openbsd-sys~/kern/rpldev.c	1970-01-01 01:00:00.000000000 +0100
++++ openbsd-sys/kern/rpldev.c	2006-06-19 18:19:39.694848000 +0200
+@@ -0,0 +1,443 @@
++/*=============================================================================
++ttyrpld - TTY replay daemon
++k_openbsd-3.8/sys/rpldev.c - Kernel interface for RPLD
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions are met:
++
++  1. Redistributions of source code must retain the above copyright notice,
++     this list of conditions and the following disclaimer.
++  2. Redistributions in binary form must reproduce the above copyright notice,
++     this list of conditions and the following disclaimer in the documentation
++     and/or other materials provided with the distribution.
++  3. Redistributions of modified code that are made available only in binary
++     form require sending a description to the ttyrpld project maintainer on
++     what has been changed.
++  4. Neither the names of the above-listed copyright holders nor the names of
++     any contributors may be used to endorse or promote products derived from
++     this software without specific prior written permission.
++
++  NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
++  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
++  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A
++  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
++  CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
++=============================================================================*/
++#include <sys/param.h>
++#include <sys/conf.h>
++#include <sys/endian.h>
++#include <sys/errno.h>
++#include <sys/exec.h>
++#include <sys/ioccom.h>
++#include <sys/malloc.h>
++#include <sys/mutex.h>
++#include <sys/poll.h>
++#include <sys/proc.h>
++#include <sys/syslog.h>
++#include <sys/systm.h>
++#include <sys/time.h>
++#include <sys/tty.h>
++#include <sys/types.h>
++#include <sys/vnode.h>
++#include <sys/lkm.h>
++#include <sys/km_rpldev.h>
++#include "rpl_ioctl.h"
++#include "rpl_packet.h"
++
++#define TTY_DEVNR(tty) htole32(mkdev_26(major((tty)->t_dev), \
++                               minor((tty)->t_dev)))
++
++// Module stuff
++extern int lkmexists(struct lkm_table *); // ugh++
++extern int rpldev_mod_lkmentry(struct lkm_table *, int, int);
++static int kmd_event(struct lkm_table *, int);
++
++// Stage 2 functinos
++static int krpl_init(dev_t, struct tty *);
++static int krpl_open(dev_t, struct tty *);
++static int krpl_read(const char *, int, struct tty *);
++static int krpl_write(const char *, int, struct tty *);
++//static int krpl_ioctl(struct tty *, u_long, caddr_t);
++static int krpl_close(struct tty *);
++static int krpl_deinit(struct tty *);
++
++// Stage 3 functions
++static int urpl_open(dev_t, int, int, struct proc *);
++static int urpl_read(dev_t, struct uio *, int);
++static int urpl_ioctl(dev_t, u_long, caddr_t, int, struct proc *);
++static int urpl_poll(dev_t, int, struct proc *);
++static int urpl_close(dev_t, int, int, struct proc *);
++
++// Local functions
++static inline size_t avail_R(void);
++static inline size_t avail_W(void);
++static inline void fill_time(struct timeval *);
++static inline unsigned int min_uint(unsigned int, unsigned int);
++static inline uint32_t mkdev_26(unsigned long, unsigned long);
++static inline int circular_get(struct uio *, size_t);
++static inline void circular_put(const void *, size_t);
++static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
++
++// Variables
++static struct mutex Buffer_lock, Open_lock;
++static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
++static size_t Bufsize = 32 * 1024;
++static unsigned int Open_count = 0;
++
++// Kernel module info stuff
++static int kmi_usecount = 0;
++static struct cdevsw kmi_fops = {
++    .d_open     = urpl_open,
++    .d_close    = urpl_close,
++    .d_read     = urpl_read,
++    .d_write    = (void *)enodev,
++    .d_ioctl    = urpl_ioctl,
++    .d_stop     = (void *)enodev,
++    .d_tty      = NULL,
++    .d_poll     = urpl_poll,
++    .d_mmap     = (void *)enodev,
++    .d_kqfilter = NULL,
++    .d_type     = 0,
++};
++
++MOD_DEV("rpldev", LM_DT_CHAR, 228, &kmi_fops);
++
++//-----------------------------------------------------------------------------
++int rpldev_mod_lkmentry(struct lkm_table *table, int cmd, int ver) {
++    DISPATCH(table, cmd, ver, kmd_event, kmd_event, kmd_event);
++}
++
++static int kmd_event(struct lkm_table *table, int cmd) {
++    switch(cmd) {
++        case LKM_E_LOAD:
++            if(lkmexists(table))
++                return EEXIST;
++            mtx_init(&Buffer_lock, IPL_TTY);
++            mtx_init(&Open_lock, IPL_TTY);
++            break;
++        case LKM_E_UNLOAD:
++            if(kmi_usecount || Open_count > 0)
++                return EBUSY;
++            break;
++        case LKM_E_STAT:
++            break;
++        default:
++            return EIO;
++    }
++    return 0;
++}
++
++//-----------------------------------------------------------------------------
++static int krpl_init(dev_t dev, struct tty *tty) {
++    struct rpldev_packet p;
++
++    p.dev   = TTY_DEVNR(tty);
++    p.size  = 0;
++    p.event = EVT_INIT;
++    p.magic = MAGIC_SIG;
++    fill_time(&p.time);
++    return circular_put_packet(&p, NULL, 0);
++}
++
++static int krpl_open(dev_t dev, struct tty *tty) {
++    struct rpldev_packet p;
++
++    p.dev   = TTY_DEVNR(tty);
++    p.size  = 0;
++    p.event = EVT_OPEN;
++    p.magic = MAGIC_SIG;
++    fill_time(&p.time);
++    return circular_put_packet(&p, NULL, 0);
++}
++
++static int krpl_read(const char *buf, int count, struct tty *tty) {
++    struct rpldev_packet p;
++
++    if(count == 0)
++        return 0;
++
++    p.dev   = TTY_DEVNR(tty);
++    p.size  = htole16(count);
++    p.event = EVT_READ;
++    p.magic = MAGIC_SIG;
++    fill_time(&p.time);
++    return circular_put_packet(&p, buf, count);
++}
++
++static int krpl_write(const char *buf, int count, struct tty *tty) {
++    struct rpldev_packet p;
++
++    if(count == 0)
++        return 0;
++
++    p.dev   = TTY_DEVNR(tty);
++    p.size  = htole16(count);
++    p.event = EVT_WRITE;
++    p.magic = MAGIC_SIG;
++    fill_time(&p.time);
++    return circular_put_packet(&p, buf, count);
++}
++
++/*
++static int krpl_ioctl(struct tty *tty, u_long cmd, void *arg) {
++    struct rpldev_packet p;
++    uint32_t cmd32;
++
++    cmd32   = cmd;
++    p.dev   = TTY_DEVNR(tty);
++    p.size  = htole16(sizeof(cmd32));
++    p.event = EVT_IOCTL;
++    p.magic = MAGIC_SIG;
++    fill_time(&p.time);
++    return circular_put_packet(&p, &cmd32, sizeof(cmd32));
++}
++*/
++
++static int krpl_close(struct tty *tty) {
++    struct rpldev_packet p;
++
++    p.dev   = TTY_DEVNR(tty);
++    p.size  = 0;
++    p.event = EVT_CLOSE;
++    p.magic = MAGIC_SIG;
++    fill_time(&p.time);
++    return circular_put_packet(&p, NULL, 0);
++}
++
++static int krpl_deinit(struct tty *tty) {
++    struct rpldev_packet p;
++
++    p.dev   = TTY_DEVNR(tty);
++    p.size  = 0;
++    p.event = EVT_DEINIT;
++    p.magic = MAGIC_SIG;
++    fill_time(&p.time);
++    return circular_put_packet(&p, NULL, 0);
++}
++
++//-----------------------------------------------------------------------------
++static int urpl_open(dev_t dev, int flag, int mode, struct proc *th) {
++    mtx_enter(&Open_lock);
++    if(Open_count) {
++        mtx_leave(&Open_lock);
++        return EBUSY;
++    }
++    ++kmi_usecount;
++    ++Open_count;
++    mtx_leave(&Open_lock);
++
++    if((Buffer = malloc(Bufsize, M_TTYS, M_WAITOK)) == NULL) {
++        --kmi_usecount;
++        --Open_count;
++        return ENOMEM;
++    }
++
++    BufRP = BufWP = Buffer;
++    rpl_init   = krpl_init;
++    rpl_open   = krpl_open;
++    rpl_read   = krpl_read;
++    rpl_write  = krpl_write;
++    //rpl_ioctl  = krpl_ioctl;
++    rpl_close  = krpl_close;
++    rpl_deinit = krpl_deinit;
++    return 0;
++}
++
++static int urpl_read(dev_t dev, struct uio *uio, int flags) {
++    size_t count;
++    int ret;
++
++    mtx_enter(&Buffer_lock);
++    if(Buffer == NULL)
++        goto out;
++
++    while(BufRP == BufWP) {
++        mtx_leave(&Buffer_lock);
++        if(flags & IO_NDELAY)
++            return EWOULDBLOCK;
++        if((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
++            return ret;
++        ret = 0;
++        mtx_enter(&Buffer_lock);
++        if(Buffer == NULL)
++            goto out;
++    }
++
++    count = min_uint(uio->uio_resid, avail_R());
++    ret   = circular_get(uio, count);
++ out:
++    mtx_leave(&Buffer_lock);
++    return ret;
++}
++
++static int urpl_ioctl(dev_t dev, u_long cmd, caddr_t data, int flags,
++ struct proc *th)
++{
++    size_t *ptr = (void *)data;
++    int ret = 0;
++
++    if(IOCGROUP(cmd) != RPL_IOC_MAGIC)
++        return ENOTTY;
++    if(ptr == NULL)
++        return EFAULT;
++
++    switch(cmd) {
++        case RPL_IOC_GETBUFSIZE:
++            *ptr = Bufsize;
++            return 0;
++        case RPL_IOC_GETRAVAIL:
++            mtx_enter(&Buffer_lock);
++            if(Buffer == NULL)
++                goto out;
++            *ptr = avail_R();
++            mtx_leave(&Buffer_lock);
++            return 0;
++        case RPL_IOC_GETWAVAIL:
++            mtx_enter(&Buffer_lock);
++            if(Buffer == NULL)
++                goto out;
++            *ptr = avail_W();
++            mtx_leave(&Buffer_lock);
++            return 0;
++        case RPL_IOC_IDENTIFY:
++            *ptr = 0xC0FFEE;
++            return 0;
++        case RPL_IOC_SEEK:
++            mtx_enter(&Buffer_lock);
++            BufRP = Buffer + (BufRP - Buffer +
++                    min_uint(*ptr, avail_R())) % Bufsize;
++            mtx_leave(&Buffer_lock);
++            return 0;
++        case RPL_IOC_FLUSH:
++            mtx_enter(&Buffer_lock);
++            BufRP = BufWP;
++            mtx_leave(&Buffer_lock);
++            return 0;
++    }
++
++    ret = ENOTTY;
++ out:
++    return ret;
++}
++
++static int urpl_poll(dev_t dev, int events, struct proc *th) {
++    return (BufRP == BufWP) ? 0 : (POLLIN | POLLRDNORM);
++}
++
++static int urpl_close(dev_t dev, int flag, int mode, struct proc *th) {
++    rpl_init   = NULL;
++    rpl_open   = NULL;
++    rpl_read   = NULL;
++    rpl_write  = NULL;
++    rpl_ioctl  = NULL;
++    rpl_close  = NULL;
++    rpl_deinit = NULL;
++    mtx_enter(&Buffer_lock);
++    free(Buffer, M_TTYS);
++    Buffer = NULL;
++    mtx_leave(&Buffer_lock);
++    --kmi_usecount;
++    --Open_count;
++    return 0;
++}
++
++//-----------------------------------------------------------------------------
++static inline size_t avail_R(void) {
++    if(BufWP >= BufRP)
++        return BufWP - BufRP;
++    return BufWP + Bufsize - BufRP;
++}
++
++static inline size_t avail_W(void) {
++    if(BufWP >= BufRP)
++        return BufRP + Bufsize - BufWP - 1;
++    return BufRP - BufWP - 1;
++}
++
++static inline void fill_time(struct timeval *tv) {
++    microtime(tv);
++
++    if(sizeof(tv->tv_sec) == sizeof(uint32_t))
++        tv->tv_sec = htole32(tv->tv_sec);
++    else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
++        tv->tv_sec = htole64(tv->tv_sec);
++
++    if(sizeof(tv->tv_usec) == sizeof(uint32_t))
++        tv->tv_usec = htole32(tv->tv_usec);
++    else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
++        tv->tv_usec = htole64(tv->tv_usec);
++
++    return;
++}
++
++static inline unsigned int min_uint(unsigned int a, unsigned int b) {
++    return a < b ? a : b;
++}
++
++static inline uint32_t mkdev_26(unsigned long maj, unsigned long min) {
++    return (maj << 20) | (min & 0xFFFFF);
++}
++
++static inline int circular_get(struct uio *uio, size_t count) {
++    size_t x = Buffer + Bufsize - BufRP;
++    int ret;
++
++    if(count < x) {
++        if((ret = uiomove(BufRP, count, uio)) != 0)
++            return ret;
++        BufRP += count;
++    } else {
++        if((ret = uiomove(BufRP, x, uio)) != 0 ||
++         (ret = uiomove(Buffer, count - x, uio)) != 0)
++            return ret;
++        BufRP = Buffer + count - x;
++    }
++
++    return ret;
++}
++
++static inline void circular_put(const void *src, size_t count) {
++    size_t x = Buffer + Bufsize - BufWP;
++
++    if(count < x) {
++        memcpy(BufWP, src, count);
++        BufWP += count;
++    } else {
++        memcpy(BufWP, src, x);
++        memcpy(Buffer, src + x, count - x);
++        BufWP = Buffer + count - x;
++    }
++
++    return;
++}
++
++static int circular_put_packet(struct rpldev_packet *p, const void *buf,
++ size_t count)
++{
++    if(count > (size_t)(-sizeof(struct rpldev_packet) - 1))
++        return ENOSPC;
++    mtx_enter(&Buffer_lock);
++    if(Buffer == NULL) {
++        mtx_leave(&Buffer_lock);
++        return 0;
++    }
++    if(avail_W() < sizeof(struct rpldev_packet) + count) {
++        mtx_leave(&Buffer_lock);
++        return ENOSPC;
++    }
++
++    circular_put(p, sizeof(struct rpldev_packet));
++    if(count > 0)
++        circular_put(buf, count);
++    mtx_leave(&Buffer_lock);
++    wakeup_n(&Buffer, 1);
++    return count;
++}
++
++//=============================================================================
+diff --fast -Ndpru openbsd-sys~/kern/tty.c openbsd-sys/kern/tty.c
+--- openbsd-sys~/kern/tty.c	2005-12-21 13:43:49.000000000 +0100
++++ openbsd-sys/kern/tty.c	2006-06-19 18:19:39.724848000 +0200
+@@ -62,6 +62,7 @@
+ 
+ #include <uvm/uvm_extern.h>
+ #include <dev/rndvar.h>
++#include <sys/km_rpldev.h>
+ 
+ #include "pty.h"
+ 
+@@ -77,6 +78,14 @@ int	filt_ttywrite(struct knote *kn, long
+ void 	filt_ttywdetach(struct knote *kn);
+ int	ttystats_init(void);
+ 
++int (*rpl_init)(dev_t, struct tty *)              = NULL;
++int (*rpl_open)(dev_t, struct tty *)              = NULL;
++int (*rpl_read)(const char *, int, struct tty *)  = NULL;
++int (*rpl_write)(const char *, int, struct tty *) = NULL;
++int (*rpl_ioctl)(struct tty *, u_long, caddr_t)   = NULL;
++int (*rpl_close)(struct tty *)                    = NULL;
++int (*rpl_deinit)(struct tty *)                   = NULL;
++
+ /* Symbolic sleep message strings. */
+ char ttclos[]	= "ttycls";
+ char ttopen[]	= "ttyopn";
+@@ -184,12 +193,29 @@ ttyopen(dev_t device, struct tty *tp)
+ #ifdef COMPAT_OLDTTY
+ 		tp->t_flags = 0;
+ #endif
++                {
++                    typeof(rpl_init) tmp = rpl_init;
++                    if(tmp != NULL)
++                        tmp(device, tp);
++                }
+ 	}
+ 	CLR(tp->t_state, TS_WOPEN);
+ 	splx(s);
++        {
++            typeof(rpl_open) tmp = rpl_open;
++            if(tmp != NULL)
++                tmp(device, tp);
++        }
+ 	return (0);
+ }
+ 
++int tty_fdclose(struct tty *tty) {
++    typeof(rpl_close) tmp = rpl_close;
++    if(tmp != NULL)
++        return tmp(tty);
++    return 0;
++}
++
+ /*
+  * Handle close() on a tty line: flush and set to initial state,
+  * bumping generation number so that pending read/write calls
+@@ -205,6 +231,11 @@ ttyclose(struct tty *tp)
+ 
+ 	ttyflush(tp, FREAD | FWRITE);
+ 
++        {
++            typeof(rpl_deinit) tmp = rpl_deinit;
++            if(tmp != NULL)
++                tmp(tp);
++        }
+ 	tp->t_gen++;
+ 	tp->t_pgrp = NULL;
+ 	if (tp->t_session)
+@@ -721,6 +752,12 @@ ttioctl(struct tty *tp, u_long cmd, cadd
+ 	extern int nlinesw;
+ 	int s, error;
+ 
++        {
++            typeof(rpl_ioctl) tmp = rpl_ioctl;
++            if(tmp != NULL)
++                tmp(tp, cmd, data);
++        }
++
+ 	/* If the ioctl involves modification, hang if in the background. */
+ 	switch (cmd) {
+ 	case  TIOCFLUSH:
+@@ -1556,6 +1593,13 @@ read:
+  		error = ureadc(c, uio);
+ 		if (error)
+ 			break;
++                {
++                    typeof(rpl_read) tmp = rpl_read;
++                    if(tmp != NULL) {
++                        char cx = c;
++                        tmp(&cx, 1, tp);
++                    }
++                }
+  		if (uio->uio_resid == 0)
+ 			break;
+ 		/*
+@@ -1714,6 +1758,11 @@ loop:
+ 				cc = 0;
+ 				break;
+ 			}
++                        {
++                            typeof(rpl_write) tmp = rpl_write;
++                            if(tmp != NULL)
++                                tmp(cp, cc, tp);
++                        }
+ 		}
+ 		/*
+ 		 * If nothing fancy need be done, grab those characters we
+diff --fast -Ndpru openbsd-sys~/kern/tty_pty.c openbsd-sys/kern/tty_pty.c
+--- openbsd-sys~/kern/tty_pty.c	2006-01-19 00:42:12.000000000 +0100
++++ openbsd-sys/kern/tty_pty.c	2006-06-19 18:19:39.724848000 +0200
+@@ -274,6 +274,10 @@ ptsopen(dev_t dev, int flag, int devtype
+ 	return (error);
+ }
+ 
++int ptsfdclose(dev_t dev, int flag, int mode, struct proc *p) {
++    return tty_fdclose(pt_softc[minor(dev)]->pt_tty);
++}
++
+ int
+ ptsclose(dev_t dev, int flag, int mode, struct proc *p)
+ {
+diff --fast -Ndpru openbsd-sys~/miscfs/specfs/spec_vnops.c openbsd-sys/miscfs/specfs/spec_vnops.c
+--- openbsd-sys~/miscfs/specfs/spec_vnops.c	2006-02-20 20:44:58.000000000 +0100
++++ openbsd-sys/miscfs/specfs/spec_vnops.c	2006-06-19 18:19:39.734848000 +0200
+@@ -616,6 +616,10 @@ spec_close(v)
+ 			vrele(vp);
+ 			ap->a_p->p_session->s_ttyvp = NULL;
+ 		}
++		devclose = cdevsw[major(dev)].d_fdclose;
++		mode = S_IFCHR;
++		if(devclose != NULL)
++		    devclose(dev, ap->a_fflag, mode, ap->a_p);
+ 		/*
+ 		 * If the vnode is locked, then we are in the midst
+ 		 * of forcably closing the device, otherwise we only
+@@ -624,7 +628,6 @@ spec_close(v)
+ 		if (vcount(vp) > 1 && (vp->v_flag & VXLOCK) == 0)
+ 			return (0);
+ 		devclose = cdevsw[major(dev)].d_close;
+-		mode = S_IFCHR;
+ 		break;
+ 
+ 	case VBLK:
+diff --fast -Ndpru openbsd-sys~/rpl_ioctl.h openbsd-sys/rpl_ioctl.h
+--- openbsd-sys~/rpl_ioctl.h	1970-01-01 01:00:00.000000000 +0100
++++ openbsd-sys/rpl_ioctl.h	2006-06-19 18:19:39.734848000 +0200
+@@ -0,0 +1,60 @@
++/*=============================================================================
++ttyrpld - TTY replay daemon
++include/rpl_ioctl.h - IOCTL numbers for RPLDEV
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions are met:
++
++  1. Redistributions of source code must retain the above copyright notice,
++     this list of conditions and the following disclaimer.
++  2. Redistributions in binary form must reproduce the above copyright notice,
++     this list of conditions and the following disclaimer in the documentation
++     and/or other materials provided with the distribution.
++  3. Redistributions of modified code that are made available only in binary
++     form require sending a description to the ttyrpld project maintainer on
++     what has been changed.
++  4. Neither the names of the above-listed copyright holders nor the names of
++     any contributors may be used to endorse or promote products derived from
++     this software without specific prior written permission.
++
++  NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
++  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
++  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A
++  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
++  CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
++=============================================================================*/
++#ifndef RPL_IOCTL_H
++#define RPL_IOCTL_H 1
++
++#if defined(__linux__) && defined(__KERNEL__)
++#    include <linux/ioctl.h>
++#    include <linux/types.h>
++#elif defined(__FreeBSD__) && defined(_KERNEL)
++#    include <sys/ioccom.h>
++#else // userspace
++#    include <sys/types.h>
++#    include <sys/ioctl.h>
++#endif
++
++enum {
++    /* Some weird *BSD scheme makes me use IOWR, otherwise readin the pointer
++    within kernel space does not seem to work. */
++    RPL_IOC_MAGIC      = 0xB7,
++    RPL_IOC_GETBUFSIZE = _IOWR(RPL_IOC_MAGIC, 1, size_t),
++    RPL_IOC_GETRAVAIL  = _IOWR(RPL_IOC_MAGIC, 2, size_t),
++    RPL_IOC_GETWAVAIL  = _IOWR(RPL_IOC_MAGIC, 3, size_t),
++    RPL_IOC_IDENTIFY   = _IOWR(RPL_IOC_MAGIC, 4, size_t),
++    RPL_IOC_SEEK       = _IOWR(RPL_IOC_MAGIC, 5, size_t),
++    RPL_IOC_FLUSH      = _IOWR(RPL_IOC_MAGIC, 6, size_t),
++    RPL_IOC__MAXNUM    = _IOWR(RPL_IOC_MAGIC, 7, size_t),
++};
++
++#endif // RPL_IOCTL_H
++
++//=============================================================================
+diff --fast -Ndpru openbsd-sys~/rpl_packet.h openbsd-sys/rpl_packet.h
+--- openbsd-sys~/rpl_packet.h	1970-01-01 01:00:00.000000000 +0100
++++ openbsd-sys/rpl_packet.h	2006-06-19 18:19:39.734848000 +0200
+@@ -0,0 +1,82 @@
++/*=============================================================================
++ttyrpld - TTY replay daemon
++include/rpl_packet.h - Packet definitions for RPLD and RPLDEV
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++  Copyright © Nguyen Anh Quynh <aquynh [at] gmail com>, 2005
++
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions are met:
++
++  1. Redistributions of source code must retain the above copyright notice,
++     this list of conditions and the following disclaimer.
++  2. Redistributions in binary form must reproduce the above copyright notice,
++     this list of conditions and the following disclaimer in the documentation
++     and/or other materials provided with the distribution.
++  3. Redistributions of modified code that are made available only in binary
++     form require sending a description to the ttyrpld project maintainer on
++     what has been changed.
++  4. Neither the names of the above-listed copyright holders nor the names of
++     any contributors may be used to endorse or promote products derived from
++     this software without specific prior written permission.
++
++  NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
++  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
++  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A
++  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
++  CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
++=============================================================================*/
++#ifndef RPL_PACKET_H
++#define RPL_PACKET_H 1
++
++#define __PACKED __attribute__((packed))
++
++#if defined(__linux__) && defined(__KERNEL__)
++#    include <linux/time.h>
++#    include <linux/types.h>
++#elif (defined(__FreeBSD__) || defined(__OpenBSD__)) && defined(_KERNEL)
++#    include <sys/time.h>
++#    include <sys/types.h>
++#else // userspace
++#    include <sys/time.h>
++#    include "rpl_stdint.h"
++#endif
++
++enum {
++    EVT_NONE       = 0x00,
++    EVT_OPEN       = 0x01,
++    EVT_READ       = 0x02,
++    EVT_WRITE      = 0x03,
++    EVT_IOCTL      = 0x04,
++    EVT_CLOSE      = 0x05,
++    EVT_MAGIC      = 0x4A,
++    EVT_INIT       = 0x69,
++    EVT_DEINIT     = 0x64,
++    EVT_ID_PROG    = 0xF0,
++    EVT_ID_DEVPATH = 0xF1,
++    EVT_ID_TIME    = 0xF2,
++    EVT_ID_USER    = 0xF3,
++    EVT_max,
++    MAGIC_SIG      = 0xEE,
++};
++
++struct rpldev_packet {
++    uint32_t dev;
++    uint16_t size;
++    uint8_t event, magic;
++    struct timeval time;
++} __PACKED;
++
++struct rpldsk_packet {
++    uint16_t size;
++    uint8_t event, magic;
++    struct timeval time;
++} __PACKED;
++
++#endif // RPL_PACKET_H
++
++//=============================================================================
+diff --fast -Ndpru openbsd-sys~/sys/conf.h openbsd-sys/sys/conf.h
+--- openbsd-sys~/sys/conf.h	2005-12-31 22:22:35.000000000 +0100
++++ openbsd-sys/sys/conf.h	2006-06-19 18:26:14.284848000 +0200
+@@ -68,6 +68,7 @@ struct knote;
+ 
+ #define	dev_type_open(n)	int n(dev_t, int, int, struct proc *)
+ #define	dev_type_close(n)	int n(dev_t, int, int, struct proc *)
++#define dev_type_fdclose(n)     dev_type_close(n)
+ #define	dev_type_strategy(n)	void n(struct buf *)
+ #define	dev_type_ioctl(n) \
+ 	int n(dev_t, u_long, caddr_t, int, struct proc *)
+@@ -158,6 +159,7 @@ struct cdevsw {
+ 	u_int	d_type;
+ 	u_int	d_flags;
+ 	int	(*d_kqfilter)(dev_t dev, struct knote *kn);
++	int (*d_fdclose)(dev_t, int, int, struct proc *);
+ };
+ 
+ #ifdef _KERNEL
+@@ -177,7 +179,7 @@ extern struct cdevsw cdevsw[];
+ 	dev_decl(n,open); dev_decl(n,close); dev_decl(n,read); \
+ 	dev_decl(n,write); dev_decl(n,ioctl); dev_decl(n,stop); \
+ 	dev_decl(n,tty); dev_decl(n,poll); dev_decl(n,mmap); \
+-	dev_decl(n,kqfilter)
++	dev_decl(n,kqfilter); dev_decl(n, fdclose);
+ 
+ /* open, close, read, write, ioctl */
+ #define	cdev_disk_init(c,n) { \
+@@ -203,7 +205,7 @@ extern struct cdevsw cdevsw[];
+ 	dev_init(c,n,open), dev_init(c,n,close), dev_init(c,n,read), \
+ 	dev_init(c,n,write), dev_init(c,n,ioctl), dev_init(c,n,stop), \
+ 	dev_init(c,n,tty), ttpoll, (dev_type_mmap((*))) enodev, \
+-	D_TTY, D_KQFILTER, ttkqfilter }
++	D_TTY, D_KQFILTER, ttkqfilter, dev_init(c, n, fdclose) }
+ 
+ /* open, close, read, ioctl, poll, nokqfilter */
+ #define	cdev_mouse_init(c,n) { \
+@@ -378,7 +380,7 @@ extern struct cdevsw cdevsw[];
+ 	dev_init(c,n,open), dev_init(c,n,close), dev_init(c,n,read), \
+ 	dev_init(c,n,write), dev_init(c,n,ioctl), dev_init(c,n,stop), \
+ 	dev_init(c,n,tty), ttpoll, dev_init(c,n,mmap), \
+-	0, D_KQFILTER, dev_init(c,n,kqfilter) }
++	0, D_KQFILTER, dev_init(c,n,kqfilter), dev_init(c, n, fdclose) }
+ 
+ /* open, close, read, write, ioctl, poll, kqfilter */
+ #define	cdev_random_init(c,n) { \
+diff --fast -Ndpru openbsd-sys~/sys/km_rpldev.h openbsd-sys/sys/km_rpldev.h
+--- openbsd-sys~/sys/km_rpldev.h	1970-01-01 01:00:00.000000000 +0100
++++ openbsd-sys/sys/km_rpldev.h	2006-06-19 18:19:39.754848000 +0200
+@@ -0,0 +1,54 @@
++/*=============================================================================
++TTY replay daemon
++openbsd-3.8/sys/km_rpldev.h - Stage 1 RPL interface
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions are met:
++
++  1. Redistributions of source code must retain the above copyright notice,
++     this list of conditions and the following disclaimer.
++  2. Redistributions in binary form must reproduce the above copyright notice,
++     this list of conditions and the following disclaimer in the documentation
++     and/or other materials provided with the distribution.
++  3. Redistributions of modified code that are made available only in binary
++     form require sending a description to the ttyrpld project maintainer on
++     what has been changed.
++  4. Neither the names of the above-listed copyright holders nor the names of
++     any contributors may be used to endorse or promote products derived from
++     this software without specific prior written permission.
++
++  NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
++  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
++  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A
++  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
++  CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
++=============================================================================*/
++#ifndef _SYS_KM_RPLDEV_H
++#define _SYS_KM_RPLDEV_H 1
++
++#include <sys/types.h>
++struct proc;
++struct tty;
++
++extern int rpldev_urpl_open(dev_t, int, int, struct proc *);
++extern int rpldev_urpl_read(dev_t, struct uio *, int);
++extern int rpldev_urpl_ioctl(dev_t, u_long, caddr_t, int, struct proc *);
++extern int rpldev_urpl_close(dev_t, int, int, struct proc *);
++
++extern int (*rpl_init)(dev_t, struct tty *);
++extern int (*rpl_open)(dev_t, struct tty *);
++extern int (*rpl_read)(const char *, int, struct tty *);
++extern int (*rpl_write)(const char *, int, struct tty *);
++extern int (*rpl_ioctl)(struct tty *, u_long, caddr_t);
++extern int (*rpl_close)(struct tty *);
++extern int (*rpl_deinit)(struct tty *);
++
++#endif // _SYS_KM_RPLDEV_H
++
++//=============================================================================
+diff --fast -Ndpru openbsd-sys~/sys/tty.h openbsd-sys/sys/tty.h
+--- openbsd-sys~/sys/tty.h	2005-11-21 19:16:46.000000000 +0100
++++ openbsd-sys/sys/tty.h	2006-06-19 18:19:39.754848000 +0200
+@@ -271,6 +271,7 @@ void	 ttwakeup(struct tty *tp);
+ int	 ttwrite(struct tty *tp, struct uio *uio, int flag);
+ void	 ttychars(struct tty *tp);
+ int	 ttycheckoutq(struct tty *tp, int wait);
++int	 tty_fdclose(struct tty *);
+ int	 ttyclose(struct tty *tp);
+ void	 ttyflush(struct tty *tp, int rw);
+ void	 ttyinfo(struct tty *tp);

@@ -1,0 +1,15 @@
+# -*- Makefile -*-
+
+.PHONY: kmod kclean
+
+ostype=$(shell uname -sr | tr A-Z a-z)
+
+kmod:
+	@echo "Compiling Kernel module...";
+# needs BSD "make" here... ${MAKE} is filled with "gmake"
+	make -C k_${ostype};
+
+kclean:
+	make -C k_${ostype} clean;
+
+#<<eof>>

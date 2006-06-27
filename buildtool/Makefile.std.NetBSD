@@ -1,0 +1,7 @@
+# -*- Makefile -*-
+
+CFLAGS     += -I/usr/local/include
+LDFLAGS    += -L/usr/local/lib
+EXT_LDLIBS += -lintl
+
+#<<eof>>

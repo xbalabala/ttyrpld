@@ -1,0 +1,16 @@
+# -*- Makefile -*-
+
+# 1. ttyrpld is preferably compiled with gcc3 or better.
+#
+# 2. OpenBSD 3.6 had gcc2, the updated gcc3 from ports was called "egcc" then.
+#
+# 3. libintl.so does not have any reference to libiconv.so (like it should be),
+#    so we have to specify it too:
+
+#CC         := egcc
+#LD         := egcc
+CFLAGS     += -I/usr/local/include
+LDFLAGS    += -L/usr/local/lib
+EXT_LDLIBS += -liconv -lintl
+
+#<<eof>>

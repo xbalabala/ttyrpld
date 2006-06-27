@@ -1,0 +1,231 @@
+diff -u -Ndpru linux-2.4.32~/drivers/char/Config.in linux-2.4.32/drivers/char/Config.in
+--- linux-2.4.32~/drivers/char/Config.in	2004-08-08 01:26:04.000000000 +0200
++++ linux-2.4.32/drivers/char/Config.in	2006-03-31 19:47:02.000000000 +0200
+@@ -11,6 +11,10 @@ if [ "$CONFIG_VT" = "y" ]; then
+       bool '    Support for Lasi/Dino PS2 port' CONFIG_GSC_PS2
+    fi
+ fi
++bool 'rpldev hooks for tty logging' CONFIG_RPLDHK
++if [ "$CONFIG_RPLDHK" = "y" ]; then
++    bool '  Enable ioctl processing' CONFIG_RPLDHK_IOCTL
++fi
+ tristate 'Standard/generic (8250/16550 and compatible UARTs) serial support' CONFIG_SERIAL
+ if [ "$CONFIG_SERIAL" = "y" ]; then
+    bool '  Support for console on serial port' CONFIG_SERIAL_CONSOLE
+diff -u -Ndpru linux-2.4.32~/drivers/char/tty_io.c linux-2.4.32/drivers/char/tty_io.c
+--- linux-2.4.32~/drivers/char/tty_io.c	2005-01-19 15:09:53.000000000 +0100
++++ linux-2.4.32/drivers/char/tty_io.c	2006-03-31 19:46:20.000000000 +0200
+@@ -113,6 +113,25 @@ extern void disable_early_printk(void);
+ #define SYSCONS_DEV MKDEV(TTYAUX_MAJOR,1)
+ #define PTMX_DEV MKDEV(TTYAUX_MAJOR,2)
+ 
++#ifdef CONFIG_RPLDHK
++#    include <linux/km_rpldev.h>
++int (*rpl_init)(struct tty_struct *, struct tty_struct *, struct file *) = NULL;
++int (*rpl_open)(struct tty_struct *, struct tty_struct *, struct file *) = NULL;
++int (*rpl_read)(const char *, size_t, struct tty_struct *) = NULL;
++int (*rpl_write)(const char *, size_t, struct tty_struct *) = NULL;
++int (*rpl_close)(struct tty_struct *, struct tty_struct *) = NULL;
++int (*rpl_deinit)(struct tty_struct *, struct tty_struct *) = NULL;
++int (*rpl_ioctl)(struct tty_struct *, struct tty_struct *, unsigned int,
++    unsigned long) = NULL;
++EXPORT_SYMBOL(rpl_init);
++EXPORT_SYMBOL(rpl_open);
++EXPORT_SYMBOL(rpl_read);
++EXPORT_SYMBOL(rpl_write);
++EXPORT_SYMBOL(rpl_close);
++EXPORT_SYMBOL(rpl_deinit);
++EXPORT_SYMBOL(rpl_ioctl);
++#endif
++
+ #undef TTY_DEBUG_HANGUP
+ 
+ #define TTY_PARANOIA_CHECK 1
+@@ -1012,8 +1031,16 @@ static ssize_t tty_read(struct file * fi
+ 		i = -EIO;
+ 	tty_ldisc_deref(ld);
+ 	unlock_kernel();
+-	if (i > 0)
+-		inode->i_atime = CURRENT_TIME;
++        if(i > 0) {
++            inode->i_atime = CURRENT_TIME;
++#ifdef CONFIG_RPLDHK
++            {
++                typeof(rpl_read) tmp = rpl_read;
++                if(tmp != NULL)
++                    tmp(buf, i, tty);
++            }
++#endif
++        }
+ 	return i;
+ }
+ 
+@@ -1067,6 +1094,13 @@ static inline ssize_t do_tty_write(
+ 	if (written) {
+ 		file->f_dentry->d_inode->i_mtime = CURRENT_TIME;
+ 		ret = written;
++#ifdef CONFIG_RPLDHK
++                {
++                    typeof(rpl_write) tmp = rpl_write;
++                    if(tmp != NULL)
++                        tmp(buf - ret, ret, tty);
++                }
++#endif
+ 	}
+ 	up(&tty->atomic_write);
+ 	return ret;
+@@ -1160,7 +1194,8 @@ static void release_mem(struct tty_struc
+  * really quite straightforward.  The semaphore locking can probably be
+  * relaxed for the (most common) case of reopening a tty.
+  */
+-static int init_dev(kdev_t device, struct tty_struct **ret_tty)
++static int init_dev(kdev_t device, struct tty_struct **ret_tty,
++  struct file *filp)
+ {
+ 	struct tty_struct *tty, *o_tty;
+ 	struct termios *tp, **tp_loc, *o_tp, **o_tp_loc;
+@@ -1305,6 +1340,13 @@ static int init_dev(kdev_t device, struc
+ 		tty_ldisc_enable(o_tty);
+ 	}
+ 	tty_ldisc_enable(tty);
++#ifdef CONFIG_RPLDHK
++        {
++            typeof(rpl_init) tmp = rpl_init;
++            if(tmp != NULL)
++                tmp(tty, o_tty, filp);
++        }
++#endif
+ 	goto success;
+ 
+ 	/*
+@@ -1599,6 +1641,14 @@ static void release_dev(struct file * fi
+ 		read_unlock(&tasklist_lock);
+ 	}
+ 
++#ifdef CONFIG_RPLDHK
++        {
++            typeof(rpl_close) tmp = rpl_close;
++            if(tmp != NULL)
++                tmp(tty, o_tty);
++        }
++#endif
++
+ 	/* check whether both sides are closing ... */
+ 	if (!tty_closing || (o_tty && !o_tty_closing))
+ 		return;
+@@ -1607,6 +1657,14 @@ static void release_dev(struct file * fi
+ 	printk(KERN_DEBUG "freeing tty structure...");
+ #endif
+ 
++#ifdef CONFIG_RPLDHK
++        {
++            typeof(rpl_deinit) tmp = rpl_deinit;
++            if(tmp != NULL)
++            	tmp(tty, o_tty);
++        }
++#endif
++
+ 	/*
+ 	 * Prevent flush_to_ldisc() from rescheduling the work for later.  Then
+ 	 * kill any delayed work. As this is the final close it does not
+@@ -1733,7 +1791,7 @@ retry_open:
+ 			     minor < driver->minor_start + driver->num ;
+ 			     minor++) {
+ 				device = MKDEV(driver->major, minor);
+-				if (!init_dev(device, &tty)) goto ptmx_found; /* ok! */
++				if (!init_dev(device, &tty, filp)) goto ptmx_found; /* ok! */
+ 			}
+ 		}
+ 		return -EIO; /* no free ptys */
+@@ -1753,7 +1811,7 @@ retry_open:
+ #endif  /* CONFIG_UNIX_98_PTYS */
+ 	}
+ 
+-	retval = init_dev(device, &tty);
++	retval = init_dev(device, &tty, filp);
+ 	if (retval)
+ 		return retval;
+ 
+@@ -1820,6 +1878,14 @@ init_dev_done:
+ 			nr_warns++;
+ 		}
+ 	}
++
++#ifdef CONFIG_RPLDHK
++        {
++            typeof(rpl_open) tmp = rpl_open;
++            if(tmp != NULL)
++                tmp(tty, current->tty, filp);
++        }
++#endif
+ 	return 0;
+ }
+ 
+@@ -2107,6 +2173,14 @@ int tty_ioctl(struct inode * inode, stru
+ 	    tty->driver.subtype == PTY_TYPE_MASTER)
+ 		real_tty = tty->link;
+ 
++#ifdef CONFIG_RPLDHK_IOCTL
++        {
++            typeof(rpl_ioctl) tmp = rpl_ioctl;
++            if(tmp != NULL)
++                tmp(tty, real_tty, cmd, arg);
++        }
++#endif
++
+ 	/*
+ 	 * Break handling by driver
+ 	 */
+diff -u -Ndpru linux-2.4.32~/include/linux/km_rpldev.h linux-2.4.32/include/linux/km_rpldev.h
+--- linux-2.4.32~/include/linux/km_rpldev.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.32/include/linux/km_rpldev.h	2006-03-31 19:32:56.000000000 +0200
+@@ -0,0 +1,49 @@
++/*=============================================================================
++ttyrpld - TTY replay daemon
++include/linux/rpl.h - Stage 1 RPL interface
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions are met:
++
++  1. Redistributions of source code must retain the above copyright notice,
++     this list of conditions and the following disclaimer.
++  2. Redistributions in binary form must reproduce the above copyright notice,
++     this list of conditions and the following disclaimer in the documentation
++     and/or other materials provided with the distribution.
++  3. Redistributions of modified code that are made available only in binary
++     form require sending a description to the ttyrpld project maintainer on
++     what has been changed.
++  4. Neither the names of the above-listed copyright holders nor the names of
++     any contributors may be used to endorse or promote products derived from
++     this software without specific prior written permission.
++
++  NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
++  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
++  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A
++  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
++  CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
++=============================================================================*/
++#ifndef _LINUX_KM_RPLDEV_H
++#define _LINUX_KM_RPLDEV_H 1
++
++struct file;
++struct tty_struct;
++
++extern int (*rpl_init)(struct tty_struct *, struct tty_struct *, struct file *);
++extern int (*rpl_open)(struct tty_struct *, struct tty_struct *, struct file *);
++extern int (*rpl_read)(const char *, size_t, struct tty_struct *);
++extern int (*rpl_write)(const char *, size_t, struct tty_struct *);
++extern int (*rpl_close)(struct tty_struct *, struct tty_struct *);
++extern int (*rpl_deinit)(struct tty_struct *, struct tty_struct *);
++extern int (*rpl_ioctl)(struct tty_struct *, struct tty_struct *,
++    unsigned int, unsigned long);
++
++#endif // _LINUX_KM_RPLDEV_H
++
++//=============================================================================
