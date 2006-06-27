@@ -542,7 +542,7 @@ static int init_device(const char *in_devs) {
         if(errno != ENOENT) {
             if(errno == EACCES)
                 fprintf(stderr, _("The device should be owned by the user "
-                 "running rpld (uid %ld) and have mode 0400.\n"), GOpt.user_id);
+                 "running rpld (UID %ld) and have mode 0400.\n"), GOpt.user_id);
             fprintf(stderr, _("static_find(): Could not open %s even"
              " though it exists: %s (trying next device)\n"),
              devp, strerror(errno));

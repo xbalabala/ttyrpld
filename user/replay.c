@@ -98,12 +98,11 @@ int main(int argc, const char **argv) {
         return EXIT_FAILURE;
 
     fprintf(stderr, "> ttyreplay " TTYRPLD_VERSION "\n");
-    fprintf(stderr,
-      _("This program comes with ABSOLUTELY NO WARRANTY; it is free"
-      " software\n" "and you are welcome to redistribute it under certain"
-      " conditions; for\n" "details see the \"LICENSE\" file which should"
-      " have come with this program.\n")
-    );
+    fprintf(stderr, _(
+        "This program comes with ABSOLUTELY NO WARRANTY; it is free software and you\n"
+        "you are welcome to redistribute it under certain conditions; for details see\n"
+        "the \"LICENSE.GPL2\" file which should have come with this program.\n"
+    ));
 
     ++argv;
     --argc;

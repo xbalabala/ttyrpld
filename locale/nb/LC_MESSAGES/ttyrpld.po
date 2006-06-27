@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: ttyrpld 2.02\n"
+"Project-Id-Version: ttyrpld 2.17\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2005-06-28 18:52+0100\n"
+"PO-Revision-Date: 2006-06-27 21:22+0100\n"
 "Last-Translator: Esben Stien <executiv [at] online no>\n"
 "Language-Team:  <ttyrpld-user [at] lists sourceforge net>\n"
 "MIME-Version: 1.0\n"
@@ -15,131 +15,12 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: user\n"
 
-#: user/replay.c:102
-#: user/rpld.c:138
+#: user/infod.c:132
 #, c-format
-msgid ""
-"This program comes with ABSOLUTELY NO WARRANTY; it is free software\n"
-"and you are welcome to redistribute it under certain conditions; for\n"
-"details see the \"LICENSE\" file which should have come with this program.\n"
-msgstr ""
-"This program comes with ABSOLUTELY NO WARRANTY; it is free software\n"
-"and you are welcome to redistribute it under certain conditions; for\n"
-"details see the \"LICENSE\" file which should have come with this program.\n"
+msgid "[infod] Unknown request %d, closing connection to not run into conversion problems.\n"
+msgstr "[infod] Ukjent forespørsel %d, stenger forbindelsen for å ikke få konverteringsproblemer.\n"
 
-#: user/replay.c:110
-#, c-format
-msgid "No arguments given but STDIN seems to be a pipe/file -- replaying from STDIN\n"
-msgstr "Ingen argumenter gitt, men STDIN ser ut til å være en pipe/fil -- spiller av fra STDIN\n"
-
-#: user/replay.c:114
-#, c-format
-msgid "No filename(s) given.\n"
-msgstr "Ingen filnavn gitt.\n"
-
-#: user/replay.c:128
-#, c-format
-msgid "Could not open %s: %s\n"
-msgstr "Kunne ikke åpne %s: %s\n"
-
-#: user/replay.c:176
-#, c-format
-msgid ""
-"\n"
-"<Packet inconsistency! Trying to find next valid packet.>\n"
-msgstr ""
-"\n"
-"<Inkonsistens i pakken! Prøver å finne neste gyldige pakke.>\n"
-
-#: user/replay.c:194
-msgid "Created using"
-msgstr "Lagd med"
-
-#: user/replay.c:199
-msgid "Device path"
-msgstr "Enhetssti"
-
-#: user/replay.c:205
-msgid "<tty device has been closed>"
-msgstr "<tty-enheten er stengt>"
-
-#: user/replay.c:229
-msgid "<Error while reading from stream>"
-msgstr "<Feil oppstod mens datastrømmen ble lest>"
-
-#: user/replay.c:233
-#, c-format
-msgid "<Log replaying of %s finished>"
-msgstr "<Avspilling av loggen %s er ferdig>"
-
-#: user/replay.c:309
-#, c-format
-msgid "Calculating average overhead..."
-msgstr "Kalkulerer gjennomsnittlig overhead..."
-
-#: user/replay.c:404
-#, c-format
-msgid ""
-"\n"
-"<Found packet boundary>\n"
-msgstr ""
-"\n"
-"<Fant pakkegrense>\n"
-
-#: user/replay.c:429
-msgid "Do not enable playing controls"
-msgstr "Ikke aktiver avspillingskontroll"
-
-#: user/replay.c:431
-msgid "Live feed follow mode (like `tail -f`)"
-msgstr "Live-Modus (som `tail -f`)"
-
-#: user/replay.c:433
-msgid "Seek to time position (HH:MM:SS or total SEC, see docs)"
-msgstr "Søk til tidsposisjon (HH:MM:SS eller total SEC, see dokumentasjonen)"
-
-#: user/replay.c:436
-msgid "Speed factor (default: 1.0)"
-msgstr "Hastighetsfaktor (Default: 1.0)"
-
-#: user/replay.c:438
-msgid "No delays (useful for text file grepping)"
-msgstr "Ingen forsinkelse (nyttig for tekstfil grep'ing)"
-
-#: user/replay.c:440
-msgid "Catch-up follow mode (play file, switch to live feed on EOF)"
-msgstr "Catch-up follow mode (spill fil, bytt til live feed idet EOF inntreffer)"
-
-#: user/replay.c:442
-msgid "Skip the given number of EVT_WRITE packets"
-msgstr "Hopp over gitt antall av EVT_WRITE pakker"
-
-#: user/replay.c:444
-msgid "Maximum delay to wait between packets"
-msgstr "Maksimum ventetid mellom pakker"
-
-#: user/replay.c:444
-msgid "msec"
-msgstr ""
-
-#: user/replay.c:446
-msgid "Show the timestamp at the top of the screen"
-msgstr "Vis tidsstempel i toppen av skjermbildet"
-
-#: user/replay.c:531
-msgid "<Switching to live feed follow mode>"
-msgstr "<Skifter til sanntidsmating følge modus>"
-
-#: user/replay.c:547
-#, c-format
-msgid ""
-"Reading from something that does not support seeking (a pipe?),\n"
-"skipping to a position where reading would block\n"
-msgstr ""
-"Leser fra noe som ikke støtter søking (en Pipe?),\n"
-"hopper til en posisjon hvor lesing ikke blokkerer\n"
-
-#: user/rdsh.c:81
+#: user/rdsh.c:82
 #, c-format
 msgid "%s: Memory allocation failure\n"
 msgstr "%s: Minneallokering feil\n"
@@ -149,101 +30,113 @@ msgstr "%s: Minneallokering feil\n"
 msgid "Connection to %s failed: %s\n"
 msgstr "Forbindelse til %s feilet: %s\n"
 
-#: user/rplctl.c:73
+#: user/rplctl.c:72
 msgid "TTY"
 msgstr "TTY"
 
-#: user/rplctl.c:73
+#: user/rplctl.c:72
 msgid "BYTES IN"
 msgstr "BYTES INN"
 
-#: user/rplctl.c:74
+#: user/rplctl.c:73
 msgid "OUT"
 msgstr "UT"
 
-#: user/rplctl.c:74
+#: user/rplctl.c:73
 msgid "FILENAME"
 msgstr "FILNAVN"
 
-#: user/rplctl.c:95
+#: user/rplctl.c:93
 #, c-format
 msgid "getdev(): Incorrect device number specification \"%s\", should be \"=%%d:%%d\"\n"
 msgstr "getdev(): Inkorrekt enhetsnummer spesifikasjon \"%s\", skulle vært \"=%%d:%%d\"\n"
 
-#: user/rplctl.c:119
+#: user/rplctl.c:117
 #, c-format
 msgid "Cannot stat %s: %s\n"
 msgstr "Kan ikke få stat %s: %s\n"
 
-#: user/rplctl.c:126
+#: user/rplctl.c:124
 #, c-format
 msgid "Cannot find %s\n"
 msgstr "Kan ikke finne %s\n"
 
-#: user/rplctl.c:191
+#: user/rplctl.c:189
 msgid "Capture data from tty"
 msgstr "Motta data fra tty"
 
+#: user/rplctl.c:189
 #: user/rplctl.c:191
-#: user/rplctl.c:193
+#: user/rplctl.c:194
 #: user/rplctl.c:196
 #: user/rplctl.c:198
 #: user/rplctl.c:200
-#: user/rplctl.c:202
 msgid "tty"
 msgstr "tty"
 
-#: user/rplctl.c:193
+#: user/rplctl.c:191
 msgid "Ignore data from tty"
 msgstr "Ignorer data fra TTY"
 
-#: user/rplctl.c:195
+#: user/rplctl.c:193
 msgid "Explicitly request info about all [or given] ttys"
 msgstr "Eksplisitt spørring etter info på alle [eller gitte] TTY'er"
 
-#: user/rplctl.c:198
+#: user/rplctl.c:196
 msgid "Ignore data from tty until next tty session"
 msgstr "Ignorer data fra tty inntil neste tty sesjon"
 
-#: user/rplctl.c:200
+#: user/rplctl.c:198
 msgid "Close the tty's logfile"
 msgstr "Lukk tty loggfil"
 
-#: user/rplctl.c:202
+#: user/rplctl.c:200
 msgid "Zero all packet and byte counters"
 msgstr "Nullstill alle pakke og oktett tellere"
 
-#: user/rplctl.c:204
+#: user/rplctl.c:202
 msgid "Path to the INFOD socket"
 msgstr "Sti til INFOD-Socket"
 
-#: user/rplctl.c:204
-#: user/rpld.c:619
-#: user/rpld.c:630
+#: user/rplctl.c:202
+#: user/rpld.c:703
+#: user/rpld.c:714
 msgid "file"
 msgstr "fil"
 
-#: user/rplctl.c:206
-#, fuzzy
+#: user/rplctl.c:204
 msgid "Generate grepable output"
 msgstr "Generer enkel ekstraktbar utdata"
 
-#: user/rpld.c:121
+#: user/rpld.c:111
 #, c-format
 msgid "/etc/rpld.conf exists but could not be read: %s\n"
 msgstr "/etc/rpld.conf eksisterer, men kunne ikke bli lest: %s\n"
 
-#: user/rpld.c:125
+#: user/rpld.c:114
+#, c-format
+msgid "/usr/local/etc/rpld.conf exists but could not be read: %s\n"
+msgstr "/etc/rpld.conf eksisterer, men kunne ikke bli lest: %s\n"
+
+#: user/rpld.c:117
 #, c-format
 msgid "$BINPATH/rpld.conf exists but could not be read: %s\n"
 msgstr "$BINPATH/rpld.conf eksisterer, men kunne ikke bli lest: %s\n"
 
-#: user/rpld.c:151
+#: user/rpld.c:130
+#, c-format
+msgid ""
+"This program comes with ABSOLUTELY NO WARRANTY; it is free software and you\n"
+"you are welcome to redistribute it under certain conditions; for details see\n"
+"the \"LICENSE.GPL2\" file which should have come with this program.\n"
+msgstr ""
+
+#: user/rpld.c:143
 #, c-format
 msgid "No device could be opened, aborting.\n"
 msgstr "Ingen enhet kunne åpnes. Avbryter.\n"
 
-#: user/rpld.c:190
+#: user/rpld.c:176
 #, c-format
 msgid ""
 "\n"
@@ -252,42 +145,47 @@ msgstr ""
 "\n"
 "Short read: %ld byte bare. Feil %d: %s\n"
 
-#: user/rpld.c:204
+#: user/rpld.c:190
 #, c-format
 msgid "Bogus packet (magic is 0x%02X)!\n"
 msgstr "Feil i pakke (Signatur er 0x%02X)!\n"
 
-#: user/rpld.c:270
+#: user/rpld.c:256
 #, c-format
 msgid "Unknown packet type 0x%02X\n"
 msgstr "Ukjent pakketype 0x%02X\n"
 
-#: user/rpld.c:313
+#: user/rpld.c:299
 #, c-format
 msgid "Should never get here! (%s:%d) Forgot to code something? (event=%d)\n"
 msgstr "Dette skal egentlig aldri skje! (%s:%d) Glemte vi å kode noe? (Event=%d)\n"
 
-#: user/rpld.c:361
+#: user/rpld.c:350
 #, c-format
 msgid "Directory permission denied: It won't be possible to write to the file %s, expect warnings.\n"
 msgstr "Filkatalog adgang forbudt: Det vil ikke være mulig å skrive til filen %s. Forvent advarsler.\n"
 
-#: user/rpld.c:453
+#: user/rpld.c:478
 msgid "NONE"
 msgstr "INGEN"
 
-#: user/rpld.c:508
-#: user/rpld.c:512
+#: user/rpld.c:534
+#: user/rpld.c:539
 #, c-format
 msgid "Connected to %s\n"
 msgstr "Tilkoblet til %s\n"
 
-#: user/rpld.c:516
+#: user/rpld.c:544
+#, c-format
+msgid "The device should be owned by the user running rpld (UID %ld) and have mode 0400.\n"
+msgstr ""
+
+#: user/rpld.c:546
 #, c-format
 msgid "static_find(): Could not open %s even though it exists: %s (trying next device)\n"
 msgstr "static_find(): Kunne ikke åpne %s selv om den eksisterer: %s (prøver neste enhet)\n"
 
-#: user/rpld.c:521
+#: user/rpld.c:550
 #, c-format
 msgid ""
 "\tThe RPL device can only be opened once,\n"
@@ -296,12 +194,12 @@ msgstr ""
 "\tRPL-enheten kan bare åpnes en gang,\n"
 "\tdet er muligen en instans av rpld som kjører!\n"
 
-#: user/rpld.c:588
+#: user/rpld.c:587
 #, c-format
 msgid "Second time we received SIGINT/SIGTERM, exiting immediately.\n"
 msgstr "Andre gangen vi mottok SIGINT/SIGTERM. Avbryter umiddelbart.\n"
 
-#: user/rpld.c:594
+#: user/rpld.c:592
 #, c-format
 msgid ""
 "\n"
@@ -310,7 +208,7 @@ msgstr ""
 "\n"
 "Mottok SIGINT/SIGTERM. Avbryter.\n"
 
-#: user/rpld.c:611
+#: user/rpld.c:609
 #, c-format
 msgid ""
 "\n"
@@ -319,58 +217,173 @@ msgstr ""
 "\n"
 "[%d] SIGPIPE mottat\n"
 
-#: user/rpld.c:619
+#: user/rpld.c:703
 #, fuzzy
 msgid "Path to the RPL device"
 msgstr "Sti til INFOD-Socket"
 
-#: user/rpld.c:621
+#: user/rpld.c:705
 msgid "Start INFOD subcomponent"
 msgstr ""
 
-#: user/rpld.c:623
+#: user/rpld.c:707
 msgid "Override OFMT variable"
 msgstr "Overkjør OFMT variabel"
 
-#: user/rpld.c:623
+#: user/rpld.c:707
 msgid "string"
 msgstr "string"
 
-#: user/rpld.c:625
+#: user/rpld.c:709
 msgid "Deactivate logging, only do bytecounting"
 msgstr "Deaktiver logging, bare gjøre byte telling"
 
-#: user/rpld.c:627
+#: user/rpld.c:711
 msgid "User to change to"
 msgstr "Bruker som skal skiftes til"
 
-#: user/rpld.c:627
+#: user/rpld.c:711
 msgid "user"
 msgstr "bruker"
 
-#: user/rpld.c:629
+#: user/rpld.c:713
 msgid "Read configuration from file"
 msgstr "Les konfigurasjon fra fil"
 
-#: user/rpld.c:632
+#: user/rpld.c:716
 msgid "Do not start INFOD subcomponent"
 msgstr "Ikke start INFOD underkomponent"
 
-#: user/rpld.c:634
+#: user/rpld.c:718
 msgid "Print warnings/errors to syslog"
 msgstr "Skriv ut advarsler/feil til syslog"
 
-#: user/rpld.c:636
+#: user/rpld.c:720
 msgid "Print statistics while rpld is running (overrides -s)"
 msgstr "Skriv ut statistikk mens rpld kjører (overkjører -s)"
 
-#: user/rpld.c:683
+#: user/rpld.c:735
 #, c-format
 msgid "No such user: %s\n"
 msgstr "Ingen slik bruker: %s\n"
 
-#: user/infod.c:130
+#: user/replay.c:112
 #, c-format
-msgid "[infod] Unknown request %d, closing connection to not run into conversion problems.\n"
-msgstr "[infod] Ukjent forespørsel %d, stenger forbindelsen for å ikke få konverteringsproblemer.\n"
+msgid "No arguments given but STDIN seems to be a pipe/file -- replaying from STDIN\n"
+msgstr "Ingen argumenter gitt, men STDIN ser ut til å være en pipe/fil -- spiller av fra STDIN\n"
+
+#: user/replay.c:116
+#, c-format
+msgid "No filename(s) given.\n"
+msgstr "Ingen filnavn gitt.\n"
+
+#: user/replay.c:131
+#, c-format
+msgid "Could not open %s: %s\n"
+msgstr "Kunne ikke åpne %s: %s\n"
+
+#: user/replay.c:181
+#, c-format
+msgid ""
+"\n"
+"<Packet inconsistency! Trying to find next valid packet.>\n"
+msgstr ""
+"\n"
+"<Inkonsistens i pakken! Prøver å finne neste gyldige pakke.>\n"
+
+#: user/replay.c:199
+msgid "Created using"
+msgstr "Lagd med"
+
+#: user/replay.c:204
+msgid "Device path"
+msgstr "Enhetssti"
+
+#: user/replay.c:209
+msgid "Recorded on"
+msgstr ""
+
+#: user/replay.c:214
+msgid "User"
+msgstr "bruker"
+
+#: user/replay.c:220
+msgid "<tty device has been closed>"
+msgstr "<tty-enheten er stengt>"
+
+#: user/replay.c:245
+msgid "<Error while reading from stream>"
+msgstr "<Feil oppstod mens datastrømmen ble lest>"
+
+#: user/replay.c:248
+#, c-format
+msgid "<Log replaying of %s finished>"
+msgstr "<Avspilling av loggen %s er ferdig>"
+
+#: user/replay.c:327
+#, c-format
+msgid "Calculating average overhead..."
+msgstr "Kalkulerer gjennomsnittlig overhead..."
+
+#: user/replay.c:423
+#, c-format
+msgid ""
+"\n"
+"<Found packet boundary>\n"
+msgstr ""
+"\n"
+"<Fant pakkegrense>\n"
+
+#: user/replay.c:448
+msgid "Do not enable playing controls"
+msgstr "Ikke aktiver avspillingskontroll"
+
+#: user/replay.c:450
+msgid "Live feed follow mode (like `tail -f`)"
+msgstr "Live-Modus (som `tail -f`)"
+
+#: user/replay.c:452
+msgid "Seek to time position (HH:MM:SS or total SEC, see docs)"
+msgstr "Søk til tidsposisjon (HH:MM:SS eller total SEC, see dokumentasjonen)"
+
+#: user/replay.c:455
+msgid "Speed factor (default: 1.0)"
+msgstr "Hastighetsfaktor (Default: 1.0)"
+
+#: user/replay.c:457
+msgid "No delays (useful for text file grepping)"
+msgstr "Ingen forsinkelse (nyttig for tekstfil grep'ing)"
+
+#: user/replay.c:459
+msgid "Catch-up follow mode (play file, switch to live feed on EOF)"
+msgstr "Catch-up follow mode (spill fil, bytt til live feed idet EOF inntreffer)"
+
+#: user/replay.c:461
+msgid "Skip the given number of EVT_WRITE packets"
+msgstr "Hopp over gitt antall av EVT_WRITE pakker"
+
+#: user/replay.c:463
+msgid "Maximum delay to wait between packets"
+msgstr "Maksimum ventetid mellom pakker"
+
+#: user/replay.c:463
+msgid "msec"
+msgstr "msec"
+
+#: user/replay.c:465
+msgid "Show the timestamp at the top of the screen"
+msgstr "Vis tidsstempel i toppen av skjermbildet"
+
+#: user/replay.c:553
+msgid "<Switching to live feed follow mode>"
+msgstr "<Skifter til sanntidsmating følge modus>"
+
+#: user/replay.c:569
+#, c-format
+msgid ""
+"Reading from something that does not support seeking (a pipe?),\n"
+"skipping to a position where reading would block\n"
+msgstr ""
+"Leser fra noe som ikke støtter søking (en Pipe?),\n"
+"hopper til en posisjon hvor lesing ikke blokkerer\n"
 

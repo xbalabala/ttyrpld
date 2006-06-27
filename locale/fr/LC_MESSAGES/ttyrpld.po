@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: ttyrpld 2.02\n"
+"Project-Id-Version: ttyrpld 2.17\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2005-06-28 18:51+0100\n"
-"Last-Translator: Fabien \"fab31\" Devaux <fab [at] gnux info>\n"
+"PO-Revision-Date: 2006-06-27 21:22+0100\n"
+"Last-Translator: Fabien 'fab31' Devaux <fab [at] gnux info>\n"
 "Language-Team:  <ttyrpld-user [at] lists sourceforge net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -15,134 +15,12 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: user\n"
 
-#: user/replay.c:102
-#: user/rpld.c:138
+#: user/infod.c:132
 #, c-format
-msgid ""
-"This program comes with ABSOLUTELY NO WARRANTY; it is free software\n"
-"and you are welcome to redistribute it under certain conditions; for\n"
-"details see the \"LICENSE\" file which should have come with this program.\n"
-msgstr ""
-"This program comes with ABSOLUTELY NO WARRANTY; it is free software\n"
-"and you are welcome to redistribute it under certain conditions; for\n"
-"details see the \"LICENSE\" file which should have come with this program.\n"
-"(Ce programme n'a ABSOLUMENT AUCUNNE GARANTIE; c'est un logiciel libre\n"
-"vous pouvez le distribuer sous certaines conditions; pour plus de détails\n"
-"regardez le fichier \"LICENSE\" joint à ce programme.)\n"
+msgid "[infod] Unknown request %d, closing connection to not run into conversion problems.\n"
+msgstr "[infod] Requete inconnue %d, fermeture de la connection pour exclure des problèmes de conversation.\n"
 
-#: user/replay.c:110
-#, c-format
-msgid "No arguments given but STDIN seems to be a pipe/file -- replaying from STDIN\n"
-msgstr "Aucun argument passé mais STDIN semble être un fichier ou un tube -- relecture depuis STDIN\n"
-
-#: user/replay.c:114
-#, c-format
-msgid "No filename(s) given.\n"
-msgstr "Aucun fichier passé en argument.\n"
-
-#: user/replay.c:128
-#, c-format
-msgid "Could not open %s: %s\n"
-msgstr "Impossible d'ouvrir %s: %s\n"
-
-#: user/replay.c:176
-#, c-format
-msgid ""
-"\n"
-"<Packet inconsistency! Trying to find next valid packet.>\n"
-msgstr ""
-"\n"
-"<Packet inconsistant! Recherche du prochain paquet valide.>\n"
-
-#: user/replay.c:194
-msgid "Created using"
-msgstr "Crée en utilisant"
-
-#: user/replay.c:199
-msgid "Device path"
-msgstr "Chemin vers les périphérique"
-
-#: user/replay.c:205
-msgid "<tty device has been closed>"
-msgstr "<Le périphérique tty a été fermé>"
-
-#: user/replay.c:229
-msgid "<Error while reading from stream>"
-msgstr "<Erreur lors de la lecture depui le flux>"
-
-#: user/replay.c:233
-#, c-format
-msgid "<Log replaying of %s finished>"
-msgstr "<Relecture du log de %s terminée>"
-
-#: user/replay.c:309
-#, c-format
-msgid "Calculating average overhead..."
-msgstr "Calcul de la surchage moyenne..."
-
-#: user/replay.c:404
-#, c-format
-msgid ""
-"\n"
-"<Found packet boundary>\n"
-msgstr ""
-"\n"
-"<Limite de paquet trouvée>\n"
-
-#: user/replay.c:429
-msgid "Do not enable playing controls"
-msgstr "Non-activation des contrôles de lecture"
-
-#: user/replay.c:431
-msgid "Live feed follow mode (like `tail -f`)"
-msgstr "Mode suivi direct (comme `tail -f`)"
-
-#: user/replay.c:433
-msgid "Seek to time position (HH:MM:SS or total SEC, see docs)"
-msgstr "Déplacement à la position temporaire (HH:MM:SS ou SEC totales, regardez la documentation)"
-
-#: user/replay.c:436
-msgid "Speed factor (default: 1.0)"
-msgstr "Facteur de vitesse (defaut: 1.0)"
-
-#: user/replay.c:438
-msgid "No delays (useful for text file grepping)"
-msgstr "Pas de délais (utile pour un grep)"
-
-#: user/replay.c:440
-msgid "Catch-up follow mode (play file, switch to live feed on EOF)"
-msgstr "Mode rattrapage (lecture du fichier puis basculement en direct en fin de fichier)"
-
-#: user/replay.c:442
-msgid "Skip the given number of EVT_WRITE packets"
-msgstr "Passage du nombre de paquets EVT_WRITE spécifié"
-
-#: user/replay.c:444
-msgid "Maximum delay to wait between packets"
-msgstr "Délai maximum entre les paquets"
-
-#: user/replay.c:444
-msgid "msec"
-msgstr "msec"
-
-#: user/replay.c:446
-msgid "Show the timestamp at the top of the screen"
-msgstr "Afficher l'emprunte temporaire en haut de l'écran"
-
-#: user/replay.c:531
-msgid "<Switching to live feed follow mode>"
-msgstr "<Basculement en mode live>"
-
-#: user/replay.c:547
-#, c-format
-msgid ""
-"Reading from something that does not support seeking (a pipe?),\n"
-"skipping to a position where reading would block\n"
-msgstr ""
-"Lecture depuis un périphérique qui ne supportement pas le déplacement\n"
-"(un tube?), déplacement jusqu'à une position où la lecture serait bloquante\n"
-
-#: user/rdsh.c:81
+#: user/rdsh.c:82
 #, c-format
 msgid "%s: Memory allocation failure\n"
 msgstr "%s: Erreur d'allocation de mémoire\n"
@@ -152,142 +30,168 @@ msgstr "%s: Erreur d'allocation de mémoire\n"
 msgid "Connection to %s failed: %s\n"
 msgstr "Échec de connexion à %s: %s\n"
 
-#: user/rplctl.c:73
+#: user/rplctl.c:72
 msgid "TTY"
 msgstr "TTY"
 
-#: user/rplctl.c:73
+#: user/rplctl.c:72
 msgid "BYTES IN"
 msgstr "BYTES RÉÇU"
 
-#: user/rplctl.c:74
+#: user/rplctl.c:73
 msgid "OUT"
 msgstr "ÉMIS"
 
-#: user/rplctl.c:74
+#: user/rplctl.c:73
 msgid "FILENAME"
 msgstr "NOM DE FICHIER"
 
-#: user/rplctl.c:95
+#: user/rplctl.c:93
 #, c-format
 msgid "getdev(): Incorrect device number specification \"%s\", should be \"=%%d:%%d\"\n"
 msgstr "getdev(): Numéro de device est incorrect \"%s\", devrait être \"=%%d:%%d\"\n"
 
-#: user/rplctl.c:119
+#: user/rplctl.c:117
 #, c-format
 msgid "Cannot stat %s: %s\n"
 msgstr "Impossible d'atteindre %s: %s\n"
 
-#: user/rplctl.c:126
+#: user/rplctl.c:124
 #, c-format
 msgid "Cannot find %s\n"
 msgstr "Impossible de trouver %s\n"
 
-#: user/rplctl.c:191
+#: user/rplctl.c:189
 msgid "Capture data from tty"
 msgstr "Capture des données depuis un tty"
 
+#: user/rplctl.c:189
 #: user/rplctl.c:191
-#: user/rplctl.c:193
+#: user/rplctl.c:194
 #: user/rplctl.c:196
 #: user/rplctl.c:198
 #: user/rplctl.c:200
-#: user/rplctl.c:202
 msgid "tty"
 msgstr "tty"
 
-#: user/rplctl.c:193
+#: user/rplctl.c:191
 msgid "Ignore data from tty"
 msgstr "Ignorer les données provenant du terminal"
 
-#: user/rplctl.c:195
+#: user/rplctl.c:193
 msgid "Explicitly request info about all [or given] ttys"
 msgstr "Demande explicite d'informations à propos de ttys"
 
-#: user/rplctl.c:198
+#: user/rplctl.c:196
 msgid "Ignore data from tty until next tty session"
 msgstr "Ignorer les données provenant du terminal jusqu'à la prochaine session tty"
 
-#: user/rplctl.c:200
+#: user/rplctl.c:198
 msgid "Close the tty's logfile"
 msgstr "Fermer le fichier de log du terminal"
 
-#: user/rplctl.c:202
+#: user/rplctl.c:200
 msgid "Zero all packet and byte counters"
 msgstr "Effacement de tous les paquets et des conteurs de bytes"
 
-#: user/rplctl.c:204
+#: user/rplctl.c:202
 msgid "Path to the INFOD socket"
 msgstr "Chemin vers le socket INFOD"
 
-#: user/rplctl.c:204
-#: user/rpld.c:619
-#: user/rpld.c:630
+#: user/rplctl.c:202
+#: user/rpld.c:703
+#: user/rpld.c:714
 msgid "file"
 msgstr "fichier"
 
-#: user/rplctl.c:206
+#: user/rplctl.c:204
 msgid "Generate grepable output"
 msgstr "Générer une sortie facilement analysable"
 
-#: user/rpld.c:121
+#: user/rpld.c:111
 #, c-format
 msgid "/etc/rpld.conf exists but could not be read: %s\n"
 msgstr "/etc/rpld.conf existe mais n'a pas pu être lu: %s\n"
 
-#: user/rpld.c:125
+#: user/rpld.c:114
+#, c-format
+msgid "/usr/local/etc/rpld.conf exists but could not be read: %s\n"
+msgstr "/etc/rpld.conf existe mais n'a pas pu être lu: %s\n"
+
+#: user/rpld.c:117
 #, c-format
 msgid "$BINPATH/rpld.conf exists but could not be read: %s\n"
 msgstr "$BINPATH/rpld.conf existe mais n'a pas pu être lu: %s\n"
 
-#: user/rpld.c:151
+#: user/rpld.c:130
+#, c-format
+msgid ""
+"This program comes with ABSOLUTELY NO WARRANTY; it is free software and you\n"
+"you are welcome to redistribute it under certain conditions; for details see\n"
+"the \"LICENSE.GPL2\" file which should have come with this program.\n"
+msgstr ""
+"This program comes with ABSOLUTELY NO WARRANTY; it is free software and you\n"
+"you are welcome to redistribute it under certain conditions; for details see\n"
+"the \"LICENSE.GPL2\" file which should have come with this program.\n"
+"(Ce programme n'a ABSOLUMENT AUCUNNE GARANTIE; c'est un logiciel libre vous\n"
+"pouvez le distribuer sous certaines conditions; pour plus de détails\n"
+"regardez le fichier \"LICENSE.GPL2\" joint à ce programme.)\n"
+
+#: user/rpld.c:143
 #, c-format
 msgid "No device could be opened, aborting.\n"
 msgstr "Impossible d'ouvrir le péripherique, avortage.\n"
 
-#: user/rpld.c:190
+#: user/rpld.c:176
 #, c-format
 msgid ""
 "\n"
 "Short read: %ld bytes only. Error %d: %s\n"
-msgstr "\nLecture courte: %ld octets seulement. Erreur %d: %s\n"
+msgstr ""
+"\n"
+"Lecture courte: %ld octets seulement. Erreur %d: %s\n"
 
-#: user/rpld.c:204
+#: user/rpld.c:190
 #, c-format
 msgid "Bogus packet (magic is 0x%02X)!\n"
 msgstr "Paquet incorrect (magic est 0x%02X)!\n"
 
-#: user/rpld.c:270
+#: user/rpld.c:256
 #, c-format
 msgid "Unknown packet type 0x%02X\n"
 msgstr "Type de paquet inconnu (0x%02X)\n"
 
-#: user/rpld.c:313
+#: user/rpld.c:299
 #, c-format
 msgid "Should never get here! (%s:%d) Forgot to code something? (event=%d)\n"
 msgstr "Emplacement impossible! (%s:%d) Oubli de programmation? (évènement=%d)\n"
 
-#: user/rpld.c:361
+#: user/rpld.c:350
 #, c-format
 msgid "Directory permission denied: It won't be possible to write to the file %s, expect warnings.\n"
 msgstr "Erreur de droits sur le répertoire: Il peut être impossible d'écrire dans %s, avertissements attendus.\n"
 
-#: user/rpld.c:453
+#: user/rpld.c:478
 msgid "NONE"
 msgstr "AUCUNE"
 
-#: user/rpld.c:508
-#: user/rpld.c:512
+#: user/rpld.c:534
+#: user/rpld.c:539
 #, c-format
 msgid "Connected to %s\n"
 msgstr "Connecté à %s\n"
 
-#: user/rpld.c:516
+#: user/rpld.c:544
+#, c-format
+msgid "The device should be owned by the user running rpld (UID %ld) and have mode 0400.\n"
+msgstr ""
+
+#: user/rpld.c:546
 #, c-format
 msgid "static_find(): Could not open %s even though it exists: %s (trying next device)\n"
 msgstr "static_find(): Impossible d'ouvrir le fichier existant %s: %s (essai sur le prochain)\n"
 
-#: user/rpld.c:521
+#: user/rpld.c:550
 #, c-format
 msgid ""
 "\tThe RPL device can only be opened once,\n"
@@ -296,12 +200,12 @@ msgstr ""
 "\tLe périphérique RPL ne peut être ouvert qu'une fois,\n"
 "\til y a probablement une autre instance de rpld active!\n"
 
-#: user/rpld.c:588
+#: user/rpld.c:587
 #, c-format
 msgid "Second time we received SIGINT/SIGTERM, exiting immediately.\n"
 msgstr "Réception de SIGINT/SIGTERM pour la deuxième fois, sortie immédiate.\n"
 
-#: user/rpld.c:594
+#: user/rpld.c:592
 #, c-format
 msgid ""
 "\n"
@@ -310,7 +214,7 @@ msgstr ""
 "\n"
 "Réception de SIGINT/SIGTERM, extinction.\n"
 
-#: user/rpld.c:611
+#: user/rpld.c:609
 #, c-format
 msgid ""
 "\n"
@@ -319,58 +223,172 @@ msgstr ""
 "\n"
 "[%d] Réception de SIGPIPE\n"
 
-#: user/rpld.c:619
+#: user/rpld.c:703
 msgid "Path to the RPL device"
 msgstr "Chemin vers le périphérique RPL"
 
-#: user/rpld.c:621
+#: user/rpld.c:705
 msgid "Start INFOD subcomponent"
 msgstr "Démarre le sous-composant INFOD"
 
-#: user/rpld.c:623
+#: user/rpld.c:707
 msgid "Override OFMT variable"
 msgstr "Écrase la variable OFMT"
 
-#: user/rpld.c:623
-#, fuzzy
+#: user/rpld.c:707
 msgid "string"
-msgstr "Chaîne de caractères"
+msgstr "string"
 
-#: user/rpld.c:625
+#: user/rpld.c:709
 msgid "Deactivate logging, only do bytecounting"
 msgstr "Désactive l'archivage, fait seulement du comptage d'octets"
 
-#: user/rpld.c:627
+#: user/rpld.c:711
 msgid "User to change to"
 msgstr "Nouvel utilisateur"
 
-#: user/rpld.c:627
+#: user/rpld.c:711
 msgid "user"
 msgstr "utilisateur"
 
-#: user/rpld.c:629
+#: user/rpld.c:713
 msgid "Read configuration from file"
 msgstr "Lit la configuration depuis un fichier"
 
-#: user/rpld.c:632
+#: user/rpld.c:716
 msgid "Do not start INFOD subcomponent"
 msgstr "Ne démarre pas le sous-élément INFOD"
 
-#: user/rpld.c:634
+#: user/rpld.c:718
 msgid "Print warnings/errors to syslog"
 msgstr "Afficher les avertissements/erreures dans syslog"
 
-#: user/rpld.c:636
+#: user/rpld.c:720
 msgid "Print statistics while rpld is running (overrides -s)"
 msgstr "Afficher les statistiques même si rpld s'éxecute (surpasse -s)"
 
-#: user/rpld.c:683
+#: user/rpld.c:735
 #, c-format
 msgid "No such user: %s\n"
 msgstr "L'utilisateur \"%s\" est introuvable\n"
 
-#: user/infod.c:130
+#: user/replay.c:112
 #, c-format
-msgid "[infod] Unknown request %d, closing connection to not run into conversion problems.\n"
-msgstr "[infod] Requete inconnue %d, fermeture de la connection pour exclure des problèmes de conversation.\n"
+msgid "No arguments given but STDIN seems to be a pipe/file -- replaying from STDIN\n"
+msgstr "Aucun argument passé mais STDIN semble être un fichier ou un tube -- relecture depuis STDIN\n"
+
+#: user/replay.c:116
+#, c-format
+msgid "No filename(s) given.\n"
+msgstr "Aucun fichier passé en argument.\n"
+
+#: user/replay.c:131
+#, c-format
+msgid "Could not open %s: %s\n"
+msgstr "Impossible d'ouvrir %s: %s\n"
+
+#: user/replay.c:181
+#, c-format
+msgid ""
+"\n"
+"<Packet inconsistency! Trying to find next valid packet.>\n"
+msgstr ""
+"\n"
+"<Packet inconsistant! Recherche du prochain paquet valide.>\n"
+
+#: user/replay.c:199
+msgid "Created using"
+msgstr "Crée en utilisant"
+
+#: user/replay.c:204
+msgid "Device path"
+msgstr "Chemin vers les périphérique"
+
+#: user/replay.c:209
+msgid "Recorded on"
+msgstr ""
+
+#: user/replay.c:214
+msgid "User"
+msgstr "utilisateur"
+
+#: user/replay.c:220
+msgid "<tty device has been closed>"
+msgstr "<Le périphérique tty a été fermé>"
+
+#: user/replay.c:245
+msgid "<Error while reading from stream>"
+msgstr "<Erreur lors de la lecture depui le flux>"
+
+#: user/replay.c:248
+#, c-format
+msgid "<Log replaying of %s finished>"
+msgstr "<Relecture du log de %s terminée>"
+
+#: user/replay.c:327
+#, c-format
+msgid "Calculating average overhead..."
+msgstr "Calcul de la surchage moyenne..."
+
+#: user/replay.c:423
+#, c-format
+msgid ""
+"\n"
+"<Found packet boundary>\n"
+msgstr ""
+"\n"
+"<Limite de paquet trouvée>\n"
+
+#: user/replay.c:448
+msgid "Do not enable playing controls"
+msgstr "Non-activation des contrôles de lecture"
+
+#: user/replay.c:450
+msgid "Live feed follow mode (like `tail -f`)"
+msgstr "Mode suivi direct (comme `tail -f`)"
+
+#: user/replay.c:452
+msgid "Seek to time position (HH:MM:SS or total SEC, see docs)"
+msgstr "Déplacement à la position temporaire (HH:MM:SS ou SEC totales, regardez la documentation)"
+
+#: user/replay.c:455
+msgid "Speed factor (default: 1.0)"
+msgstr "Facteur de vitesse (defaut: 1.0)"
+
+#: user/replay.c:457
+msgid "No delays (useful for text file grepping)"
+msgstr "Pas de délais (utile pour un grep)"
+
+#: user/replay.c:459
+msgid "Catch-up follow mode (play file, switch to live feed on EOF)"
+msgstr "Mode rattrapage (lecture du fichier puis basculement en direct en fin de fichier)"
+
+#: user/replay.c:461
+msgid "Skip the given number of EVT_WRITE packets"
+msgstr "Passage du nombre de paquets EVT_WRITE spécifié"
+
+#: user/replay.c:463
+msgid "Maximum delay to wait between packets"
+msgstr "Délai maximum entre les paquets"
+
+#: user/replay.c:463
+msgid "msec"
+msgstr "msec"
+
+#: user/replay.c:465
+msgid "Show the timestamp at the top of the screen"
+msgstr "Afficher l'emprunte temporaire en haut de l'écran"
+
+#: user/replay.c:553
+msgid "<Switching to live feed follow mode>"
+msgstr "<Basculement en mode live>"
+
+#: user/replay.c:569
+#, c-format
+msgid ""
+"Reading from something that does not support seeking (a pipe?),\n"
+"skipping to a position where reading would block\n"
+msgstr ""
+"Lecture depuis un périphérique qui ne supportement pas le déplacement\n"
+"(un tube?), déplacement jusqu'à une position où la lecture serait bloquante\n"
 
