@@ -1,6 +1,6 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
-k_freebsd-6.0/rpldev.c - Kernel interface for RPLD
+k_freebsd-6.1/rpldev.c - Kernel interface for RPLD
   Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
 
   Redistribution and use in source and binary forms, with or without
@@ -65,20 +65,20 @@ static int kmd_load(void);
 static int kmd_unload(void);
 
 // Stage 2 functions
-static int krpl_init(struct cdev *, struct tty *);
-static int krpl_open(struct cdev *, struct tty *);
-static int krpl_read(const char *, int, struct tty *);
-static int krpl_write(const char *, int, struct tty *);
-//static int krpl_ioctl(struct tty *, u_long, void *);
-static int krpl_close(struct tty *);
-static int krpl_deinit(struct tty *);
+static int rpldhk_init(struct cdev *, struct tty *);
+static int rpldhk_open(struct cdev *, struct tty *);
+static int rpldhk_read(const char *, int, struct tty *);
+static int rpldhk_write(const char *, int, struct tty *);
+//static int rpldhk_ioctl(struct tty *, u_long, void *);
+static int rpldhk_close(struct tty *);
+static int rpldhk_deinit(struct tty *);
 
 // Stage 3 functions
-static int urpl_open(struct cdev *, int, int, struct thread *);
-static int urpl_read(struct cdev *, struct uio *, int);
-static int urpl_ioctl(struct cdev *, u_long, caddr_t, int, struct thread *);
-static int urpl_poll()
-static int urpl_close(struct cdev *, int, int, struct thread *);
+static int rpldev_open(struct cdev *, int, int, struct thread *);
+static int rpldev_read(struct cdev *, struct uio *, int);
+static int rpldev_ioctl(struct cdev *, u_long, caddr_t, int, struct thread *);
+static int rpldev_poll()
+static int rpldev_close(struct cdev *, int, int, struct thread *);
 
 // Local functions
 static inline size_t avail_R(void);
@@ -106,11 +106,11 @@ static struct cdevsw kmi_fops = {
 #if __FreeBSD_version < 600000
     .d_maj     = MAJOR_AUTO,
 #endif
-    .d_open    = urpl_open,
-    .d_read    = urpl_read,
-    .d_ioctl   = urpl_ioctl,
-    .d_close   = urpl_close,
-    .d_poll    = urpl_poll,
+    .d_open    = rpldev_open,
+    .d_read    = rpldev_read,
+    .d_ioctl   = rpldev_ioctl,
+    .d_close   = rpldev_close,
+    .d_poll    = rpldev_poll,
 };
 static moduledata_t kmi_rpldev = {
     .name   = "rpldev",
@@ -152,7 +152,7 @@ static int kmd_unload(void) {
 }
 
 //-----------------------------------------------------------------------------
-static int krpl_init(struct cdev *cd, struct tty *tty) {
+static int rpldhk_init(struct cdev *cd, struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL)
@@ -166,7 +166,7 @@ static int krpl_init(struct cdev *cd, struct tty *tty) {
     return circular_put_packet(&p, NULL, 0);
 }
 
-static int krpl_open(struct cdev *cd, struct tty *tty) {
+static int rpldhk_open(struct cdev *cd, struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL)
@@ -180,7 +180,7 @@ static int krpl_open(struct cdev *cd, struct tty *tty) {
     return circular_put_packet(&p, NULL, 0);
 }
 
-static int krpl_read(const char *buf, int count, struct tty *tty) {
+static int rpldhk_read(const char *buf, int count, struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL || count == 0)
@@ -194,7 +194,7 @@ static int krpl_read(const char *buf, int count, struct tty *tty) {
     return circular_put_packet(&p, buf, count);
 }
 
-static int krpl_write(const char *buf, int count, struct tty *tty) {
+static int rpldhk_write(const char *buf, int count, struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL || count == 0)
@@ -209,7 +209,7 @@ static int krpl_write(const char *buf, int count, struct tty *tty) {
 }
 
 /*
-static int krpl_ioctl(struct tty *tty, u_long cmd, void *arg) {
+static int rpldhk_ioctl(struct tty *tty, u_long cmd, void *arg) {
     struct rpldev_packet p;
     uint32_t cmd32;
 
@@ -226,7 +226,7 @@ static int krpl_ioctl(struct tty *tty, u_long cmd, void *arg) {
 }
 */
 
-static int krpl_close(struct tty *tty) {
+static int rpldhk_close(struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL)
@@ -240,7 +240,7 @@ static int krpl_close(struct tty *tty) {
     return circular_put_packet(&p, NULL, 0);
 }
 
-static int krpl_deinit(struct tty *tty) {
+static int rpldhk_deinit(struct tty *tty) {
     struct rpldev_packet p;
 
     p.dev   = TTY_DEVNR(tty);
@@ -252,7 +252,9 @@ static int krpl_deinit(struct tty *tty) {
 }
 
 //-----------------------------------------------------------------------------
-static int urpl_open(struct cdev *cd, int flag, int mode, struct thread *th) {
+static int rpldev_open(struct cdev *cd, int flag, int mode,
+ struct thread *th)
+{
     mtx_lock(&Open_lock);
     if(Open_count) {
         mtx_unlock(&Open_lock);
@@ -270,20 +272,20 @@ static int urpl_open(struct cdev *cd, int flag, int mode, struct thread *th) {
     }
 
     BufRP = BufWP = Buffer;
-    rpl_init   = krpl_init;
-    rpl_open   = krpl_open;
-    rpl_read   = krpl_read;
-    rpl_write  = krpl_write;
+    rpl_init   = rpldhk_init;
+    rpl_open   = rpldhk_open;
+    rpl_read   = rpldhk_read;
+    rpl_write  = rpldhk_write;
     /* ioctl reporting is deactivated, because 1) a _lot_ more ioctls are
     generated in *BSD compared to Linux, 2) ioctls are not yet interpreted by
     userspace apps (ttyreplay). */
-    //rpl_ioctl  = krpl_ioctl;
-    rpl_close  = krpl_close;
-    rpl_deinit = krpl_deinit;
+    //rpl_ioctl  = rpldhk_ioctl;
+    rpl_close  = rpldhk_close;
+    rpl_deinit = rpldhk_deinit;
     return 0;
 }
 
-static int urpl_read(struct cdev *cd, struct uio *uio, int flags) {
+static int rpldev_read(struct cdev *cd, struct uio *uio, int flags) {
     size_t count;
     int ret = 0;
 
@@ -310,7 +312,7 @@ static int urpl_read(struct cdev *cd, struct uio *uio, int flags) {
     return ret;
 }
 
-static int urpl_ioctl(struct cdev *cd, u_long cmd, caddr_t data, int flags,
+static int rpldev_ioctl(struct cdev *cd, u_long cmd, caddr_t data, int flags,
  struct thread *th)
 {
     /* Linux does ioctls better: negative non-zero is error, and the rest is
@@ -363,7 +365,9 @@ static int urpl_ioctl(struct cdev *cd, u_long cmd, caddr_t data, int flags,
     return ret;
 }
 
-static int urpl_close(struct cdev *cd, int flags, int fmt, struct thread *th) {
+static int rpldev_close(struct cdev *cd, int flags, int fmt,
+ struct thread *th)
+{
     rpl_init   = NULL;
     rpl_open   = NULL;
     rpl_read   = NULL;
