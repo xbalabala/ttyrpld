@@ -171,6 +171,10 @@ static void mainloop(int fd) {
         if((ret = read(fd, &packet, sizeof(struct rpldev_packet))) <
          (ssize_t)sizeof(struct rpldev_packet)) {
             struct stat sb;
+#if defined(__OpenBSD__) || defined(__NetBSD__)
+            if(errno == EINTR)
+                continue;
+#endif
             fstat(fd, &sb);
             if(!S_ISREG(sb.st_mode))
                 fprintf(stderr, _("\n" "Short read: %ld bytes only. "
