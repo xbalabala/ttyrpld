@@ -47,7 +47,7 @@
       2006)&nbsp;&gt;</td>
     <td valign="top">
 
-      <ul type="clog">
+      <ul>
         <li class="star">Fixed OpenBSD 3.9 kpatch</li>
         <li class="plus">Readded workaround for OpenBSD/NetBSD EINTR signal handling that got lost in 2.17</li>
       </ul>
@@ -62,7 +62,7 @@
       2006)&nbsp;&gt;</td>
     <td valign="top">
 
-      <ul type="clog">
+      <ul>
         <li class="plus">Support for Linux 2.6.17, FreeBSD 6.1, OpenBSD 3.9</li>
         <li class="plus">added missing <tt>-fprofile-arcs -ftest-coverage</tt> to <tt>LDFLAGS</tt> for <tt>PROF=1</tt></li>
       </ul>
@@ -77,7 +77,7 @@
       2006)&nbsp;&gt;</td>
     <td valign="top">
 
-      <ul type="clog">
+      <ul>
         <li class="minus"><tt>user/rpld.c</tt>: removed a superfluous variable</li>
         <li class="star">Added polling functions to the BSD rpldevs. This fixes the high CPU usage (which is due to the implementation of pthreads on OpenBSD) observed with <i>rpld</i>/OpenBSD.</li>
         <li class="star">OpenBSD part is again just a patch since modules are said to be unsupported on non-i386</li>
