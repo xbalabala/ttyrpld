@@ -50,7 +50,7 @@
         </tr>
         <tr>
           <td>Operating Systems:</td>
-          <td>Linux 2.4/2.6, FreeBSD 5.3/6.0, OpenBSD 3.8, NetBSD 3.0<br />
+          <td>Linux 2.4/2.6, FreeBSD 5.3/6.0/6.1, OpenBSD 3.9, NetBSD 3.0<br />
             (and possibly offsprings)</td>
         </tr>
         <tr>
