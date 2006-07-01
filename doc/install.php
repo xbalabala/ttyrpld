@@ -23,7 +23,7 @@
         <tr>
           <td><a href="http://jengelh.hopto.org/coding/libHX.php">libHX</a></td>
           <td>1.8.0</li>
-          <td>1.8.0</li>
+          <td>1.8.1</li>
         </tr>
         <tr>
           <td>GNU C Compiler</td>
@@ -142,7 +142,7 @@
       <div class="indent">
         <p class="code"><tt>
         $ <b>cd /usr/src/sys/;</b><br />
-        $ <b>patch -p1 -i /usr/src/ttyrpld/kpatch/freebsd-6.0.diff;</b>
+        $ <b>patch -p1 -i /usr/src/ttyrpld/kpatch/freebsd-6.1.diff;</b>
         </tt></p>
       </div>
 
@@ -176,7 +176,7 @@
       <div class="indent">
         <p class="code"><tt>
         $ <b>cd /usr/src/sys/;</b><br />
-        $ <b>patch -p1 -i /usr/src/ttyrpld/kpatch/openbsd-3.8.diff;</b>
+        $ <b>patch -p1 -i /usr/src/ttyrpld/kpatch/openbsd-3.9.diff;</b>
         </tt></p>
       </div>
 
@@ -217,7 +217,7 @@
 
       <p class="block">BSD users have to use <tt>gmake</tt>;
       <tt>KERNEL_DIR</tt> and <tt>MODULES_DIR</tt> is not applicable for BSD,
-      but you may <tt>cd</tt> into <tt>freebsd-6.0</tt> by hand and run (bsd)
+      but you may <tt>cd</tt> into <tt>freebsd-6.1</tt> by hand and run (bsd)
       <tt>make</tt> with any options you need. The kmod target <i>will not</i>
       install the module on FreeBSD.</p>
 
