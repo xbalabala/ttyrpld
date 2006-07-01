@@ -27,8 +27,8 @@
         </tr>
         <tr>
           <td>OpenBSD</td>
-          <td>2.16/2.17</td>
-          <td><i>monolithic kernel</i> / <i>modules not supported</i></td>
+          <td>2.18</td>
+          <td>no-go: <i>monolithic kernel</i> / <i>modules not really supported</i></td>
         </tr>
         <tr>
           <td>NetBSD</td>
@@ -37,6 +37,21 @@
         </tr>
       </table>
       </div>
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="right" valign="top" class="section"><b>To 2.18 (July 01
+      2006)&nbsp;&gt;</td>
+    <td valign="top">
+
+      <ul type="clog">
+        <li class="star">Fixed OpenBSD 3.9 kpatch</li>
+        <li class="plus">Readded workaround for OpenBSD/NetBSD EINTR signal handling that got lost in 2.17</li>
+      </ul>
+
     </td>
   </tr>
   <tr>
