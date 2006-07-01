@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: ttyrpld 2.17\n"
+"Project-Id-Version: ttyrpld 2.18\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: 2006-06-27 21:22+0100\n"
 "Last-Translator: Patrik Johansson <patjoh [at] itstud chalmers se>\n"

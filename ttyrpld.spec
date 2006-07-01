@@ -1,7 +1,7 @@
 
 Name:           ttyrpld
-Version:        2.17
-Release:        1
+Version:        2.18
+Release:        0
 Group:          System Environment/Daemons
 Summary:        kernel-based tty screen- and keylogger
 License:        LGPL/BSD

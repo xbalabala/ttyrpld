@@ -48,7 +48,7 @@ extern "C" {
 #define _(s) gettext(s)
 
 #define MAXFNLEN 256
-#define TTYRPLD_VERSION "2.17"
+#define TTYRPLD_VERSION "2.18"
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 #    define D_IOCTL(fd, cmd, eax) (ioctl((fd), (cmd), *(eax)) == 0)
 #else
