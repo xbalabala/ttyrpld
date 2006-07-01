@@ -109,7 +109,7 @@
         <p class="block"><i>Excerpt from <tt>k_linux-2.6/rpldev.c</tt></i></p>
 
         <p class="code"><tt>
-        <b>static int</b> krpl_write(<b>const char</b> __user <b>*</b>buf, <b>size_t</b> count, <b>struct</b> tty_struct <b>*</b>tty)&nbsp;{<br />
+        <b>static int</b> rpldhk_write(<b>const char</b> __user <b>*</b>buf, <b>size_t</b> count, <b>struct</b> tty_struct <b>*</b>tty)&nbsp;{<br />
         &nbsp; &nbsp; <b>struct</b> rpld_packet p;<br />
         <br />
         &nbsp; &nbsp; SKIP_PTM(tty);<br />
@@ -165,7 +165,7 @@
         <p class="block"><i>Excerpt from <tt>kernel-2.6/rpldev.c</tt></i></p>
 
         <p class="code"><tt>
-        <b>static ssize_t</b> urpl_read(<b>struct</b> file <b>*</b>filp, <b>char *</b>buf, <b>size_t</b> count, <b>loff_t *</b>ppos)&nbsp;{<br />
+        <b>static ssize_t</b> rpldev_read(<b>struct</b> file <b>*</b>filp, <b>char *</b>buf, <b>size_t</b> count, <b>loff_t *</b>ppos)&nbsp;{<br />
         &nbsp; &nbsp; ...<br />
         &nbsp; &nbsp; <b>// Data is available, so give it to the user</b><br />
         &nbsp; &nbsp; count = imin(count, avail_R());<br />
