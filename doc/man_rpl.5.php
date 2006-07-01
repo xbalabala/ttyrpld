@@ -91,7 +91,7 @@
     also&nbsp;&gt;</b></td>
 
     <td valign="top" class="block"><a
-    href="man_rpldev.4.php"><tt>rpldev(4)</tt></a></td>
+    href="man_rpldev.4.php"><tt>rpldev(4)</tt></a>&nbsp;</td>
 
   </tr>
 <?php include_once("_footer.php"); ?>

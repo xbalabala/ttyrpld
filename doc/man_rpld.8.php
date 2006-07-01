@@ -275,7 +275,7 @@
     also&nbsp;&gt;</b></td>
 
     <td valign="top" class="block"><a
-    href="man_ttyreplay.1.php"><tt>ttyreplay(1)</tt></a></td>
+    href="man_ttyreplay.1.php"><tt>ttyreplay(1)</tt></a>&nbsp;</td>
 
   </tr>
 <?php include_once("_footer.php"); ?>

@@ -228,7 +228,7 @@ D 136 4 pts-4 1884 91257 /var/log/rpl/root/20050328.224341.pts-4<br />
     also&nbsp;&gt;</b></td>
 
     <td valign="top" class="block"><a
-    href="man_rpld.8.php"><tt>rpld(8)</tt></a></td>
+    href="man_rpld.8.php"><tt>rpld(8)</tt></a>&nbsp;</td>
 
   </tr>
 <?php include_once("_footer.php"); ?>
