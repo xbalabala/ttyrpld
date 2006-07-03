@@ -361,8 +361,7 @@ static void log_open(struct tty *tty) {
 
     /* Add an optional magic packet for file(1) to recognize. (EVT_ID_PROG may
     contain _anything_, while EVT_MAGIC is fixed. See share/ttyrpld.magic.) */
-    strncpy(buf, "RPL", sizeof(buf) - 1); // <-- STRING FIXED
-    buf[sizeof(buf)-1] = '\0';
+    HX_strncpy(buf, "RPL", sizeof(buf)); // <-- STRING FIXED
     p.event = EVT_MAGIC;
     s = p.size = strlen(buf) + 1; // include '\0' in stream
     SWAB1(&p.size);
@@ -371,8 +370,7 @@ static void log_open(struct tty *tty) {
 
     /* Add an optional ident header to record the program and version which
     this logfile was created with. */
-    strncpy(buf, "ttyrpld " TTYRPLD_VERSION, sizeof(buf) - 1);
-    buf[sizeof(buf) - 1] = '\0';
+    HX_strncpy(buf, "ttyrpld " TTYRPLD_VERSION, sizeof(buf));
     p.event = EVT_ID_PROG;
     s = p.size = strlen(buf) + 1;
     SWAB1(&p.size);
@@ -458,8 +456,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev) {
     (aux_sdev) that was used open the device. Use it, if available. */
     if(aux_sdev != NULL && *aux_sdev != '\0') {
         const char **dirp = Device_dirs;
-        strncpy(full_dev, aux_sdev, MAXFNLEN);
-        full_dev[MAXFNLEN - 1] = '\0';
+        HX_strncpy(full_dev, aux_sdev, sizeof(full_dev));
         while(*dirp != NULL) {
             if(strncmp(full_dev, *dirp, strlen(*dirp)) == 0) {
                 pbase = *dirp;
@@ -496,8 +493,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev) {
          strlen(full_dev) - strlen(pbase));         // copy includes '\0'
     } else {
         // Usually this is [MAJOR:MINOR]
-        strncpy(sdev, full_dev, sizeof(sdev) - 1);
-        sdev[sizeof(sdev) - 1] = '\0';
+        HX_strncpy(sdev, full_dev, sizeof(sdev));
     }
     while(i < sizeof(sdev)) {
         if(sdev[i] == '/')
@@ -654,8 +650,7 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
             continue;
         if(S_ISCHR(sb.st_mode) &&
          K26_MKDEV(COMPAT_MAJOR(sb.st_rdev), COMPAT_MINOR(sb.st_rdev)) == id) {
-            strncpy(dest, buf, len);
-            dest[len - 1] = '\0';
+            HX_strncpy(dest, buf, len);
             HXdir_close(dx);
             return 1;
         }
@@ -682,8 +677,7 @@ static char *getnamefromuid(uid_t uid, char *result, size_t len) {
 #endif
     if(ep == NULL)
         return NULL;
-    strncpy(result, ep->pw_name, len - 1);
-    result[len - 1] = '\0';
+    HX_strncpy(result, ep->pw_name, len);
     return result;
 }
 
@@ -771,8 +765,7 @@ static int read_config(const char *file) {
 static int read_config_bp(const char *app_path, const char *file) {
     char *fpath = HX_strdup(app_path), *ptr, construct[MAXFNLEN];
     if((ptr = strrchr(fpath, '/')) == NULL) {
-        strncpy(construct, file, MAXFNLEN - 1);
-        construct[sizeof(construct) - 1] = '\0';
+        HX_strncpy(construct, file, sizeof(construct));
     } else {
         *ptr++ = '\0';
         snprintf(construct, sizeof(construct), "%s/%s", fpath, file);
