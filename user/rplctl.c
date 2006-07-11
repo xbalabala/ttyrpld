@@ -172,7 +172,7 @@ static int unix_client(const char *port) {
     int fd = -1;
 
     sk.sun_family = AF_UNIX;
-    HX_strncpy(sk.sun_path, port, sizeof(sk.sun_path));
+    HX_strlcpy(sk.sun_path, port, sizeof(sk.sun_path));
 
     if((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0 ||
      connect(fd, (struct sockaddr *)&sk, sizeof(struct sockaddr_un)) < 0)
