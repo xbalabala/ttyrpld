@@ -152,7 +152,7 @@ module_param_named(minor, Minor_nr, uint, S_IRUGO);
 #endif
 
 //-----------------------------------------------------------------------------
-__init static int rpldev_init(void) {
+static __init int rpldev_init(void) {
     int ret;
     kmi_miscinfo.minor = Minor_nr;
     if((ret = misc_register(&kmi_miscinfo)) != 0)
@@ -162,7 +162,7 @@ __init static int rpldev_init(void) {
     return 0;
 }
 
-__exit static void rpldev_exit(void) {
+static __exit void rpldev_exit(void) {
     misc_deregister(&kmi_miscinfo);
     return;
 }
