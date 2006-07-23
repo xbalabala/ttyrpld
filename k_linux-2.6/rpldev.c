@@ -4,12 +4,11 @@ k_linux-2.6/rpldev.c - Kernel interface for RPLD
   Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
   -- License restrictions apply (LGPL v2.1)
 
-  This file is part of ttyrpld.
-  ttyrpld is free software; you can redistribute it and/or modify it
+  This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published
   by the Free Software Foundation; however ONLY version 2 of the License.
 
-  ttyrpld is distributed in the hope that it will be useful, but
+  This program is distributed in the hope that it will be useful, but
   WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
   Lesser General Public License for more details.
@@ -136,7 +135,7 @@ static struct miscdevice kmi_miscinfo = {
 };
 
 MODULE_DESCRIPTION("ttyrpld kernel interface");
-MODULE_AUTHOR("Jan Engelhardt <jengelh@gmx.de>");
+MODULE_AUTHOR("Jan Engelhardt <jengelh [at] gmx de>");
 MODULE_LICENSE("GPL and additional rights");
 MODULE_PARM_DESC(Bufsize, "Buffer size (default 32K)");
 MODULE_PARM_DESC(Minor_nr, "Minor number to use (default: 255(=DYNAMIC))");
