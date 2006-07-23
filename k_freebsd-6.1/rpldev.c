@@ -69,7 +69,7 @@ static int rpldhk_init(struct cdev *, struct tty *);
 static int rpldhk_open(struct cdev *, struct tty *);
 static int rpldhk_read(const char *, int, struct tty *);
 static int rpldhk_write(const char *, int, struct tty *);
-//static int rpldhk_ioctl(struct tty *, u_long, void *);
+static int rpldhk_ioctl(struct tty *, u_long, void *);
 static int rpldhk_close(struct tty *);
 static int rpldhk_deinit(struct tty *);
 
@@ -77,7 +77,7 @@ static int rpldhk_deinit(struct tty *);
 static int rpldev_open(struct cdev *, int, int, struct thread *);
 static int rpldev_read(struct cdev *, struct uio *, int);
 static int rpldev_ioctl(struct cdev *, u_long, caddr_t, int, struct thread *);
-static int rpldev_poll()
+//static int rpldev_poll()
 static int rpldev_close(struct cdev *, int, int, struct thread *);
 
 // Local functions
@@ -110,7 +110,7 @@ static struct cdevsw kmi_fops = {
     .d_read    = rpldev_read,
     .d_ioctl   = rpldev_ioctl,
     .d_close   = rpldev_close,
-    .d_poll    = rpldev_poll,
+//    .d_poll    = rpldev_poll,
 };
 static moduledata_t kmi_rpldev = {
     .name   = "rpldev",
@@ -208,7 +208,6 @@ static int rpldhk_write(const char *buf, int count, struct tty *tty) {
     return circular_put_packet(&p, buf, count);
 }
 
-/*
 static int rpldhk_ioctl(struct tty *tty, u_long cmd, void *arg) {
     struct rpldev_packet p;
     uint32_t cmd32;
@@ -224,7 +223,6 @@ static int rpldhk_ioctl(struct tty *tty, u_long cmd, void *arg) {
     fill_time(&p.time);
     return circular_put_packet(&p, &cmd32, sizeof(cmd32));
 }
-*/
 
 static int rpldhk_close(struct tty *tty) {
     struct rpldev_packet p;
