@@ -61,7 +61,7 @@ static int rpldhk_init(dev_t, struct tty *);
 static int rpldhk_open(struct tty *);
 static int rpldhk_read(const char *, int, struct tty *);
 static int rpldhk_write(const char *, int, struct tty *);
-//static int rpldhk_ioctl(struct tty *, u_long, caddr_t);
+static int rpldhk_ioctl(struct tty *, u_long, caddr_t);
 static int rpldhk_close(struct tty *);
 static int rpldhk_deinit(struct tty *);
 
@@ -88,7 +88,7 @@ static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
 static size_t Bufsize = 32 * 1024;
 static unsigned int Open_count = 0;
 
-// Kernel module info stuff
+// Module stuff
 static int kmi_usecount = 0;
 static struct cdevsw kmi_fops = {
     .d_open     = rpldev_open,
@@ -182,7 +182,6 @@ static int rpldhk_write(const char *buf, int count, struct tty *tty) {
     return circular_put_packet(&p, buf, count);
 }
 
-/*
 static int rpldhk_ioctl(struct tty *tty, u_long cmd, void *arg) {
     struct rpldev_packet p;
     uint32_t cmd32;
@@ -195,7 +194,6 @@ static int rpldhk_ioctl(struct tty *tty, u_long cmd, void *arg) {
     fill_time(&p.time);
     return circular_put_packet(&p, &cmd32, sizeof(cmd32));
 }
-*/
 
 static int rpldhk_close(struct tty *tty) {
     struct rpldev_packet p;
@@ -241,6 +239,7 @@ static int rpldev_open(dev_t dev, int flag, int mode, struct proc *th) {
     rpl_open   = rpldhk_open;
     rpl_read   = rpldhk_read;
     rpl_write  = rpldhk_write;
+    // BSD generates too much useless ioctls
     //rpl_ioctl  = rpldhk_ioctl;
     rpl_close  = rpldhk_close;
     rpl_deinit = rpldhk_deinit;
@@ -375,7 +374,7 @@ static inline void fill_time(struct timeval *tv) {
 }
 
 static inline unsigned int min_uint(unsigned int a, unsigned int b) {
-    return a < b ? a : b;
+    return (a < b) ? a : b;
 }
 
 static inline uint32_t mkdev_26(unsigned long maj, unsigned long min) {
