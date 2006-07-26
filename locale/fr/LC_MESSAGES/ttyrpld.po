@@ -36,7 +36,7 @@ msgstr "TTY"
 
 #: user/rplctl.c:72
 msgid "BYTES IN"
-msgstr "BYTES RÉÇU"
+msgstr "BYTES REÇUS"
 
 #: user/rplctl.c:73
 msgid "OUT"
@@ -184,7 +184,7 @@ msgstr "Connecté à %s\n"
 #: user/rpld.c:544
 #, c-format
 msgid "The device should be owned by the user running rpld (UID %ld) and have mode 0400.\n"
-msgstr ""
+msgstr "Le périphérique doit être possédé par l'utilisateur executant rpld (UID %ld) et avoir le mode 0400.\n"
 
 #: user/rpld.c:546
 #, c-format
@@ -306,7 +306,7 @@ msgstr "Chemin vers les périphérique"
 
 #: user/replay.c:209
 msgid "Recorded on"
-msgstr ""
+msgstr "Enregistré le"
 
 #: user/replay.c:214
 msgid "User"
