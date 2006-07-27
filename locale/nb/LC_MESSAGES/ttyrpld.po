@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ttyrpld 2.18\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: 2006-06-27 21:22+0100\n"
-"Last-Translator: Esben Stien <executiv [at] online no>\n"
+"Last-Translator: Esben Stien <b0ef [at] esben-stien name>\n"
 "Language-Team:  <ttyrpld-user [at] lists sourceforge net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -106,7 +106,7 @@ msgstr "fil"
 
 #: user/rplctl.c:204
 msgid "Generate grepable output"
-msgstr "Generer enkel ekstraktbar utdata"
+msgstr "Genererer enkel ekstraktbar utdata"
 
 #: user/rpld.c:111
 #, c-format
@@ -130,6 +130,12 @@ msgid ""
 "you are welcome to redistribute it under certain conditions; for details see\n"
 "the \"LICENSE.GPL2\" file which should have come with this program.\n"
 msgstr ""
+"This program comes with ABSOLUTELY NO WARRANTY; it is free software and you\n"
+"you are welcome to redistribute it under certain conditions; for details see\n"
+"the \"LICENSE.GPL2\" file which should have come with this program.\n"
+"(Dette programmet kommer med ABSOLUTT INGEN GARANTI; det er fri programvare\n"
+"og du er velkommen til å redistribuere det under visse betingelser\n"
+"for detailjer, se \"LICENSE.GPL2\" filen som kommer med dette programmet.)\n"
 
 #: user/rpld.c:143
 #, c-format
@@ -143,7 +149,7 @@ msgid ""
 "Short read: %ld bytes only. Error %d: %s\n"
 msgstr ""
 "\n"
-"Short read: %ld byte bare. Feil %d: %s\n"
+"Kort lesing: %ld byte bare. Feil %d: %s\n"
 
 #: user/rpld.c:190
 #, c-format
@@ -178,7 +184,7 @@ msgstr "Tilkoblet til %s\n"
 #: user/rpld.c:544
 #, c-format
 msgid "The device should be owned by the user running rpld (UID %ld) and have mode 0400.\n"
-msgstr ""
+msgstr "Enheten burde vært eid av brukeren som kjører rpld (UID %ld) and ha modus 0400.\n"
 
 #: user/rpld.c:546
 #, c-format
@@ -192,7 +198,7 @@ msgid ""
 "\tthere is probably an instance of rpld running!\n"
 msgstr ""
 "\tRPL-enheten kan bare åpnes en gang,\n"
-"\tdet er muligen en instans av rpld som kjører!\n"
+"\tdet er muligens en instans av rpld som kjører!\n"
 
 #: user/rpld.c:587
 #, c-format
@@ -224,7 +230,7 @@ msgstr "Sti til INFOD-Socket"
 
 #: user/rpld.c:705
 msgid "Start INFOD subcomponent"
-msgstr ""
+msgstr "Start INFOD underkomponent"
 
 #: user/rpld.c:707
 msgid "Override OFMT variable"
@@ -385,5 +391,5 @@ msgid ""
 "skipping to a position where reading would block\n"
 msgstr ""
 "Leser fra noe som ikke støtter søking (en Pipe?),\n"
-"hopper til en posisjon hvor lesing ikke blokkerer\n"
+"hopper til en posisjon hvor lesing blokkerer\n"
 
