@@ -48,8 +48,13 @@ include/rdsh.h - Shared definitions for RPLD/INFO/RPLINFO
 extern "C" {
 #endif
 
+// Definitions
 #define RECEIVE_FULL(fd, ptr, sz) \
     (recv((fd), (ptr), (sz), MSG_WAITALL) == (sz))
+
+// Code annotations
+#define reinterpret_cast(type, expr)    ((type)(expr))
+#define static_cast(type, expr)         ((type)(expr))
 
 struct GOptmap_t {
     int syslog, verbose;
@@ -82,14 +87,20 @@ enum {
     IFP_ZERO,
 };
 
-// infod.c
+/*
+ *      INFOD.C
+ */
 extern void infod_init(void);
 extern void *infod_main(void *);
 
-// rplctl.c
+/*
+ *      RPLCTL.C
+ */
 extern int rplctl_main(int, const char **);
 
-// rdsh.c
+/*
+ *      RDSH.C
+ */
 extern pthread_mutex_t Ttys_lock;
 extern const char *Device_dirs[];
 extern struct HXbtree *Ttys;

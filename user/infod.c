@@ -82,10 +82,10 @@ void *infod_main(void *arg) {
         pthread_t id;
         int clfd;
 
-        if((clfd = accept(Svfd, (struct sockaddr *)&remote, &sz)) < 0)
+        if((clfd = accept(Svfd, reinterpret_cast(void *, &remote), &sz)) < 0)
             continue;
 
-        pthread_create(&id, NULL, client_thread, (void *)clfd);
+        pthread_create(&id, NULL, client_thread, reinterpret_cast(void *, clfd));
         pthread_detach(id);
     }
 
@@ -93,7 +93,7 @@ void *infod_main(void *arg) {
 }
 
 static void *client_thread(void *arg) {
-    int fd = (int)arg;
+    int fd = reinterpret_cast(int, arg);
 
     while(1) {
         static const uint32_t zero = 0;
@@ -337,7 +337,8 @@ static int unix_server(const char *port) {
     unlink(sk.sun_path);
 
     if((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0 ||
-     bind(fd, (struct sockaddr *)&sk, sizeof(struct sockaddr_un)) < 0 ||
+     bind(fd, reinterpret_cast(struct sockaddr *, &sk),
+     sizeof(struct sockaddr_un)) < 0 ||
      listen(fd, SOMAXCONN) < 0)
         return -1;
 

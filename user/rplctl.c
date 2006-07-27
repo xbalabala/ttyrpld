@@ -175,7 +175,8 @@ static int unix_client(const char *port) {
     HX_strlcpy(sk.sun_path, port, sizeof(sk.sun_path));
 
     if((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0 ||
-     connect(fd, (struct sockaddr *)&sk, sizeof(struct sockaddr_un)) < 0)
+     connect(fd, reinterpret_cast(void *, &sk),
+     sizeof(struct sockaddr_un)) < 0)
         return -1;
 
     return fd;
@@ -224,7 +225,7 @@ static void getopt_proc(const struct HXoptcb *cbi) {
             uint32_t dev;
             ++Got_arg;
             if((dev = getdev(cbi->s)) != 0)
-                send_int(Sockfd, mapping[(int)cbi->tsh], dev);
+                send_int(Sockfd, mapping[static_cast(int, cbi->tsh)], dev);
             break;
         }
         case 'L': {
@@ -236,7 +237,7 @@ static void getopt_proc(const struct HXoptcb *cbi) {
         case 'Z': {
             uint32_t dev = (cbi->s != NULL) ? getdev(cbi->s) : 0;
             ++Got_arg;
-            send_int(Sockfd, mapping[(int)cbi->tsh], dev);
+            send_int(Sockfd, mapping[static_cast(int, cbi->tsh)], dev);
             break;
         }
     }

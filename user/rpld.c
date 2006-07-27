@@ -169,7 +169,7 @@ static void mainloop(int fd) {
         ssize_t ret;
 
         if((ret = read(fd, &packet, sizeof(struct rpldev_packet))) <
-         (ssize_t)sizeof(struct rpldev_packet)) {
+         static_cast(ssize_t, sizeof(struct rpldev_packet))) {
             struct stat sb;
 #if defined(__OpenBSD__) || defined(__NetBSD__)
             if(errno == EINTR)
@@ -178,7 +178,8 @@ static void mainloop(int fd) {
             fstat(fd, &sb);
             if(!S_ISREG(sb.st_mode))
                 fprintf(stderr, _("\n" "Short read: %ld bytes only. "
-                 "Error %d: %s\n"), (long)ret, errno, strerror(errno));
+                        "Error %d: %s\n"), static_cast(long, ret), errno,
+                        strerror(errno));
             Opt._running = 0;
             break;
         }
@@ -396,7 +397,7 @@ static void log_open(struct tty *tty) {
 
     // ... as well as the username (or UID) the tty belongs to
     if(getnamefromuid(tty->uid, buf, sizeof(buf)) == NULL)
-        snprintf(buf, sizeof(buf), "%ld", (long)tty->uid);
+        snprintf(buf, sizeof(buf), "%ld", static_cast(long, tty->uid));
     p.event = EVT_ID_USER;
     s = p.size = strlen(buf) + 1;
     SWAB1(&p.size);
@@ -481,7 +482,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev) {
         tty->uid = sb.st_uid;
         if(getnamefromuid(sb.st_uid, user, sizeof(user)) == NULL)
             // Well, at least the UID.
-            snprintf(user, sizeof(user), "%ld", (long)sb.st_uid);
+            snprintf(user, sizeof(user), "%ld", static_cast(long, sb.st_uid));
     }
 
     /* The filename in sdev contains a common prefix, such as "/dev", and may

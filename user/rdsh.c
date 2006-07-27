@@ -63,7 +63,7 @@ struct tty *get_tty(uint32_t dev, int create) {
     const struct HXbtree_node *ts;
     struct tty *ret = NULL, *tty;
 
-    if((ret = HXbtree_get(Ttys, (void *)dev)) != NULL)
+    if((ret = HXbtree_get(Ttys, reinterpret_cast(const void *, dev))) != NULL)
         return ret;
     if(!create || (tty = malloc(sizeof(struct tty))) == NULL)
         return NULL;
@@ -77,7 +77,7 @@ struct tty *get_tty(uint32_t dev, int create) {
     tty->sdev     = NULL;
     tty->full_dev = NULL;
 
-    if((ts = HXbtree_add(Ttys, (const void *)dev, tty)) == NULL) {
+    if((ts = HXbtree_add(Ttys, reinterpret_cast(const void *, dev), tty)) == NULL) {
         free(tty);
         notify(LOG_ERR, _("%s: Memory allocation failure\n"), __FUNCTION__);
         return NULL;
@@ -101,7 +101,7 @@ void log_close(struct tty *tty) {
         get_tty(). If it is IFP_DEACTIVSES, it will change to IFP_ACTIVATED,
         as per definition. So we only need the data structure if
         IFP_DEACTIVATED is on. */
-        HXbtree_del(Ttys, (const void *)tty->dev);
+        HXbtree_del(Ttys, reinterpret_cast(const void *, tty->dev));
         free(tty);
     }
     return;

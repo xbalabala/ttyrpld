@@ -38,6 +38,7 @@ user/pctrl.c - "Remote control" for ttyreplay
 #    define SA_ONESHOT SA_RESETHAND
 #endif
 #include "pctrl.h"
+#include "rdsh.h"
 
 // Functions
 static void *pctrl_thread(void *);
@@ -90,7 +91,7 @@ static void *pctrl_thread(void *arg) {
         read(ctty, &c, 1);
         switch(tolower(c)) {
             case ' ':
-                pstatus->paused ^= (unsigned long)-1;
+                pstatus->paused ^= static_cast(unsigned long, -1);
                 break;
             case '<':
                 pstatus->brk = PCTRL_PREV;
@@ -108,7 +109,7 @@ static void *pctrl_thread(void *arg) {
                 pstatus->factor *= 1.0 + 1.0 / 3.0;
                 break;
             case 'e':
-                pstatus->echo ^= (unsigned long)-1;
+                pstatus->echo ^= static_cast(unsigned long, -1);
                 break;
             case '6':
                 if(pstatus->skval < 0)

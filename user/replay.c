@@ -37,6 +37,7 @@ user/replay.c - Realtime TTY log analyzer
 #include "rpl_packet.h"
 #include "lib.h"
 #include "pctrl.h"
+#include "rdsh.h"
 
 #define offsetof(type, member) ((size_t)&((type *)NULL)->member)
 #define containerof(var, type, member) ((void *)(var) - offsetof(type, member))
@@ -283,7 +284,7 @@ static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
 
         if(i->factor != 1.0)
             // -S switch for the fast
-            usec2tv((double)tv2usec(&delta) / i->factor, &delta);
+            usec2tv(static_cast(double, tv2usec(&delta)) / i->factor, &delta);
 
         if(Opt.maxdelay > 0 && tv2usec(&delta) > Opt.maxdelay)
             // -m switch for those who do not want to wait their lifetime.
@@ -345,7 +346,7 @@ static int find_next_packet(int fd, const struct pctrl_info *ps) {
 #define BZ           (2 * LZ)
 #define MAGIC_OFFSET offsetof(struct rpldsk_packet, magic)
     char buf[BZ];
-    struct rpldsk_packet *packet = (void *)buf;
+    struct rpldsk_packet *packet = static_cast(void *, buf);
     size_t s;
     int ok = 0;
 
