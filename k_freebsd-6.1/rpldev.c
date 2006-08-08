@@ -65,13 +65,13 @@ static int kmd_load(void);
 static int kmd_unload(void);
 
 // Stage 2 functions
-static int rpldhk_init(struct cdev *, struct tty *);
-static int rpldhk_open(struct cdev *, struct tty *);
-static int rpldhk_read(const char *, int, struct tty *);
-static int rpldhk_write(const char *, int, struct tty *);
-static int rpldhk_ioctl(struct tty *, u_long, void *);
-static int rpldhk_close(struct tty *);
-static int rpldhk_deinit(struct tty *);
+static int rpldhc_init(struct cdev *, struct tty *);
+static int rpldhc_open(struct cdev *, struct tty *);
+static int rpldhc_read(const char *, int, struct tty *);
+static int rpldhc_write(const char *, int, struct tty *);
+static int rpldhc_ioctl(struct tty *, u_long, void *);
+static int rpldhc_close(struct tty *);
+static int rpldhc_deinit(struct tty *);
 
 // Stage 3 functions
 static int rpldev_open(struct cdev *, int, int, struct thread *);
@@ -152,7 +152,7 @@ static int kmd_unload(void) {
 }
 
 //-----------------------------------------------------------------------------
-static int rpldhk_init(struct cdev *cd, struct tty *tty) {
+static int rpldhc_init(struct cdev *cd, struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL)
@@ -166,7 +166,7 @@ static int rpldhk_init(struct cdev *cd, struct tty *tty) {
     return circular_put_packet(&p, NULL, 0);
 }
 
-static int rpldhk_open(struct cdev *cd, struct tty *tty) {
+static int rpldhc_open(struct cdev *cd, struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL)
@@ -180,7 +180,7 @@ static int rpldhk_open(struct cdev *cd, struct tty *tty) {
     return circular_put_packet(&p, NULL, 0);
 }
 
-static int rpldhk_read(const char *buf, int count, struct tty *tty) {
+static int rpldhc_read(const char *buf, int count, struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL || count == 0)
@@ -194,7 +194,7 @@ static int rpldhk_read(const char *buf, int count, struct tty *tty) {
     return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhk_write(const char *buf, int count, struct tty *tty) {
+static int rpldhc_write(const char *buf, int count, struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL || count == 0)
@@ -208,7 +208,7 @@ static int rpldhk_write(const char *buf, int count, struct tty *tty) {
     return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhk_ioctl(struct tty *tty, u_long cmd, void *arg) {
+static int rpldhc_ioctl(struct tty *tty, u_long cmd, void *arg) {
     struct rpldev_packet p;
     uint32_t cmd32;
 
@@ -224,7 +224,7 @@ static int rpldhk_ioctl(struct tty *tty, u_long cmd, void *arg) {
     return circular_put_packet(&p, &cmd32, sizeof(cmd32));
 }
 
-static int rpldhk_close(struct tty *tty) {
+static int rpldhc_close(struct tty *tty) {
     struct rpldev_packet p;
 
     if(tty == NULL)
@@ -238,7 +238,7 @@ static int rpldhk_close(struct tty *tty) {
     return circular_put_packet(&p, NULL, 0);
 }
 
-static int rpldhk_deinit(struct tty *tty) {
+static int rpldhc_deinit(struct tty *tty) {
     struct rpldev_packet p;
 
     p.dev   = TTY_DEVNR(tty);
@@ -270,16 +270,16 @@ static int rpldev_open(struct cdev *cd, int flag, int mode,
     }
 
     BufRP = BufWP = Buffer;
-    rpl_init   = rpldhk_init;
-    rpl_open   = rpldhk_open;
-    rpl_read   = rpldhk_read;
-    rpl_write  = rpldhk_write;
+    rpl_init   = rpldhc_init;
+    rpl_open   = rpldhc_open;
+    rpl_read   = rpldhc_read;
+    rpl_write  = rpldhc_write;
     /* ioctl reporting is deactivated, because 1) a _lot_ more ioctls are
     generated in *BSD compared to Linux, 2) ioctls are not yet interpreted by
     userspace apps (ttyreplay). */
-    //rpl_ioctl  = rpldhk_ioctl;
-    rpl_close  = rpldhk_close;
-    rpl_deinit = rpldhk_deinit;
+    //rpl_ioctl  = rpldhc_ioctl;
+    rpl_close  = rpldhc_close;
+    rpl_deinit = rpldhc_deinit;
     return 0;
 }
 

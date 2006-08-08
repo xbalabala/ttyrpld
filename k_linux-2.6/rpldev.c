@@ -80,14 +80,14 @@ k_linux-2.6/rpldev.c - Kernel interface for RPLD
 #define SKIP_PTM(tty)   if(IS_PTY_MASTER(tty)) return 0;
 
 // Stage 2 functions
-static int rpldhk_init(struct tty_struct *, struct tty_struct *, struct file *);
-static int rpldhk_open(struct tty_struct *, struct tty_struct *, struct file *);
-static int rpldhk_read(const char __user *, size_t, struct tty_struct *);
-static int rpldhk_write(const char __user *, size_t, struct tty_struct *);
-static int rpldhk_ioctl(struct tty_struct *, struct tty_struct *, unsigned int,
+static int rpldhc_init(struct tty_struct *, struct tty_struct *, struct file *);
+static int rpldhc_open(struct tty_struct *, struct tty_struct *, struct file *);
+static int rpldhc_read(const char __user *, size_t, struct tty_struct *);
+static int rpldhc_write(const char __user *, size_t, struct tty_struct *);
+static int rpldhc_ioctl(struct tty_struct *, struct tty_struct *, unsigned int,
     unsigned long);
-static int rpldhk_close(struct tty_struct *, struct tty_struct *);
-static int rpldhk_deinit(struct tty_struct *, struct tty_struct *);
+static int rpldhc_close(struct tty_struct *, struct tty_struct *);
+static int rpldhc_deinit(struct tty_struct *, struct tty_struct *);
 
 // Stage 3 functions
 static int     rpldev_open(struct inode *, struct file *);
@@ -170,7 +170,7 @@ module_init(rpldev_init);
 module_exit(rpldev_exit);
 
 //-----------------------------------------------------------------------------
-static int rpldhk_init(struct tty_struct *tty, struct tty_struct *ctl,
+static int rpldhc_init(struct tty_struct *tty, struct tty_struct *ctl,
  struct file *filp)
 {
     /* Called from drivers/char/tty_io.c:init_dev() when the refcount of a tty
@@ -199,7 +199,7 @@ static int rpldhk_init(struct tty_struct *tty, struct tty_struct *ctl,
     return circular_put_packet(&p, full_dev, len);
 }
 
-static int rpldhk_open(struct tty_struct *tty, struct tty_struct *ctl,
+static int rpldhc_open(struct tty_struct *tty, struct tty_struct *ctl,
  struct file *filp)
 {
     /* Called from drivers/char/tty_io.c:tty_open() whenever an open() on a
@@ -226,10 +226,10 @@ static int rpldhk_open(struct tty_struct *tty, struct tty_struct *ctl,
     return circular_put_packet(&p, full_dev, len);
 }
 
-static int rpldhk_read(const char __user *buf, size_t count,
+static int rpldhc_read(const char __user *buf, size_t count,
  struct tty_struct *tty)
 {
-    /* The data flow is a bit weird at first. rpldhk_read() gets the data on
+    /* The data flow is a bit weird at first. rpldhc_read() gets the data on
     its way between ttyDriver(master) -> /dev/stdin(slave), meaning this
     function is called when you hit the keyboard. _Even_ if you do not see any
     text onscreen. */
@@ -247,7 +247,7 @@ static int rpldhk_read(const char __user *buf, size_t count,
     return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhk_write(const char __user *buf, size_t count,
+static int rpldhc_write(const char __user *buf, size_t count,
  struct tty_struct *tty)
 {
     /* Data flow: /dev/stdout(slave) -> tty driver(master).
@@ -279,7 +279,7 @@ static int rpldhk_write(const char __user *buf, size_t count,
     return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhk_ioctl(struct tty_struct *tty, struct tty_struct *ctl,
+static int rpldhc_ioctl(struct tty_struct *tty, struct tty_struct *ctl,
  unsigned int cmd, unsigned long arg)
 {
     struct rpldev_packet p;
@@ -296,7 +296,7 @@ static int rpldhk_ioctl(struct tty_struct *tty, struct tty_struct *ctl,
     return circular_put_packet(&p, &cmd32, sizeof(cmd32));
 }
 
-static int rpldhk_close(struct tty_struct *tty, struct tty_struct *other) {
+static int rpldhc_close(struct tty_struct *tty, struct tty_struct *other) {
     struct rpldev_packet p;
 
     SKIP_PTM(tty);
@@ -309,7 +309,7 @@ static int rpldhk_close(struct tty_struct *tty, struct tty_struct *other) {
     return circular_put_packet(&p, NULL, 0);
 }
 
-static int rpldhk_deinit(struct tty_struct *tty, struct tty_struct *other) {
+static int rpldhc_deinit(struct tty_struct *tty, struct tty_struct *other) {
     struct rpldev_packet p;
 
     if(IS_PTY_MASTER(tty))
@@ -352,15 +352,15 @@ static int rpldev_open(struct inode *inode, struct file *filp) {
 
     /* Update links. I do it here 'cause I do not want memory copying (from the
     tty driver to the buffer) when there is no one to read. */
-    rpl_init   = rpldhk_init;
-    rpl_open   = rpldhk_open;
-    rpl_read   = rpldhk_read;
-    rpl_write  = rpldhk_write;
-    rpl_close  = rpldhk_close;
-    rpl_deinit = rpldhk_deinit;
+    rpl_init   = rpldhc_init;
+    rpl_open   = rpldhc_open;
+    rpl_read   = rpldhc_read;
+    rpl_write  = rpldhc_write;
+    rpl_close  = rpldhc_close;
+    rpl_deinit = rpldhc_deinit;
 
     if(Enable_ioctl_proc)
-        rpl_ioctl = rpldhk_ioctl;
+        rpl_ioctl = rpldhc_ioctl;
 
     /* The inode's times are changed as follows:
             Access Time: if data is read from the device
