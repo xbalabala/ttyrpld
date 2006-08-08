@@ -45,18 +45,20 @@ static int rpldev_getinfo(dev_info_t *, ddi_info_cmd_t, void *, void **);
 
 // Stage 2 functions
 /*
-static int rpldhk_init(void);
-static int rpldhk_open(void);
-static int rpldhk_read(void);
-static int rpldhk_write(void);
-static int rpldhk_ioctl(void);
-static int rpldhk_close(void);
-static int rpldhk_deinit(void);
+static int rpldhc_init(void);
+static int rpldhc_open(void);
+static int rpldhc_read(void);
+static int rpldhc_write(void);
+static int rpldhc_ioctl(void);
+static int rpldhc_close(void);
+static int rpldhc_deinit(void);
 */
 
 // Stage 3 functions
 static int rpldev_open(dev_t *, int, int, cred_t *);
 static int rpldev_close(dev_t, int, int, cred_t *);
+static int rpldev_read(dev_t, struct uio *, cred_t *);
+static int rpldev_chpoll(dev_t, short, int, short *, struct pollhead **);
 
 // Local functions
 static inline size_t avail_R(void);
@@ -82,13 +84,13 @@ static struct cb_ops rpldev_cbops = {
     .cb_strategy = nodev,
     .cb_print    = nodev,
     .cb_dump     = nodev,
-    .cb_read     = nodev, // rpldev_read
+    .cb_read     = rpldev_read,
     .cb_write    = nodev, // rpldev_write
     .cb_ioctl    = nodev, // rpldev_ioctl
     .cb_devmap   = nodev,
     .cb_mmap     = nodev,
     .cb_segmap   = nodev,
-    .cb_chpoll   = nochpoll,
+    .cb_chpoll   = rpldev_chpoll,
     .cb_prop_op  = ddi_prop_op,
     .cb_flag     = D_NEW | D_MP | D_64BIT,
     .cb_rev      = CB_REV,
@@ -110,7 +112,7 @@ static struct dev_ops rpldev_devops = {
 
 static struct modldrv rpldev_modldrv = {
     .drv_modops   = &mod_driverops,
-    .drv_linkinfo = "rpldev tty grabber",
+    .drv_linkinfo = "ttyrpld/2.18 rpldev",
     .drv_dev_ops  = &rpldev_devops,
 };
 
@@ -210,14 +212,16 @@ static int rpldev_open(dev_t *devp, int flag, int otyp, cred_t *credp) {
 
     BufRP = BufWP = Buffer;
 /*
-    rpl_init   = rpldhk_init;
-    rpl_open   = rpldhk_open;
-    rpl_read   = rpldhk_read;
-    rpl_write  = rpldhk_write;
-    //rpl_ioctl  = rpldhk_ioctl;
-    rpl_close  = rpldhk_close;
-    rpl_deinit = rpldhk_deinit;
+    rpl_init   = rpldhc_init;
+    rpl_open   = rpldhc_open;
+    rpl_read   = rpldhc_read;
+    rpl_write  = rpldhc_write;
+    //rpl_ioctl  = rpldhc_ioctl;
+    rpl_close  = rpldhc_close;
+    rpl_deinit = rpldhc_deinit;
 */
+    strcpy(Buffer, "Just some random bytes to test the functionality");
+    BufWP += strlen(Buffer);
     cmn_err(CE_NOTE, "rpldev: opened\n");
     return 0;
 }
@@ -230,20 +234,30 @@ static int rpldev_read(dev_t dev, struct uio *uio, cred_t *credp) {
     if(Buffer == NULL)
         goto out;
 
+    cmn_err(CE_NOTE, "rpldev: read\n");
     while(BufRP == BufWP) {
         mutex_exit(&Buffer_lock);
         if(uio->uio_fmode & (FNDELAY | FNONBLOCK))
             return EAGAIN;
-        if((ret = cv_wait_sig(&Buffer_wait, &Buffer_lock)) == 0)
+        cmn_err(CE_NOTE, "rpldev: waiting in read\n");
+        mutex_enter(&Buffer_lock);
+        ret = cv_wait_sig(&Buffer_wait, &Buffer_lock);
+        mutex_exit(&Buffer_lock);
+        if(ret == 0)
             return EINTR;
+        cmn_err(CE_NOTE, "rpldev: acquiring in read\n");
         ret = 0;
         mutex_enter(&Buffer_lock);
         if(Buffer == NULL)
             goto out;
     }
 
+    cmn_err(CE_NOTE, "rpldev_read: jo, resid=%d, avail=%d\n",
+     (int)uio->uio_resid, (int)avail_R());
     count = min_uint(uio->uio_resid, avail_R());
+    cmn_err(CE_NOTE, "rpldev_read: jo, count=%d\n", (int)count);
     ret   = circular_get(uio, count);
+    cmn_err(CE_NOTE, "rpldev_read: jo, ret=%d\n", (int)ret);
  out:
     mutex_exit(&Buffer_lock);
     return ret;
@@ -252,11 +266,53 @@ static int rpldev_read(dev_t dev, struct uio *uio, cred_t *credp) {
 static int rpldev_ioctl(dev_t dev, int cmd, intptr_t arg, int mode,
  cred_t *credp, int *rvalp)
 {
+    size_t val;
+    int ret = 0;
+
+    if(_IOC_TYPE(cmd) != RPL_IOC_MAGIC)
+        return ENOTTY;
+
+    switch(cmd) {
+        case RPL_IOC_GETBUFSIZE:
+            return (ddi_copyout((void *)arg, &Bufsize,
+                   sizeof(Bufsize), 0) != 0) ? EFAULT : 0;
+        case RPL_IOC_GETRAVAIL:
+            mutex_enter(&Buffer_lock);
+            if(Buffer == NULL)
+                goto out;
+            val = avail_R();
+            ret = ddi_copyout((void *)arg, &val, sizeof(val), 0);
+            mutex_exit(&Buffer_lock);
+            return (ret != 0) ? EFAULT : 0;
+        case RPL_IOC_GETWAVAIL:
+            mutex_enter(&Buffer_lock);
+            if(Buffer == NULL)
+                goto out;
+            val = avail_W();
+            ret = ddi_copyout((void *)arg, &val, sizeof(val), 0);
+            mutex_exit(&Buffer_lock);
+            return (ret != 0) ? EFAULT : 0;
+        case RPL_IOC_IDENTIFY:
+            val = 0xC0FFEE;
+            return (ddi_copyout((void *)arg, &val,
+                   sizeof(val), 0) != 0) ? EFAULT : 0;
+        case RPL_IOC_FLUSH:
+            mutex_enter(&Buffer_lock);
+            BufRP = BufWP;
+            mutex_exit(&Buffer_lock);
+            return 0;
+    }
+
+    ret = ENOTTY;
+ out:
+    return ret;
 }
 
 static int rpldev_chpoll(dev_t dev, short requested_events, int any_yet,
  short *available_events, struct pollhead **pollhd)
 {
+    cmn_err(CE_NOTE, "rpldev: chpoll rq %d BufRP %p BufWP %p\n",
+     requested_events, BufRP, BufWP);
     if((requested_events & (POLLIN | POLLRDNORM)) && BufRP != BufWP) {
         *available_events = POLLIN | POLLRDNORM;
         return 0;
