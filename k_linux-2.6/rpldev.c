@@ -114,7 +114,7 @@ static DECLARE_WAIT_QUEUE_HEAD(Pull_queue);
 static DECLARE_MUTEX(Buffer_lock);
 static DECLARE_MUTEX(Open_lock);
 static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
-static size_t Bufsize = 32 * 1024;
+static unsigned int Bufsize = 32 * 1024;
 static unsigned int Minor_nr = MISC_DYNAMIC_MINOR, Open_count = 0,
     Enable_ioctl_proc = 0;
 
