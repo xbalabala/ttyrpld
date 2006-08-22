@@ -2,7 +2,7 @@
 
 .PHONY: kmod kclean
 
-ostype=$(shell uname -sr | tr A-Z a-z)
+ostype=$(shell uname -s | tr A-Z a-z)-$(shell uname -r | cut -b 1-3)
 
 kmod:
 	@echo "Compiling Kernel module...";
