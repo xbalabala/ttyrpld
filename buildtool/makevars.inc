@@ -4,9 +4,10 @@ V        := 0
 DEBUG    := 0
 PREFIX   := /usr/local
 
-cc-option := $(shell if $(CC) $(CFLAGS) $(1) -S -o /dev/null -xc /dev/null \
-             >/dev/null 2>/dev/null; then echo -en "$(1)"; else echo "$(2)"; fi;)
-check_gcc := $(call cc-option,$(1),$(2))
+cc-option = $(shell if ${CC} ${CFLAGS} $(1) -c -o .dev.null.o -xc /dev/null \
+            >/dev/null 2>/dev/null; then echo -en "$(2)"; else echo "$(3)"; \
+            fi; rm -f .dev.null.o)
+check_gcc = $(call cc-option,$(1),$(2),$(3))
 
 CC       := gcc
 CXX      := g++
@@ -25,6 +26,11 @@ LDFLAGS  :=
 SOFLAGS  := -shared
 AR       := ar
 ARFLAGS  :=
+
+# Enable unit-at-a-time mode when possible. It shrinks the binary size.
+cc_funit_at_a_time := $(call check_gcc,-funit-at-a-time,-funit-at-a-time)
+CFLAGS             += ${cc_funit_at_a_time}
+CXXFLAGS           += ${cc_funit_at_a_time}
 
 ifeq (${DEBUG},1)
   CFLAGS   += -ggdb3
@@ -53,9 +59,5 @@ ifeq (${V},0)
   VECHO_LD  = ${Q}echo "  LD    " $@
   VECHO_AR  = ${Q}echo "  AR    " $@
 endif
-
-# Enable unit-at-a-time mode when possible.
-# It shrinks the binary size considerably.
-CFLAGS += $(call check_gcc,-funit-at-a-time,)
 
 #==============================================================================
