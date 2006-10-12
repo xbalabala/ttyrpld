@@ -40,7 +40,7 @@ else
 fi;
 
 verbose="-v";
-grep "^ETCINITD_QUIET=yes" /etc/rpld.conf &>/dev/null && verbose="";
+grep -q "^ETCINITD_QUIET=yes" /etc/rpld.conf 2>/dev/null && verbose="";
 DAEMON_BIN="/usr/sbin/rpld";
 
 rc_reset;
