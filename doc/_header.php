@@ -6,15 +6,21 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="format-white.css" />
-<link rel="alternate stylesheet" type="text/css" href="format-black.css" title="Black background" />
 <title>ttyrpld - TTY replay daemon</title>
 </head>
 
 <body>
 
-<p style="background-color: #000000; padding: 5px;"><a
-href="http://ttyrpld.sourceforge.net/"><img src="ttyrpld.png"
-alt="ttyrpld logo" border="0" /></a></p>
+<div style="background-color: #FFF6D5; border-bottom: 1px solid #808080;
+padding: 5px;">
+<table>
+  <tr>
+    <td valign="center"><a
+        href="http://ttyrpld.sourceforge.net/"><img src="ttyrpld.png"
+        alt="ttyrpld logo" border="0" /></a></td>
+    <td valign="center">ttyrpld&nbsp;- tty logging daemon</td>
+  </tr>
+</table></div>
 
 <p align="center">
 <?php if(!$man) { ?>
