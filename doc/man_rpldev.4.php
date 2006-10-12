@@ -24,7 +24,7 @@
       <p class="block">On FreeBSD, devfs takes care of all this, so when the
       module is loaded, a working <tt>/dev/rpl</tt> is also present. For
       OpenBSD and NetBSD, it always loads at <tt>char(228,0)</tt>. Use
-      <tt>mknod /dev/rpl b 228 0</tt> to create the node. It should be made
+      `<tt>mknod /dev/rpl b 228 0</tt>` to create the node. It should be made
       mode <tt>0400</tt> and owned by the low-privileged user that is set in
       <tt>rpld.conf</tt>.</p>
 
@@ -65,9 +65,9 @@
         </tt></p>
       </div>
 
-      <p class="block">If you cannot influence the modprobe call, or do not
-      should (do not modify <tt>/etc/init.d/rpld</tt> if you can avoid it), you
-      can put the options into <tt>/etc/modprobe.conf.local</tt>:</p>
+      <p class="block">You can put the options into
+      <tt>/etc/modprobe.conf.local</tt>, to be automatically sourced when
+      modprobe is called:</p>
 
       <div class="indent">
         <p class="code"><tt>options rpldev Minor_nr=37</tt></p>
@@ -117,11 +117,11 @@
       byte-aligning gaps between the members, i.e. it is a so-called
       <i>packed</i> structure. (No pun between packet and packed.)</p>
 
-      <p class="block">The <tt>.dev</tt> member contains the device number on
-      which the event occurred. Since both the master and the slave side of a
-      pty pair can generate events, and we usually do not need the master side
-      events, packets from the master sides are already dropped at the kernel
-      level.</p>
+      <p class="block">The <tt>-&gt;dev</tt> member contains the device number
+      on which the event occurred. Since both the master and the slave side of
+      a pty pair can generate events, and we usually do not need the master
+      side events, packets from the master sides are already dropped at the
+      kernel level.</p>
 
       <p class="block">The device field is made up of 12 bits for the major
       number and 20 bits for the minor number, in little-endian, and has this

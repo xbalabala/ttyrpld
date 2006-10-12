@@ -15,7 +15,7 @@
 
       <p class="block">The logfiles <i>rpld</i> creates are a small variation
       of the packet protocol as described in <a
-      href="man_rpldev.4.php">rpldev(4)</a>. The <tt>.dev</tt> field is not
+      href="man_rpldev.4.php">rpldev(4)</a>. The <tt>-&gt;dev</tt> field is not
       present. (Since ttyrpld v2.00, the timestamp is already added in the
       kernel.) All fields are little endian and packed, i.e. there are no
       alignment gaps. The structure is similar to the <tt>struct
@@ -30,8 +30,8 @@
         } <i>__attribute__((packed))</i>;</tt></p>
       </div>
 
-      <p class="block">The <tt>.magic</tt> is always <tt>0xEE</tt>.</p>
-      Possible values for <tt>.event</tt> equal those listed in <a
+      <p class="block">The <tt>-&gt;magic</tt> is always <tt>0xEE</tt>.</p>
+      Possible values for <tt>-&gt;event</tt> equal those listed in <a
       href="man_rpldev.4.php">rpldev(4)</a>, plus the following:</p>
 
       <div class="indent">
@@ -57,9 +57,9 @@
 
       <ul>
         <li>if the first packet <i>rpld</i> picks up for a certain
-          <tt>.dev</tt> line is a <tt>EVT_INIT</tt> or <tt>EVT_OPEN</tt> packet
-          with a dentry name (e.g. <tt>/dev/tty1</tt>), this name will be used
-          for this major-minor number</li>
+          <tt>-&gt;dev</tt> line is a <tt>EVT_INIT</tt> or <tt>EVT_OPEN</tt>
+          packet with a dentry name (e.g. <tt>/dev/tty1</tt>), this name will
+          be used for this major-minor number</li>
         <li><i>rpld</i> will look into <tt>/dev</tt> and take the first
           pick</li>
       </ul>

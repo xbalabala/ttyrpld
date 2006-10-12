@@ -5,7 +5,7 @@
   <tr>
     <td align="right" valign="top" class="section"><b>Name&nbsp;&gt;</b></td>
     <td valign="top">
-      <p>TTYRPLD Architecture</p>
+      <p><i>ttyrpld</i> Architecture</p>
     </td>
   </tr>
   <tr>
@@ -21,13 +21,8 @@
       <p class="block">Different keyloggers take different ways. <i>Linspy</i>
       (see Phrack 50, File 5) modifies the syscall table to provide its own
       functions, <i>vlogger</i> (Phrack 59, File 0x0E) chooses to intercept the
-      <tt>receive_buf()</tt> function. <i>ttyrpld</i>'s technique arose out of
-      2 lines of <i>UML</i> (User Mode Linux) code which I found in <a
-      href="http://jengelh.hopto.org/linux-suse.php"
-      target="_blank">2.4.21-SUSE</a>. UML only had tty logging within, well... 
-      UML, and it did not look that pretty to me. On top, UML had it easy,
-      because the host system accounted for writing it to disk, but what's the
-      parent of a real Kernel? None!</p>
+      <tt>receive_buf()</tt> function. <i>ttyrpld</i> instead hooks in at the
+      top of the tty layer level.</p>
 
       <p class="block">The first step in capturing the data off a tty is
       directly in the kernel, within <tt>drivers/char/tty_io.c</tt>. It is
@@ -66,16 +61,13 @@
         <b>#</b>endif</tt></p>
       </div>
 
-      <p class="block"><tt>tty_write()</tt>, etc. is the spot to take (as UML
-      did), because this is directly below before the tty buffers spread into
-      their disciplines. That way, any tty (teletype) is logged, <tt>vc</tt>
-      (virtual console, aka Ctrl+Alt+F1), <tt>pts</tt> (Unix98 pty, used e.g.
-      with SSH), <tt>ttyp</tt> (BSD ptys, rarely used anymore), <tt>ttyS</tt>
-      (serial), and if someone's gonna try it, even weirdo stuff like
-      <tt>ttyI</tt> (isdn).</p>
-
-      <p class="block"><i>Update (2004-08-14):</i> Yes, it actually records
-      serial lines too... I just found the data from an UPS <tt>;-)</tt></p>
+      <p class="block"><tt>tty_write()</tt>, etc. is the spot to take, because
+      this is directly below before the tty buffers spread into their
+      disciplines. That way, any tty (teletype) is logged, <tt>vc</tt> (virtual
+      console, aka Ctrl+Alt+F1), <tt>pts</tt> (Unix98 pty, used e.g. with SSH),
+      <tt>ttyp</tt> (BSD ptys, rarely used anymore), <tt>ttyS</tt> (serial),
+      and if someone is going to try it, even ISDN lines like <tt>ttyI</tt>
+      may show up.</p>
 
     </td>
   </tr>
@@ -129,6 +121,10 @@
       size. Thanks to <i>rpldev</i> being a module, you can remove it and
       re-<tt>modprobe</tt> with the corresponding parameter
       <tt>Bufsize</tt>.</p>
+
+      <p class="block">I have decided not to block processes trying to write to
+      a full ring buffer because that could create a real bad userspace
+      deadlock.</p>
 
     </td>
   </tr>

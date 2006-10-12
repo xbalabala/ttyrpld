@@ -88,9 +88,9 @@
           <td valign="top" nowrap="nowrap"><b>-T</b></td>
 
           <td valign="top">Shows (replays) the log without any delays. This can
-          be used to generate a screen log like <tt>script</tt> or
-          <tt>screen</tt> (rpl logfile without any packet headers, basically)
-          for easy grepping.</td>
+          be used to generate a screen log like <i>script</i> or <i>screen</i>
+          (rpl logfile without any packet headers, basically) for easy
+          grepping.</td>
 
         </tr>
         <tr>

@@ -28,8 +28,6 @@
       target="_blank">[Support]</a> <a
       href="http://sourceforge.net/tracker/?group_id=120202&amp;atid=686263"
       target="_blank">[Bugs]</a> <a
-      href="http://sourceforge.net/tracker/?group_id=120202&atid=686265"
-      target="_blank">[Patches]</a> <a
       href="http://sourceforge.net/tracker/?group_id=120202&atid=686266"
       target="_blank">[Feature Requests]</a></p>
 

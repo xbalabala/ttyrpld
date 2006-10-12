@@ -13,7 +13,7 @@
         <tr>
           <td>GNU make</td>
           <td>3.79</td>
-          <td>3.80</td>
+          <td>3.81</td>
         </tr>
         <tr>
           <td>BSD make<br />
@@ -23,7 +23,7 @@
         <tr>
           <td><a href="http://jengelh.hopto.org/coding/libHX.php">libHX</a></td>
           <td>1.8.0</li>
-          <td>1.8.1</li>
+          <td>1.9.2</li>
         </tr>
         <tr>
           <td>GNU C Compiler</td>
@@ -37,21 +37,21 @@
         <tr>
           <td>perl</td>
           <td>5.6.0</td>
-          <td>&gt;= 5.6.0</td>
+          <td>-</td>
         </tr>
         <tr>
           <td>php</td>
           <td>4.x</td>
-          <td>&gt;= 4.x</td>
+          <td>-</td>
         </tr>
         <tr>
           <td>w3m</td>
           <td>0.5.0</td>
-          <td>0.5.1</td>
+          <td>-</td>
         </tr>
         <tr>
           <td>bzip2, patch, tar</td>
-          <td colspan="2"><i>whatever works</i></td>
+          <td colspan="2"><i>any</i></td>
         </tr>
         <tr>
           <td colspan="3"><i>Please check your kernel documentation on what

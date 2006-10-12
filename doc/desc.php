@@ -20,20 +20,11 @@
   </tr>
   <tr>
 
-    <td align="right" valign="top" class="section"><b>Categorization<br />
-    (SF-style)&nbsp;&gt;</b></td>
+    <td align="right" valign="top" class="section"><b>General
+      info&nbsp;&gt;</b></td>
 
     <td valign="top">
       <div class="indent"><table border="1" class="sBorder">
-        <tr>
-          <td>Development Status:</td>
-          <td>6 - Mature</td>
-        </tr>
-        <tr>
-          <td>Intended Audience:</td>
-          <td>Advanced End Users, Developers, System Administrators,
-            Telecommunications Industry, Information Technology</td>
-        </tr>
         <tr>
           <td>License:</td>
           <td><ul>
@@ -42,28 +33,14 @@
             </ul></td>
         </tr>
         <tr>
-          <td>Languages (natural first):</td>
-          <td>English, Persian-Farsi (<tt>fa_IR</tt>), German (<tt>de</tt>),
-            Spanish (<tt>es</tt>), French (<tt>fr</tt>), Italian (<tt>it</tt>),
-            Norwegian-Bokmål (<tt>nb</tt>), Netherlandish (<tt>nl</tt>),
-            Swedish (<tt>sv</tt>)</td>
+          <td>Languages:</td>
+          <td>English, Dutch, French, German, Italian, Norwegian-Bokmål,
+            Persian(Farsi), Spanish, Swedish</td>
         </tr>
         <tr>
           <td>Operating Systems:</td>
           <td>Linux 2.4/2.6, FreeBSD 5.3/6.0/6.1, OpenBSD 3.9, NetBSD 3.0<br />
             (and possibly offsprings)</td>
-        </tr>
-        <tr>
-          <td>Programming Language:</td>
-          <td>C/GNU89</td>
-        </tr>
-        <tr>
-          <td>Topic:</td>
-          <td>Systems Administration, Security</td>
-        </tr>
-        <tr>
-          <td>Environment:</td>
-          <td>Non-interactive (Daemon), Console/Terminal</td>
         </tr>
       </table></div>
     </td>

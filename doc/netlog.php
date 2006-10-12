@@ -13,7 +13,8 @@
       two hosts! Network logging is currently only of use between Linux where
       tty classes have the same major number. Another constraint is that the
       tty node must also exist on the destination system, which is not always
-      the case with dynamic /dev directories (either by devfs or udev).</p>
+      the case with dynamic <tt>/dev</tt> directories (either by devfs or
+      udev).</p>
 
     </td>
   </tr>
