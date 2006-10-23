@@ -55,9 +55,9 @@ static int rpldhc_deinit(void);
 */
 
 // Stage 3 functions
-static int rpldev_open(dev_t *, int, int, cred_t *);
-static int rpldev_close(dev_t, int, int, cred_t *);
-static int rpldev_read(dev_t, struct uio *, cred_t *);
+static int rpldev_open(dev_t *, int, int, struct cred *);
+static int rpldev_close(dev_t, int, int, struct cred *);
+static int rpldev_read(dev_t, struct uio *, struct cred *);
 static int rpldev_chpoll(dev_t, short, int, short *, struct pollhead **);
 
 // Local functions
@@ -196,7 +196,7 @@ static int rpldev_getinfo(dev_info_t *dip, ddi_info_cmd_t cmd, void *arg,
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-static int rpldev_open(dev_t *devp, int flag, int otyp, cred_t *credp) {
+static int rpldev_open(dev_t *devp, int flag, int otyp, struct cred *credp) {
     mutex_enter(&Open_lock);
     if(Open_count) {
         mutex_exit(&Open_lock);
@@ -226,7 +226,7 @@ static int rpldev_open(dev_t *devp, int flag, int otyp, cred_t *credp) {
     return 0;
 }
 
-static int rpldev_read(dev_t dev, struct uio *uio, cred_t *credp) {
+static int rpldev_read(dev_t dev, struct uio *uio, struct cred *credp) {
     size_t count;
     int ret = 0;
 
@@ -264,7 +264,7 @@ static int rpldev_read(dev_t dev, struct uio *uio, cred_t *credp) {
 }
 
 static int rpldev_ioctl(dev_t dev, int cmd, intptr_t arg, int mode,
- cred_t *credp, int *rvalp)
+ struct cred *credp, int *rvalp)
 {
     size_t val;
     int ret = 0;
@@ -324,7 +324,7 @@ static int rpldev_chpoll(dev_t dev, short requested_events, int any_yet,
     return 0;
 }
 
-static int rpldev_close(dev_t dev, int flag, int otyp, cred_t *credp) {
+static int rpldev_close(dev_t dev, int flag, int otyp, struct cred *credp) {
 /*
     rpl_init   = NULL;
     rpl_open   = NULL;
