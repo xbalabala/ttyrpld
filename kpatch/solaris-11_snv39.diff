@@ -1,0 +1,156 @@
+Index: uts/common/fs/specfs/specsubr.c
+===================================================================
+--- uts.orig/common/fs/specfs/specsubr.c	2006-05-09 15:58:50.000000000 +0200
++++ uts/common/fs/specfs/specsubr.c	2006-10-21 15:40:40.675303000 +0200
+@@ -780,6 +780,21 @@
+ 	return (0);
+ }
+ 
++int device_fdclose(struct vnode *vp, int flag, struct cred *cr)
++{
++	const struct snode *sp = VTOS(vp);
++	struct vnode *cvp      = sp->s_commonvp;
++
++	if(vp->v_type != VCHR)
++		return 0;
++	if(!STREAMSTAB(getmajor(sp->s_dev)))
++		return dev_fdclose(sp->s_dev, flag, OTYP_CHR, cr);
++	if(cvp->v_stream != NULL)
++		return strfdclose(cvp, flag, cr);
++
++	return 0;
++}
++
+ int
+ device_close(struct vnode *vp, int flag, struct cred *cr)
+ {
+Index: uts/common/fs/specfs/specvnops.c
+===================================================================
+--- uts.orig/common/fs/specfs/specvnops.c	2006-05-09 15:58:50.000000000 +0200
++++ uts/common/fs/specfs/specvnops.c	2006-10-21 14:33:02.489403000 +0200
+@@ -803,6 +803,10 @@
+ 			ddi_rele_driver(getmajor(dev));
+ 		}
+ 		mutex_enter(&csp->s_lock);
++	} else {
++		mutex_exit(&csp->s_lock);
++		device_fdclose(vp, flag, cr);
++		mutex_enter(&csp->s_lock);
+ 	}
+ 
+ 	UNLOCK_CSP_LOCK_HELD(csp);
+Index: uts/common/os/driver.c
+===================================================================
+--- uts.orig/common/os/driver.c	2006-05-09 15:58:50.000000000 +0200
++++ uts/common/os/driver.c	2006-10-21 15:40:27.250395000 +0200
+@@ -273,6 +273,16 @@
+ 	return ((*cb->cb_open)(devp, flag, type, cred));
+ }
+ 
++int dev_fdclose(dev_t dev, int flag, int type, struct cred *cred)
++{
++	const struct cb_ops *ops = devopsp[getmajor(dev)]->devo_cb_ops;
++
++	if(ops == NULL || ops->cb_fdclose == NULL)
++		return 0;
++
++	return ops->cb_fdclose(dev, flag, type, cred);
++}
++
+ int
+ dev_close(dev_t dev, int flag, int type, struct cred *cred)
+ {
+Index: uts/common/os/streamio.c
+===================================================================
+--- uts.orig/common/os/streamio.c	2006-05-09 15:58:50.000000000 +0200
++++ uts/common/os/streamio.c	2006-10-21 20:44:57.590674000 +0200
+@@ -560,6 +560,29 @@
+  * stream structure.
+  */
+ 
++int strfdclose(struct vnode *vp, int flag, struct cred *crp)
++{
++	struct stdata *stp = vp->v_stream;
++	struct queue *qp;
++	int ret = 0;
++
++	if(stp == NULL || (qp = stp->sd_wrq) == NULL)
++		return 0;
++
++	while(qp != NULL && _SAMESTR(qp)) {
++		struct qinit *qi = _RD(qp)->q_qinfo;
++
++		if(qi != NULL && qi->qi_qfdclose != NULL)
++			ret = qi->qi_qfdclose(qi, flag, crp);
++
++		mutex_enter(&stp->sd_lock);
++		qp = qp->q_next;
++		mutex_exit(&stp->sd_lock);
++	}
++
++	return ret;
++}
++
+ int
+ strclose(struct vnode *vp, int flag, cred_t *crp)
+ {
+Index: uts/common/sys/conf.h
+===================================================================
+--- uts.orig/common/sys/conf.h	2006-05-09 15:58:50.000000000 +0200
++++ uts/common/sys/conf.h	2006-10-21 20:46:47.269228000 +0200
+@@ -96,6 +96,7 @@
+  */
+ extern int dev_open(dev_t *, int, int, cred_t *);
+ extern int dev_lopen(dev_t *, int, int, cred_t *);
++extern int dev_fdclose(dev_t, int, int, struct cred *);
+ extern int dev_close(dev_t, int, int, cred_t *);
+ extern int dev_lclose(dev_t, int, int, cred_t *);
+ 
+Index: uts/common/sys/devops.h
+===================================================================
+--- uts.orig/common/sys/devops.h	2006-05-09 15:58:50.000000000 +0200
++++ uts/common/sys/devops.h	2006-10-21 20:46:55.974408000 +0200
+@@ -114,6 +114,7 @@
+ 	int	cb_rev;			/* cb_ops version number */
+ 	int	(*cb_aread)(dev_t dev, struct aio_req *aio, cred_t *credp);
+ 	int	(*cb_awrite)(dev_t dev, struct aio_req *aio, cred_t *credp);
++	int	(*cb_fdclose)(dev_t, int, int, struct cred *);
+ };
+ 
+ /*
+Index: uts/common/sys/fs/snode.h
+===================================================================
+--- uts.orig/common/sys/fs/snode.h	2006-05-09 15:58:51.000000000 +0200
++++ uts/common/sys/fs/snode.h	2006-10-21 00:20:55.998836000 +0200
+@@ -153,6 +153,7 @@
+ void	sdelete(struct snode *);
+ void 	smark(struct snode *, int);
+ int	specinit(int, char *);
++extern int device_fdclose(struct vnode *, int, struct cred *);
+ int	device_close(struct vnode *, int, struct cred *);
+ int	spec_putpage(struct vnode *, offset_t, size_t, int, struct cred *);
+ int	spec_segmap(dev_t, off_t, struct as *, caddr_t *, off_t,
+Index: uts/common/sys/stream.h
+===================================================================
+--- uts.orig/common/sys/stream.h	2006-05-09 15:58:51.000000000 +0200
++++ uts/common/sys/stream.h	2006-10-21 00:27:36.658853000 +0200
+@@ -266,6 +266,7 @@
+ 	int	(*qi_rwp)();		/* r/w procedure */
+ 	int	(*qi_infop)();		/* information procedure */
+ 	int	qi_struiot;		/* stream uio type for struio() */
++	int	(*qi_qfdclose)();
+ };
+ 
+ /*
+Index: uts/common/sys/strsubr.h
+===================================================================
+--- uts.orig/common/sys/strsubr.h	2006-05-09 15:58:51.000000000 +0200
++++ uts/common/sys/strsubr.h	2006-10-21 20:46:25.713896000 +0200
+@@ -1094,6 +1094,7 @@
+ extern int strstartplumb(struct stdata *, int, int);
+ extern void strendplumb(struct stdata *);
+ extern int stropen(struct vnode *, dev_t *, int, cred_t *);
++extern int strfdclose(struct vnode *, int, struct cred *);
+ extern int strclose(struct vnode *, int, cred_t *);
+ extern int strpoll(register struct stdata *, short, int, short *,
+     struct pollhead **);
