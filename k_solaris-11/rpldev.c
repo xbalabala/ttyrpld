@@ -63,10 +63,10 @@ static int rpldev_chpoll(dev_t, short, int, short *, struct pollhead **);
 // Local functions
 static inline size_t avail_R(void);
 static inline size_t avail_W(void);
-static inline unsigned int min_uint(unsigned int, unsigned int);
 static inline int circular_get(struct uio *, size_t);
 static inline void circular_put(const void *, size_t);
 static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
+static inline unsigned int min_uint(unsigned int, unsigned int);
 
 // Variables
 static struct pollhead   Buffer_queue;
@@ -356,10 +356,6 @@ static inline size_t avail_W(void) {
     return BufRP - BufWP - 1;
 }
 
-static inline unsigned int min_uint(unsigned int a, unsigned int b) {
-    return (a < b) ? a : b;
-}
-
 static inline int circular_get(struct uio *uio, size_t count) {
     size_t x = Buffer + Bufsize - BufRP;
     int ret;
@@ -416,6 +412,10 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
     pollwakeup(&Buffer_queue, POLLIN | POLLRDNORM);
     cv_broadcast(&Buffer_wait);
     return count;
+}
+
+static inline unsigned int min_uint(unsigned int a, unsigned int b) {
+    return (a < b) ? a : b;
 }
 
 //=============================================================================

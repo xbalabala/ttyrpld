@@ -101,13 +101,13 @@ static int rpldev_close(struct inode *, struct file *);
 // Local functions
 static inline size_t avail_R(void);
 static inline size_t avail_W(void);
-static inline void fill_time(struct timeval *);
-static inline unsigned int min_uint(unsigned int, unsigned int);
-static inline uint32_t mkdev_26(unsigned long, unsigned long);
 static inline int circular_get(char __user *, size_t);
 static inline void circular_put(const void __kernel *, size_t);
 static inline void circular_putU(const void __user *, size_t);
 static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
+static inline void fill_time(struct timeval *);
+static inline unsigned int min_uint(unsigned int, unsigned int);
+static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
 // Variables
 static DECLARE_WAIT_QUEUE_HEAD(Pull_queue);
@@ -526,32 +526,6 @@ static inline size_t avail_W(void) {
     return BufRP - BufWP - 1;
 }
 
-static inline void fill_time(struct timeval *tv) {
-    do_gettimeofday(tv);
-
-    /* The following code all gets optimized away on little-endian.
-    On big-endian, it is reduced by 50%. */
-    if(sizeof(tv->tv_sec) == sizeof(uint32_t))
-        tv->tv_sec = cpu_to_le32(tv->tv_sec);
-    else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
-        tv->tv_sec = cpu_to_le64(tv->tv_sec);
-
-    if(sizeof(tv->tv_usec) == sizeof(uint32_t))
-        tv->tv_usec = cpu_to_le32(tv->tv_usec);
-    else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
-        tv->tv_usec = cpu_to_le64(tv->tv_usec);
-
-    return;
-}
-
-static inline unsigned int min_uint(unsigned int a, unsigned int b) {
-    return (a < b) ? a : b;
-}
-
-static inline uint32_t mkdev_26(unsigned long maj, unsigned long min) {
-    return (maj << 20) | (min & 0xFFFFF);
-}
-
 static inline int circular_get(char __user *dest, size_t count) {
     /* circular_get() reads COUNT bytes from the circulary buffer and puts it
     into userspace memory. The caller must make sure that COUNT is at most
@@ -641,6 +615,32 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
     up(&Buffer_lock);
     wake_up(&Pull_queue);
     return count;
+}
+
+static inline void fill_time(struct timeval *tv) {
+    do_gettimeofday(tv);
+
+    /* The following code all gets optimized away on little-endian.
+    On big-endian, it is reduced by 50%. */
+    if(sizeof(tv->tv_sec) == sizeof(uint32_t))
+        tv->tv_sec = cpu_to_le32(tv->tv_sec);
+    else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
+        tv->tv_sec = cpu_to_le64(tv->tv_sec);
+
+    if(sizeof(tv->tv_usec) == sizeof(uint32_t))
+        tv->tv_usec = cpu_to_le32(tv->tv_usec);
+    else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
+        tv->tv_usec = cpu_to_le64(tv->tv_usec);
+
+    return;
+}
+
+static inline unsigned int min_uint(unsigned int a, unsigned int b) {
+    return (a < b) ? a : b;
+}
+
+static inline uint32_t mkdev_26(unsigned long maj, unsigned long min) {
+    return (maj << 20) | (min & 0xFFFFF);
 }
 
 //=============================================================================

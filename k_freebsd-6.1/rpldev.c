@@ -83,12 +83,12 @@ static int rpldev_close(struct cdev *, int, int, struct thread *);
 // Local functions
 static inline size_t avail_R(void);
 static inline size_t avail_W(void);
-static inline void fill_time(struct timeval *);
-static inline unsigned int min_uint(unsigned int, unsigned int);
-static inline uint32_t mkdev_26(unsigned long, unsigned long);
 static inline int circular_get(struct uio *, size_t);
 static inline void circular_put(const void *, size_t);
 static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
+static inline void fill_time(struct timeval *);
+static inline unsigned int min_uint(unsigned int, unsigned int);
+static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
 // Variables
 static MALLOC_DEFINE(Buffer_malloc, "rpldev", "rpldev ring buffer");
@@ -396,29 +396,6 @@ static inline size_t avail_W(void) {
     return BufRP - BufWP - 1;
 }
 
-static inline void fill_time(struct timeval *tv) {
-    microtime(tv);
-
-    if(sizeof(tv->tv_sec) == sizeof(uint32_t))
-        tv->tv_sec = htole32(tv->tv_sec);
-    else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
-        tv->tv_sec = htole64(tv->tv_sec);
-
-    if(sizeof(tv->tv_usec) == sizeof(uint32_t))
-        tv->tv_usec = htole32(tv->tv_usec);
-    else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
-        tv->tv_usec = htole64(tv->tv_usec);
-    return;
-}
-
-static inline unsigned int min_uint(unsigned int a, unsigned int b) {
-    return (a < b) ? a : b;
-}
-
-static inline uint32_t mkdev_26(unsigned long maj, unsigned long min) {
-    return (maj << 20) | (min & 0xFFFFF);
-}
-
 static inline int circular_get(struct uio *uio, size_t count) {
     size_t x = Buffer + Bufsize - BufRP;
     int ret;
@@ -473,6 +450,29 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
     mtx_unlock(&Buffer_lock);
     wakeup_one(&Buffer);
     return count;
+}
+
+static inline void fill_time(struct timeval *tv) {
+    microtime(tv);
+
+    if(sizeof(tv->tv_sec) == sizeof(uint32_t))
+        tv->tv_sec = htole32(tv->tv_sec);
+    else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
+        tv->tv_sec = htole64(tv->tv_sec);
+
+    if(sizeof(tv->tv_usec) == sizeof(uint32_t))
+        tv->tv_usec = htole32(tv->tv_usec);
+    else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
+        tv->tv_usec = htole64(tv->tv_usec);
+    return;
+}
+
+static inline unsigned int min_uint(unsigned int a, unsigned int b) {
+    return (a < b) ? a : b;
+}
+
+static inline uint32_t mkdev_26(unsigned long maj, unsigned long min) {
+    return (maj << 20) | (min & 0xFFFFF);
 }
 
 //=============================================================================
