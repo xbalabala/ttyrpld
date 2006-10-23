@@ -25,33 +25,34 @@ k_solaris-11/rpldhk.c - Kernel interface for RPLD
 #include <sys/cmn_err.h>
 #include <sys/conf.h>
 #include <sys/ddi.h>
+#include <sys/mkdev.h>
 #include <sys/modctl.h>
 #include <sys/sunddi.h>
 #include <sys/stream.h>
+#include <sys/strsubr.h>
+#include <sys/vnode.h>
+#include "rpldhk.h"
 
 // Functions
-static int rpldhk_rdopen(queue_t *, dev_t *, int, int, cred_t *);
-static int rpldhk_rdput(queue_t *, mblk_t *);
-static int rpldhk_rdclose(queue_t *, int, cred_t *);
-
-static int rpldhk_wropen(queue_t *, dev_t *, int, int, cred_t *);
-static int rpldhk_wrput(queue_t *, mblk_t *);
-static int rpldhk_wrclose(queue_t *, int, cred_t *);
+static int rpldhk_open(struct queue *, dev_t *, int, int, struct cred *);
+static int rpldhk_read(struct queue *, struct msgb *);
+static int rpldhk_write(struct queue *, struct msgb *);
+static int rpldhk_fdclose(struct queue *, int, struct cred *);
+static int rpldhk_close(struct queue *, int, struct cred *);
+static int rpldhk_trap(void);
 
 // Variables
+int (*rpl_init)(struct queue *);
+int (*rpl_open)(struct queue *);
+int (*rpl_read)(const char *, size_t, struct queue *);
+int (*rpl_write)(const char *, size_t, struct queue *);
+int (*rpl_ioctl)(struct queue *);
+int (*rpl_close)(struct queue *);
+int (*rpl_deinit)(struct queue *);
 
 // Module info
-static struct module_info rpldhk_rdinfo = {
+static struct module_info rpldhk_minfo = {
     .mi_idnum  = 1337,
-    .mi_idname = "rpldhk",
-    .mi_minpsz = 0,
-    .mi_maxpsz = INFPSZ,
-    .mi_hiwat  = 300,
-    .mi_lowat  = 200,
-};
-
-static struct module_info rpldhk_wrinfo = {
-    .mi_idnum  = 1338,
     .mi_idname = "rpldhk",
     .mi_minpsz = 0,
     .mi_maxpsz = INFPSZ,
@@ -60,17 +61,19 @@ static struct module_info rpldhk_wrinfo = {
 };
 
 static struct qinit rpldhk_rdinit = {
-    .qi_putp   = rpldhk_rdput,
-    .qi_qopen  = rpldhk_rdopen,
-    .qi_qclose = rpldhk_rdclose,
-    .qi_minfo  = &rpldhk_rdinfo,
+    .qi_qopen    = rpldhk_open,
+    .qi_putp     = rpldhk_read,
+    .qi_qfdclose = rpldhk_fdclose,
+    .qi_qclose   = rpldhk_close,
+    .qi_minfo    = &rpldhk_minfo,
 };
 
 static struct qinit rpldhk_wrinit = {
-    .qi_putp   = rpldhk_wrput,
-    .qi_qopen  = rpldhk_wropen,
-    .qi_qclose = rpldhk_wrclose,
-    .qi_minfo  = &rpldhk_wrinfo,
+    .qi_qopen    = rpldhk_trap,
+    .qi_putp     = rpldhk_write,
+    .qi_qfdclose = rpldhk_trap,
+    .qi_qclose   = rpldhk_trap,
+    .qi_minfo    = &rpldhk_minfo,
 };
 
 static struct streamtab rpldhk_strops = {
@@ -81,7 +84,7 @@ static struct streamtab rpldhk_strops = {
 static struct fmodsw rpldhk_devops = {
     .f_name = "rpldhk",
     .f_str  = &rpldhk_strops,
-    .f_flag = D_MP, /* D_NEW */
+    .f_flag = D_MP, // | D_NEW
 };
 
 static struct modlstrmod rpldhk_modldrv = {
@@ -109,37 +112,71 @@ int _fini(void) {
 }
 
 //-----------------------------------------------------------------------------
-static int rpldhk_rdopen(queue_t *q, dev_t *dev, int oflag, int sflag,
- cred_t *cred)
+static int rpldhk_open(struct queue *q, dev_t *dev, int oflag, int sflag,
+ struct cred *cred)
 {
-    cmn_err(CE_NOTE, "%s dev=%ld\n", __FUNCTION__, (long)*dev);
+    typeof(rpl_open) tmp = rpl_open;
+    if(tmp != NULL)
+        rpl_open(q);
+    qprocson(q);
     return 0;
 }
 
-static int rpldhk_rdput(queue_t *q, mblk_t *mp) {
-    cmn_err(CE_NOTE, "%s\n", __FUNCTION__);
+static void rpldhk_packet(struct queue *q, struct msgb *mp, int wr) {
+    const struct msgb *mblk = mp;
+
+    for(mblk = mp; mblk != NULL; mblk = mblk->b_cont) {
+        const struct datab *dblk = mblk->b_datap;
+        if(mblk->b_rptr > mblk->b_wptr) {
+            cmn_err(CE_NOTE, "Strange mblk received: rptr > wptr\n");
+            continue;
+        }
+
+	if(dblk->db_type != M_DATA)
+	    continue;
+
+	if(wr) {
+	    typeof(rpl_write) tmp = rpl_write;
+	    if(tmp)
+		tmp(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
+	} else {
+	    typeof(rpl_read) tmp = rpl_read;
+	    if(tmp)
+		tmp(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
+	}
+    }
+    return;
+}
+
+static int rpldhk_read(struct queue *q, struct msgb *mp) {
+    rpldhk_packet(q, mp, 0);
+    putnext(q, mp);
     return 0;
 }
 
-static int rpldhk_rdclose(queue_t *q, int flag, cred_t *cred) {
-    cmn_err(CE_NOTE, "%s\n", __FUNCTION__);
+static int rpldhk_write(struct queue *q, struct msgb *mp) {
+    rpldhk_packet(q, mp, 1);
+    putnext(q, mp);
     return 0;
 }
 
-static int rpldhk_wropen(queue_t *q, dev_t *dev, int oflag, int sflag,
- cred_t *cred)
-{
-    cmn_err(CE_NOTE, "%s dev=%ld\n", __FUNCTION__, (long)*dev);
+static int rpldhk_fdclose(struct queue *q, int flag, struct cred *cred) {
+    typeof(rpl_close) tmp = rpl_close;
+    if(tmp)
+	tmp(q);
     return 0;
 }
 
-static int rpldhk_wrput(queue_t *q, mblk_t *mp) {
-    cmn_err(CE_NOTE, "%s\n", __FUNCTION__);
+static int rpldhk_close(struct queue *q, int flag, struct cred *cred) {
+    typeof(rpl_deinit) tmp = rpl_deinit;
+    qprocsoff(q);
+    if(tmp)
+	tmp(q);
     return 0;
 }
 
-static int rpldhk_wrclose(queue_t *q, int flag, cred_t *cred) {
-    cmn_err(CE_NOTE, "%s\n", __FUNCTION__);
+static int rpldhk_trap(void) {
+    cmn_err(CE_NOTE, "This function should have never been called!\n");
     return 0;
 }
 

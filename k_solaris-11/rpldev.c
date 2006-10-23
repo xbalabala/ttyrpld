@@ -21,6 +21,7 @@ k_solaris-11/rpldev.c - Kernel interface for RPLD
   -- For details, see the file named "LICENSE.LGPL2"
 =============================================================================*/
 #include <sys/types.h>
+#include <sys/byteorder.h>
 #include <sys/ccompile.h>
 #include <sys/cmn_err.h>
 #include <sys/conf.h>
@@ -33,8 +34,11 @@ k_solaris-11/rpldev.c - Kernel interface for RPLD
 #include <sys/modctl.h>
 #include <sys/sunddi.h>
 #include <sys/stat.h>
+#include <sys/strsubr.h>
+#include <sys/time.h>
 #include <sys/uio.h>
-#include <sys/km_rpldev.h>
+#include <sys/vnode.h>
+#include "rpldhk.h"
 #include "../include/rpl_ioctl.h"
 #include "../include/rpl_packet.h"
 
@@ -44,15 +48,13 @@ static int rpldev_detach(dev_info_t *, ddi_detach_cmd_t);
 static int rpldev_getinfo(dev_info_t *, ddi_info_cmd_t, void *, void **);
 
 // Stage 2 functions
-/*
-static int rpldhc_init(void);
-static int rpldhc_open(void);
-static int rpldhc_read(void);
-static int rpldhc_write(void);
-static int rpldhc_ioctl(void);
-static int rpldhc_close(void);
-static int rpldhc_deinit(void);
-*/
+static int rpldhc_init(struct queue *);
+static int rpldhc_open(struct queue *);
+static int rpldhc_read(const char *, size_t, struct queue *);
+static int rpldhc_write(const char *, size_t, struct queue *);
+//static int rpldhc_ioctl(void);
+static int rpldhc_close(struct queue *);
+static int rpldhc_deinit(struct queue *);
 
 // Stage 3 functions
 static int rpldev_open(dev_t *, int, int, struct cred *);
@@ -61,12 +63,15 @@ static int rpldev_read(dev_t, struct uio *, struct cred *);
 static int rpldev_chpoll(dev_t, short, int, short *, struct pollhead **);
 
 // Local functions
+static long TTY_DEVNR(const struct queue *);
 static inline size_t avail_R(void);
 static inline size_t avail_W(void);
 static inline int circular_get(struct uio *, size_t);
 static inline void circular_put(const void *, size_t);
 static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
+static void fill_time(struct timeval *);
 static inline unsigned int min_uint(unsigned int, unsigned int);
+static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
 // Variables
 static struct pollhead   Buffer_queue;
@@ -190,11 +195,84 @@ static int rpldev_getinfo(dev_info_t *dip, ddi_info_cmd_t cmd, void *arg,
         case DDI_INFO_DEVT2INSTANCE:
             *resultp = NULL;
             return DDI_SUCCESS;
+	default:
+	    return DDI_FAILURE;
     }
-    return DDI_FAILURE;
 }
 
 //-----------------------------------------------------------------------------
+static int rpldhc_init(struct queue *q) {
+    struct rpldev_packet p;
+
+    p.dev   = TTY_DEVNR(q);
+    p.size  = 0;
+    p.event = EVT_INIT;
+    p.magic = MAGIC_SIG;
+    fill_time(&p.time);
+    return circular_put_packet(&p, NULL, 0);
+}
+
+static int rpldhc_open(struct queue *q) {
+    struct rpldev_packet p;
+
+    p.dev   = TTY_DEVNR(q);
+    p.size  = 0;
+    p.event = EVT_OPEN;
+    p.magic = MAGIC_SIG;
+    fill_time(&p.time);
+    return circular_put_packet(&p, NULL, 0);
+}
+
+static int rpldhc_read(const char *buf, size_t count, struct queue *q) {
+    struct rpldev_packet p;
+
+    if(count == 0)
+	return 0;
+
+    p.dev   = TTY_DEVNR(q);
+    p.size  = LE_16(count);
+    p.event = EVT_READ;
+    p.magic = MAGIC_SIG;
+    fill_time(&p.time);
+    return circular_put_packet(&p, buf, count);
+}
+
+static int rpldhc_write(const char *buf, size_t count, struct queue *q) {
+    struct rpldev_packet p;
+
+    if(count == 0)
+	return 0;
+
+    p.dev   = TTY_DEVNR(q);
+    p.size  = LE_16(count);
+    p.event = EVT_WRITE;
+    p.magic = MAGIC_SIG;
+    fill_time(&p.time);
+    return circular_put_packet(&p, buf, count);
+}
+
+static int rpldhc_close(struct queue *q) {
+    struct rpldev_packet p;
+
+    p.dev   = TTY_DEVNR(q);
+    p.size  = 0;
+    p.event = EVT_CLOSE;
+    p.magic = MAGIC_SIG;
+    fill_time(&p.time);
+    return circular_put_packet(&p, NULL, 0);
+}
+
+static int rpldhc_deinit(struct queue *q) {
+    struct rpldev_packet p;
+
+    p.dev   = TTY_DEVNR(q);
+    p.size  = 0;
+    p.event = EVT_DEINIT;
+    p.magic = MAGIC_SIG;
+    fill_time(&p.time);
+    return circular_put_packet(&p, NULL, 0);
+}
+
 //-----------------------------------------------------------------------------
 static int rpldev_open(dev_t *devp, int flag, int otyp, struct cred *credp) {
     mutex_enter(&Open_lock);
@@ -269,7 +347,7 @@ static int rpldev_ioctl(dev_t dev, int cmd, intptr_t arg, int mode,
     size_t val;
     int ret = 0;
 
-    if(_IOC_TYPE(cmd) != RPL_IOC_MAGIC)
+/*    if(_IOC_TYPE(cmd) != RPL_IOC_MAGIC) */
         return ENOTTY;
 
     switch(cmd) {
@@ -325,7 +403,6 @@ static int rpldev_chpoll(dev_t dev, short requested_events, int any_yet,
 }
 
 static int rpldev_close(dev_t dev, int flag, int otyp, struct cred *credp) {
-/*
     rpl_init   = NULL;
     rpl_open   = NULL;
     rpl_read   = NULL;
@@ -333,7 +410,7 @@ static int rpldev_close(dev_t dev, int flag, int otyp, struct cred *credp) {
     rpl_ioctl  = NULL;
     rpl_close  = NULL;
     rpl_deinit = NULL;
-*/
+
     mutex_enter(&Buffer_lock);
     ddi_umem_free(Buffer_cookie);
     Buffer = NULL;
@@ -344,6 +421,11 @@ static int rpldev_close(dev_t dev, int flag, int otyp, struct cred *credp) {
 }
 
 //-----------------------------------------------------------------------------
+static long TTY_DEVNR(const struct queue *q) {
+    dev_t id = q->q_stream->sd_vnode->v_rdev;
+    return mkdev_26(getmajor(id), getminor(id));
+}
+
 static inline size_t avail_R(void) {
     if(BufWP >= BufRP)
         return BufWP - BufRP;
@@ -414,8 +496,28 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
     return count;
 }
 
+static void fill_time(struct timeval *tv) {
+    uniqtime(tv);
+
+    if(sizeof(tv->tv_sec) == sizeof(uint32_t))
+	tv->tv_sec = LE_32(tv->tv_sec);
+    else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
+	tv->tv_sec = LE_64(tv->tv_sec);
+
+    if(sizeof(tv->tv_usec) == sizeof(uint32_t))
+	tv->tv_usec = LE_32(tv->tv_usec);
+    else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
+	tv->tv_usec = LE_64(tv->tv_usec);
+
+    return;
+}
+
 static inline unsigned int min_uint(unsigned int a, unsigned int b) {
     return (a < b) ? a : b;
+}
+
+static inline uint32_t mkdev_26(unsigned long maj, unsigned long min) {
+    return (maj << 20) | (min & 0xFFFF);
 }
 
 //=============================================================================
