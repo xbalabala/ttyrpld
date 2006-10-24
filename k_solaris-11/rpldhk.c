@@ -40,6 +40,7 @@ static int rpldhk_write(struct queue *, struct msgb *);
 static int rpldhk_fdclose(struct queue *, int, struct cred *);
 static int rpldhk_close(struct queue *, int, struct cred *);
 static int rpldhk_trap(void);
+static void rpldhk_packet(struct queue *, struct msgb *, int);
 
 // Variables
 int (*rpl_init)(struct queue *);
@@ -69,6 +70,9 @@ static struct qinit rpldhk_rdinit = {
 };
 
 static struct qinit rpldhk_wrinit = {
+    /* "The @open and @close procedures are only used on the read
+    side of the queue and can be set to %NULL in the write-side @qinit
+    stream stucture initialization." -STREAMS, p.101 */
     .qi_qopen    = rpldhk_trap,
     .qi_putp     = rpldhk_write,
     .qi_qfdclose = rpldhk_trap,
@@ -115,37 +119,18 @@ int _fini(void) {
 static int rpldhk_open(struct queue *q, dev_t *dev, int oflag, int sflag,
  struct cred *cred)
 {
-    typeof(rpl_open) tmp = rpl_open;
-    if(tmp != NULL)
-        rpl_open(q);
+    if(q->q_ptr == NULL) {
+	typeof(rpl_init) tmp = rpl_init;
+	if(tmp != NULL)
+	    tmp(q);
+	q->q_ptr = (void *)0x1337caec;
+    } else {
+        typeof(rpl_open) tmp = rpl_open;
+        if(tmp != NULL)
+	    rpl_open(q);
+    }
     qprocson(q);
     return 0;
-}
-
-static void rpldhk_packet(struct queue *q, struct msgb *mp, int wr) {
-    const struct msgb *mblk = mp;
-
-    for(mblk = mp; mblk != NULL; mblk = mblk->b_cont) {
-        const struct datab *dblk = mblk->b_datap;
-        if(mblk->b_rptr > mblk->b_wptr) {
-            cmn_err(CE_NOTE, "Strange mblk received: rptr > wptr\n");
-            continue;
-        }
-
-	if(dblk->db_type != M_DATA)
-	    continue;
-
-	if(wr) {
-	    typeof(rpl_write) tmp = rpl_write;
-	    if(tmp)
-		tmp(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
-	} else {
-	    typeof(rpl_read) tmp = rpl_read;
-	    if(tmp)
-		tmp(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
-	}
-    }
-    return;
 }
 
 static int rpldhk_read(struct queue *q, struct msgb *mp) {
@@ -172,12 +157,36 @@ static int rpldhk_close(struct queue *q, int flag, struct cred *cred) {
     qprocsoff(q);
     if(tmp)
 	tmp(q);
+    q->q_ptr = NULL;
     return 0;
 }
 
 static int rpldhk_trap(void) {
     cmn_err(CE_NOTE, "This function should have never been called!\n");
     return 0;
+}
+
+static void rpldhk_packet(struct queue *q, struct msgb *mp, int wr) {
+    const struct msgb *mblk = mp;
+    typeof(rpl_read)  tmpr  = rpl_read;
+    typeof(rpl_write) tmpw  = rpl_write;
+
+    for(mblk = mp; mblk != NULL; mblk = mblk->b_cont) {
+        const struct datab *dblk = mblk->b_datap;
+        if(mblk->b_rptr > mblk->b_wptr) {
+            cmn_err(CE_NOTE, "Strange mblk received: rptr > wptr\n");
+            continue;
+        }
+
+	if(dblk->db_type != M_DATA)
+	    continue;
+
+	if(wr && tmpw != NULL)
+	    tmpw(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
+	else if(!wr && tmpr != NULL)
+	    tmpr(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
+    }
+    return;
 }
 
 //=============================================================================

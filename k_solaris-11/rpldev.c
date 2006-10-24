@@ -69,7 +69,7 @@ static inline size_t avail_W(void);
 static inline int circular_get(struct uio *, size_t);
 static inline void circular_put(const void *, size_t);
 static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
-static void fill_time(struct timeval *);
+static inline void fill_time(struct timeval *);
 static inline unsigned int min_uint(unsigned int, unsigned int);
 static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
