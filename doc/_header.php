@@ -15,10 +15,10 @@
 padding: 5px;">
 <table>
   <tr>
-    <td valign="center"><a
+    <td style="vertical-align: middle;" valign="center"><a
         href="http://ttyrpld.sourceforge.net/"><img src="ttyrpld.png"
         alt="ttyrpld logo" border="0" /></a></td>
-    <td valign="center">ttyrpld&nbsp;- tty logging daemon</td>
+    <td style="vertical-align: middle;">ttyrpld&nbsp;- tty logging daemon</td>
   </tr>
 </table></div>
 
