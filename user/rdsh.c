@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 user/rdsh.c - Shared functions for RPLD/INFOD/RPLCTL
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
   -- License restrictions apply (LGPL v2.1)
 
   This file is part of ttyrpld.

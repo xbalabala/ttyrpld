@@ -954,7 +954,7 @@ diff --fast -Ndpru sys~/kern/rpldev.c sys/kern/rpldev.c
 +/*=============================================================================
 +ttyrpld - TTY replay daemon
 +k_openbsd-3.9/sys/rpldev.c - Kernel interface for RPLD
-+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 +
 +  Redistribution and use in source and binary forms, with or without
 +  modification, are permitted provided that the following conditions are met:
@@ -1493,7 +1493,7 @@ diff --fast -Ndpru sys~/rpl_ioctl.h sys/rpl_ioctl.h
 +/*=============================================================================
 +ttyrpld - TTY replay daemon
 +include/rpl_ioctl.h - IOCTL numbers for RPLDEV
-+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 +
 +  Redistribution and use in source and binary forms, with or without
 +  modification, are permitted provided that the following conditions are met:
@@ -1557,7 +1557,7 @@ diff --fast -Ndpru sys~/rpl_packet.h sys/rpl_packet.h
 +/*=============================================================================
 +ttyrpld - TTY replay daemon
 +include/rpl_packet.h - Packet definitions for RPLD and RPLDEV
-+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 +  Copyright © Nguyen Anh Quynh <aquynh [at] gmail com>, 2005
 +
 +  Redistribution and use in source and binary forms, with or without
@@ -1713,7 +1713,7 @@ diff --fast -Ndpru sys~/sys/km_rpldev.h sys/sys/km_rpldev.h
 +/*=============================================================================
 +TTY replay daemon
 +openbsd-3.9/sys/km_rpldev.h - Stage 1 RPL interface
-+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 +
 +  Redistribution and use in source and binary forms, with or without
 +  modification, are permitted provided that the following conditions are met:

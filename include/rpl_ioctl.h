@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 include/rpl_ioctl.h - IOCTL numbers for RPLDEV
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:

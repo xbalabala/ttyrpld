@@ -2493,7 +2493,7 @@ diff --fast -Ndpru sys~/sys/km_rpldev.h sys/sys/km_rpldev.h
 +/*=============================================================================
 +TTY replay daemon
 +sys/km_rpldev.h - Stage 1 RPL interface
-+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 +
 +  Redistribution and use in source and binary forms, with or without
 +  modification, are permitted provided that the following conditions are met:

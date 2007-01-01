@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 k_linux-2.6/rpldev.c - Kernel interface for RPLD
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
   -- License restrictions apply (LGPL v2.1)
 
   This program is free software; you can redistribute it and/or modify it

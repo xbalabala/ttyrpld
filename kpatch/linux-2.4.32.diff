@@ -183,7 +183,7 @@ diff -u -Ndpru linux-2.4.32~/include/linux/km_rpldev.h linux-2.4.32/include/linu
 +/*=============================================================================
 +ttyrpld - TTY replay daemon
 +include/linux/rpl.h - Stage 1 RPL interface
-+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
++  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 +
 +  Redistribution and use in source and binary forms, with or without
 +  modification, are permitted provided that the following conditions are met:

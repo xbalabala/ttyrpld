@@ -2,7 +2,7 @@
 #==============================================================================
 # ttyrpld - TTY replay daemon
 # /etc/init.d/rpld - Init script for RPLD
-#   Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+#   by Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 #   This file is released in the Public Domain.
 #==============================================================================
 ### BEGIN INIT INFO

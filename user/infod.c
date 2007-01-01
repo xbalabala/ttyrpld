@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 user/infod.c - INFO socket for RPLD
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
   -- License restrictions apply (LGPL v2.1)
 
   This file is part of ttyrpld.

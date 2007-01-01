@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 user/lib.c - Shared functions for user-space apps
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
   Copyright © Nguyen Anh Quynh <aquynh [at] gmail com>, 2005
   -- License restrictions apply (LGPL v2.1)
 

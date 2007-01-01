@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 k_netbsd-3.0/rpldev.c - Kernel interface for RPLD
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:

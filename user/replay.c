@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 user/replay.c - Realtime TTY log analyzer
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
   -- License restrictions apply (LGPL v2.1)
 
   This file is part of ttyrpld.

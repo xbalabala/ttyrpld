@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 k_solaris-11/rpldev.c - Kernel interface for RPLD
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2006 - 2007
   -- License restrictions apply (LGPL v2.1)
 
   This program is free software; you can redistribute it and/or modify it

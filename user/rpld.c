@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 user/rpld.c - User space daemon (filtering, etc.)
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
   Copyright © Nguyen Anh Quynh <aquynh [at] gmail com>, 2005
   -- License restrictions apply (LGPL v2.1)
 

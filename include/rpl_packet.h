@@ -1,7 +1,7 @@
 /*=============================================================================
 ttyrpld - TTY replay daemon
 include/rpl_packet.h - Packet definitions for RPLD and RPLDEV
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2006
+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
   Copyright © Nguyen Anh Quynh <aquynh [at] gmail com>, 2005
 
   Redistribution and use in source and binary forms, with or without
