@@ -342,7 +342,7 @@ static int rpldev_open(struct inode *inode, struct file *filp) {
     up(&Open_lock);
 
     if((Buffer = kmalloc(Bufsize, GFP_KERNEL)) == NULL) {
-        Buffer = __vmalloc(Bufsize, GFP_KERNEL, PAGE_KERNEL);
+        Buffer = vmalloc(Bufsize);
         if(Buffer == NULL) {
             --Open_count;
             return -ENOMEM;
