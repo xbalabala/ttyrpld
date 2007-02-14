@@ -19,6 +19,7 @@ modules_install: rpldev.ko
 
 clean:
 	make -C ${KERNEL_DIR} M=$$PWD $@;
+	rm -f Module.symvers;
 
 obj-m += rpldev.o
 EXTRA_CFLAGS += -funit-at-a-time  
