@@ -127,6 +127,7 @@ static struct modlinkage rpldev_modlinkage = {
 };
 
 static dev_info_t *rpldev_dip = NULL;
+char _depends_on[] = "strmod/rpldhk";
 
 //-----------------------------------------------------------------------------
 int _init(void) {
