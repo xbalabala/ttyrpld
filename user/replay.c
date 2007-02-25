@@ -659,7 +659,7 @@ static int usleep_ovcorr(struct timeval *req, long *skew) {
     /* If none of these three cases, or case 2 applies, nanosleep() will be
     called with the time request. */
     nano_req.tv_sec  = req->tv_sec;
-    nano_req.tv_nsec = req->tv_usec * 1000,
+    nano_req.tv_nsec = req->tv_usec * 1000;
     rv = nanosleep(&nano_req, NULL);
     gettimeofday(&stop, NULL);
 
