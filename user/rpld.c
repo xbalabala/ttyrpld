@@ -93,7 +93,7 @@ static struct {
     ._running    = 1,
     .dolog       = 1, // !-Q
     .bsize       = 32 * 1024,
-    .device      = "/dev/misc/rpl:/dev/rpl", // -D
+    .device      = "/dev/misc/rpl /dev/rpl", // -D
     .infod_start = 0, // -I
 };
 
@@ -528,7 +528,7 @@ static int init_device(const char *in_devs) {
     char *copy = HX_strdup(in_devs), *workp = copy, *devp;
     int fd = -1;
 
-    while((devp = HX_strsep(&workp, ":")) != NULL) {
+    while((devp = HX_strsep(&workp, " ")) != NULL) {
         if(devp[0] == '-' && devp[1] == '\0') {
             fd = STDIN_FILENO;
             if(GOpt.verbose)

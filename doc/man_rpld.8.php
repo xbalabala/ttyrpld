@@ -205,8 +205,8 @@
           <td valign="top"><tt>DEVICE</tt></td>
 
           <td valign="top" class="block">List of possible rpl devices,
-          separated by colon (<tt>:</tt>). The default is
-          "<tt>/dev/misc/rpl:/dev/rpl</tt>".</td>
+          separated by space. The default is "<tt>/dev/misc/rpl
+	  /dev/rpl</tt>".</td>
 
         </tr>
         <tr>
