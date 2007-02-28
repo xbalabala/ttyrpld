@@ -34,31 +34,29 @@ include/rpl_endian.h
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
 #    include <sys/endian.h>
-#    if _BYTE_ORDER == _BIG_ENDIAN
-#        define SWAB(ptr, sz) swab_be((ptr), (sz))
-#        define SWAB1(ptr) swab_be((ptr), sizeof(*(ptr)))
-#    else
-#        define SWAB(ptr, sz)
-#        define SWAB1(ptr)
+#    ifndef __BYTE_ORDER
+#        define __BYTE_ORDER    _BYTE_ORDER
+#        define __LITTLE_ENDIAN _LITTLE_ENDIAN
+#        define __BIG_ENDIAN    _BIG_ENDIAN
 #    endif
 #elif defined(__OpenBSD__)
 #    include <machine/endian.h>
 #    if BYTE_ORDER == BIG_ENDIAN
-#        define SWAB(ptr, sz) swab_be((ptr), (sz))
-#        define SWAB1(ptr) swab_be((ptr), sizeof(*(ptr)))
-#    else
-#        define SWAB(ptr, sz)
-#        define SWAB1(ptr)
+#        define __BYTE_ORDER    BYTE_ORDER
+#        define __LITTLE_ENDIAN LITTLE_ENDIAN
+#        define __BIG_ENDIAN    BIG_ENDIAN
 #    endif
 #else
 #    include <endian.h>
-#    if __BYTE_ORDER == __BIG_ENDIAN
-#        define SWAB(ptr, sz) swab_be((ptr), (sz))
-#        define SWAB1(ptr) swab_be((ptr), sizeof(*(ptr)))
-#    else
-#        define SWAB(ptr, sz)
-#        define SWAB1(ptr)
-#    endif
+/* __BYTE_ORDER defined */
+#endif
+
+#if __BYTE_ORDER == __BIG_ENDIAN
+#    define SWAB(ptr, sz) swab_be((ptr), (sz))
+#    define SWAB1(ptr) swab_be((ptr), sizeof(*(ptr)))
+#else
+#    define SWAB(ptr, sz)
+#    define SWAB1(ptr)
 #endif
 
 #endif // RPL_ENDIAN_H
