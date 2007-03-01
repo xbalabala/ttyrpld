@@ -10,6 +10,9 @@
 */
 #include <sys/types.h>
 #include <sys/stat.h>
+#if defined(__linux__) || defined(__sun)
+#    include <alloca.h>
+#endif
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -81,7 +84,7 @@ static struct {
 	._running    = 1,
 	.dolog       = 1,
 	.bsize       = 32 * 1024,
-	.device      = "/dev/misc/rpl /dev/rpl",
+	.device      = "/dev/misc/rpl /dev/rpl /devices/pseudo/rpldev@0:0",
 	.infod_start = 0,
 };
 
@@ -640,7 +643,8 @@ static void sighandler_alrm(int s)
 
 static void sighandler_pipe(int s)
 {
-	fprintf(stderr, _("\n" "[%d] Received SIGPIPE\n"), getpid());
+	fprintf(stderr, _("\n" "[%d] Received SIGPIPE\n"),
+	        static_cast(int, getpid()));
 	return;
 }
 

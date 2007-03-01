@@ -6,7 +6,8 @@
 #if defined(__linux__) && defined(__KERNEL__)
 #	include <linux/time.h>
 #	include <linux/types.h>
-#elif (defined(__FreeBSD__) || defined(__OpenBSD__)) && defined(_KERNEL)
+#elif (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__sun)) && \
+    defined(_KERNEL)
 #	include <sys/time.h>
 #	include <sys/types.h>
 #else /* userspace */

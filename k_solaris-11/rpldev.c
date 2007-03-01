@@ -6,8 +6,7 @@
 	Development and Distribution License, Version 1.0 only (the "License").
 	You may not use this file except in compliance with the License.
 
-	You can obtain a copy of the license in the file "LICENSE.CDDL"
-	or http://www.opensolaris.org/os/licensing.
+	You can obtain a copy of the license in the file "LICENSE.CDDL".
 	See the License for the specific language governing permissions
 	and limitations under the License.
 
@@ -302,15 +301,13 @@ static int rpldev_open(dev_t *devp, int flag, int otyp, struct cred *credp)
 	}
 
 	BufRP = BufWP = Buffer;
-/*
 	rpl_init   = rpldhc_init;
 	rpl_open   = rpldhc_open;
 	rpl_read   = rpldhc_read;
 	rpl_write  = rpldhc_write;
-	//rpl_ioctl  = rpldhc_ioctl;
+//	rpl_ioctl  = rpldhc_ioctl;
 	rpl_close  = rpldhc_close;
 	rpl_deinit = rpldhc_deinit;
-*/
 	strcpy(Buffer, "Just some random bytes to test the functionality");
 	BufWP += strlen(Buffer);
 	cmn_err(CE_NOTE, "rpldev: opened\n");
@@ -436,9 +433,22 @@ static int rpldev_close(dev_t dev, int flag, int otyp, struct cred *credp)
 }
 
 //-----------------------------------------------------------------------------
-static long TTY_DEVNR(const struct queue *q)
-{
-	dev_t id = q->q_stream->sd_vnode->v_rdev;
+static long TTY_DEVNR(const struct queue *queue) {
+	if(queue == NULL) {
+		cmn_err(CE_NOTE, "TTY_DEVNR: queue==NULL\n");
+		return 0;
+	}
+	typeof(queue->q_stream) stream = queue->q_stream;
+	if(stream == NULL) {
+		cmn_err(CE_NOTE, "TTY_DEVNR: stream==NULL\n");
+		return 0;
+	}
+	typeof(stream->sd_vnode) vnode = stream->sd_vnode;
+	if(vnode == NULL) {
+		cmn_err(CE_NOTE, "TTY_DEVNR: cnode==NULL\n");
+		return 0;
+	}
+	dev_t id = vnode->v_rdev;
 	return mkdev_26(getmajor(id), getminor(id));
 }
 

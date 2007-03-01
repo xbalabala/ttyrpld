@@ -6,6 +6,8 @@
 #	include <linux/types.h>
 #elif defined(__FreeBSD__) && defined(_KERNEL)
 #	include <sys/ioccom.h>
+#elif defined(__sun__) /* SunOS kernel-/userspace */
+#	include <sys/ioccom.h>
 #else /* userspace */
 #	include <sys/types.h>
 #	include <sys/ioctl.h>

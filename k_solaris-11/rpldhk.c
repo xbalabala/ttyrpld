@@ -6,8 +6,7 @@
 	Development and Distribution License, Version 1.0 only (the "License").
 	You may not use this file except in compliance with the License.
 
-	You can obtain a copy of the license in the file "LICENSE.CDDL"
-	or http://www.opensolaris.org/os/licensing.
+	You can obtain a copy of the license in the file "LICENSE.CDDL".
 	See the License for the specific language governing permissions
 	and limitations under the License.
 
@@ -48,7 +47,7 @@ int (*rpl_ioctl)(struct queue *);
 int (*rpl_close)(struct queue *);
 int (*rpl_deinit)(struct queue *);
 
-// Module info
+/* Module info */
 static struct module_info rpldhk_minfo = {
 	.mi_idnum  = 1337,
 	.mi_idname = "rpldhk",

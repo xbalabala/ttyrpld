@@ -30,12 +30,12 @@ locale:
 
 ttyreplay: user/replay.o user/pctrl.o user/lib.o
 	${VECHO_LD}
-	${Q}${LD} ${LDFLAGS} -o $@ $^ -lHX -pthread ${EXT_LDLIBS};
+	${Q}${LD} ${LDFLAGS} -o $@ $^ -lHX -lpthread ${EXT_LDLIBS};
 	${Q}${STRIP} -s $@;
 
 rpld: user/rpld.o user/infod.o user/rplctl.o user/rdsh.o user/lib.o
 	${VECHO_LD}
-	${Q}${LD} ${LDFLAGS} -o $@ $^ -lHX -pthread ${EXT_LDLIBS};
+	${Q}${LD} ${LDFLAGS} -o $@ $^ -lHX -lpthread ${EXT_LDLIBS};
 	${Q}${STRIP} -s $@;
 
 rplctl: rpld

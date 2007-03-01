@@ -5,6 +5,9 @@
 #	/* lacks it */
 #	define rpld_getpwnam(user, rbuf, buffer, buflen) getpwnam(user)
 #	define rpld_getpwuid(uid, rbuf, buffer, buflen)  getpwuid(uid)
+#elif defined(__sun__)
+#	define rpld_getpwnam getpwnam_r
+#	define rpld_getpwuid getpwuid_r
 #elif defined(__linux__) || defined(__FreeBSD__)
 static inline struct passwd *rpld_getpwnam(const char *user,
     struct passwd *buffer, char *resbuf, size_t buflen)
