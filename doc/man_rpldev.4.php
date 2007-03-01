@@ -24,7 +24,7 @@
       <p class="block">On FreeBSD, devfs takes care of all this, so when the
       module is loaded, a working <tt>/dev/rpl</tt> is also present. For
       OpenBSD and NetBSD, it always loads at <tt>char(228,0)</tt>. Use
-      `<tt>mknod /dev/rpl b 228 0</tt>` to create the node. It should be made
+      `<tt>mknod /dev/rpl c 228 0</tt>` to create the node. It should be made
       mode <tt>0400</tt> and owned by the low-privileged user that is set in
       <tt>rpld.conf</tt>.</p>
 
