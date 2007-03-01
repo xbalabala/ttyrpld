@@ -39,22 +39,12 @@
 #define PREFIX "rpldev: "
 #define MAXFNLEN 256
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 0)
-#	define KERNEL_2_4 1
-#	define IS_PTY_MASTER(tty) \
-		(((tty)->driver.major >= UNIX98_PTY_MASTER_MAJOR && \
-		(tty)->driver.major < UNIX98_PTY_MASTER_MAJOR + \
-		UNIX98_PTY_MAJOR_COUNT) ||
-		(tty)->driver.major == PTY_MASTER_MAJOR)
-#	define TTY_DEVNR(tty) \
-		cpu_to_le32(mkdev_26(MAJOR((tty)->device), MINOR((tty)->device)))
-#else
-#	define IS_PTY_MASTER(tty) \
-		((tty)->driver->major == UNIX98_PTY_MASTER_MAJOR || \
-		(tty)->driver->major == PTY_MASTER_MAJOR)
-#	define TTY_DEVNR(tty) \
-		cpu_to_le32(mkdev_26((tty)->driver->major, \
-		(tty)->driver->minor_start + (tty)->index))
+#define IS_PTY_MASTER(tty) \
+	((tty)->driver->major == UNIX98_PTY_MASTER_MAJOR || \
+	(tty)->driver->major == PTY_MASTER_MAJOR)
+#define TTY_DEVNR(tty) \
+	cpu_to_le32(mkdev_26((tty)->driver->major, \
+	(tty)->driver->minor_start + (tty)->index))
 #endif
 #ifndef SEEK_SET
 #	define SEEK_SET 0
@@ -127,16 +117,9 @@ MODULE_AUTHOR("Jan Engelhardt <jengelh [at] gmx de>");
 MODULE_LICENSE("GPL and additional rights");
 MODULE_PARM_DESC(Bufsize, "Buffer size (default 32K)");
 MODULE_PARM_DESC(Minor_nr, "Minor number to use (default: 255(=DYNAMIC))");
-#ifdef KERNEL_2_4
-MODULE_PARM(Bufsize, "i");
-MODULE_PARM(Minor_nr, "i");
-EXPORT_NO_SYMBOLS;
-#warning Ahem. Go upgrade to 2.6.x so I can remove support for this ancient stuff.
-#else
 module_param_named(buffer_size, Bufsize, uint, S_IRUGO);
 module_param_named(ioctl_proc, Enable_ioctl_proc, uint, S_IRUGO);
 module_param_named(minor, Minor_nr, uint, S_IRUGO);
-#endif
 
 //-----------------------------------------------------------------------------
 static __init int rpldev_init(void)
