@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include <libHX.h>
+#include "compat.h"
 #include "dev.h"
 #include "rpl_endian.h"
 #include "rpl_ioctl.h"
@@ -706,14 +707,9 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 static char *getnamefromuid(uid_t uid, char *result, size_t len)
 {
 	/* Turn a UID into a username, if possible. */
-	struct passwd *ep;
-#if defined(__OpenBSD__)
-	ep = getpwuid(uid);
-#else
-	struct passwd ent;
+	struct passwd ent, *ep;
 	char additional[1024];
-	getpwuid_r(uid, &ent, additional, sizeof(additional), &ep);
-#endif
+	ep = rpld_getpwuid(uid, &ent, additional, sizeof(additional));
 	if(ep == NULL)
 		return NULL;
 	HX_strlcpy(result, ep->pw_name, len);
@@ -722,14 +718,9 @@ static char *getnamefromuid(uid_t uid, char *result, size_t len)
 
 static uid_t getuidfromname(const char *name)
 {
-	struct passwd *ep;
-#if defined(__OpenBSD__)
-	ep = getpwnam(name);
-#else
-	struct passwd ent;
+	struct passwd ent, *ep;
 	char additional[1024];
-	getpwnam_r(name, &ent, additional, sizeof(additional), &ep);
-#endif
+	ep = rpld_getpwnam(name, &ent, additional, sizeof(additional));
 	if(ep == NULL)
 		return -1;
 	return ep->pw_uid;
