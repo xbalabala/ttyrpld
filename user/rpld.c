@@ -489,7 +489,8 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 		 * Use [MAJOR:MINOR] as a fictitious filename if the device
 		 * node could not be found.
 		 */
-		snprintf(full_dev, sizeof(full_dev), "[%lu:%lu]", KD26_PARTS(tty->dev));
+		snprintf(full_dev, sizeof(full_dev), "[%lu:%lu]",
+		         KD26_PARTS(tty->dev));
 	}
 
 	/*
