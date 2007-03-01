@@ -1,26 +1,13 @@
-/*=============================================================================
-ttyrpld - TTY replay daemon
-user/pctrl.c - "Remote control" for ttyreplay
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-  -- License restrictions apply (LGPL v2.1)
+/*
+	ttyrpld/user/pctrl.c
+	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 
-  This file is part of ttyrpld.
-  ttyrpld is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published
-  by the Free Software Foundation; however ONLY version 2 of the License.
-
-  ttyrpld is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this program kit; if not, write to:
-  Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
-  Boston, MA  02110-1301  USA
-
-  -- For details, see the file named "LICENSE.LGPL2"
-=============================================================================*/
+	This file is part of ttyrpld. ttyrpld is free software; you can
+	redistribute it and/or modify it under the terms of the GNU
+	Lesser General Public License as published by the Free Software
+	Foundation; however ONLY version 2 of the License. For details,
+	see the file named "LICENSE.LGPL2".
+*/
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/stat.h>
@@ -35,15 +22,15 @@ user/pctrl.c - "Remote control" for ttyreplay
 #include <termios.h>
 #include <unistd.h>
 #ifndef SA_ONESHOT
-#    define SA_ONESHOT SA_RESETHAND
+#	define SA_ONESHOT SA_RESETHAND
 #endif
 #include "pctrl.h"
 #include "rdsh.h"
 
-// Functions
+/* Functions */
 static void *pctrl_thread(void *);
 
-// Variables
+/* Variables */
 static struct pctrl_info *pstatus = NULL;
 static struct termios tio_default, tio_pad;
 static pthread_mutex_t ps_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -52,124 +39,127 @@ static int ctty = -1;
 
 //-----------------------------------------------------------------------------
 int pctrl_init(void) {
-    struct sigaction sa;
+	struct sigaction sa;
 
-    if((ctty = open("/dev/tty", O_RDWR)) < 0)
-        return -errno;
+	if((ctty = open("/dev/tty", O_RDWR)) < 0)
+		return -errno;
 
-    tcgetattr(ctty, &tio_default);
-    sa.sa_handler = pctrl_deactivate;
-    sa.sa_flags   = SA_RESTART | SA_ONESHOT;
-    sigemptyset(&sa.sa_mask);
-    sigaction(SIGINT,  &sa, NULL);
-    sigaction(SIGQUIT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
+	tcgetattr(ctty, &tio_default);
+	sa.sa_handler = pctrl_deactivate;
+	sa.sa_flags   = SA_RESTART | SA_ONESHOT;
+	sigemptyset(&sa.sa_mask);
+	sigaction(SIGINT,  &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
 
-    pthread_mutex_init(&ps_lock, NULL);
-    pthread_create(&worker, NULL, pctrl_thread, NULL);
-    pthread_detach(worker);
-    return 1;
+	pthread_mutex_init(&ps_lock, NULL);
+	pthread_create(&worker, NULL, pctrl_thread, NULL);
+	pthread_detach(worker);
+	return 1;
 }
 
 static void *pctrl_thread(void *arg) {
-    while(1) {
-        fd_set set;
-        char c = 0;
+	while(1) {
+		fd_set set;
+		char c = 0;
 
-        FD_ZERO(&set);
-        FD_SET(ctty, &set);
+		FD_ZERO(&set);
+		FD_SET(ctty, &set);
 
-        if(select(ctty + 1, &set, NULL, NULL, NULL) <= 0)
-            continue;
+		if(select(ctty + 1, &set, NULL, NULL, NULL) <= 0)
+			continue;
 
-        pthread_mutex_lock(&ps_lock);
-        if(pstatus == NULL) {
-            usleep(10000);
-            continue;
-        }
+		pthread_mutex_lock(&ps_lock);
+		if(pstatus == NULL) {
+			usleep(10000);
+			continue;
+		}
 
-        read(ctty, &c, 1);
-        switch(tolower(c)) {
-            case ' ':
-                pstatus->paused ^= static_cast(unsigned long, -1);
-                break;
-            case '<':
-                pstatus->brk = PCTRL_PREV;
-                break;
-            case '>':
-                pstatus->brk = PCTRL_NEXT;
-                break;
-            case '[':
-                pstatus->factor -= 1.10;
-                break;
-            case ']':
-                pstatus->factor += 1.10;
-                break;
-            case 'c':
-                pstatus->factor *= 1.0 + 1.0 / 3.0;
-                break;
-            case 'e':
-                pstatus->echo ^= static_cast(unsigned long, -1);
-                break;
-            case '6':
-                if(pstatus->skval < 0)
-                    pstatus->skval = 0;
-                pstatus->paused = 0;
-                pstatus->sktype = PCTRL_SKTIME;
-                pstatus->skval += 10 * 1000;
-                break;
-            case '9':
-                if(pstatus->skval < 0)
-                    pstatus->skval = 0;
-                pstatus->paused = 0;
-                pstatus->sktype = PCTRL_SKTIME;
-                pstatus->skval += 60 * 1000;
-                break;
-            case 'q':
-                pstatus->brk = PCTRL_EXIT;
-                break;
-            case 'x':
-                pstatus->factor = 1;
-                break;
-            case 'y':
-            case 'z':
-                pstatus->factor /= 1.0 + 1.0 / 3.0;
-                break;
-        }
-        pthread_mutex_unlock(&ps_lock);
-    }
+		read(ctty, &c, 1);
+		switch(tolower(c)) {
+		case ' ':
+			pstatus->paused ^= static_cast(unsigned long, -1);
+			break;
+		case '<':
+			pstatus->brk = PCTRL_PREV;
+			break;
+		case '>':
+			pstatus->brk = PCTRL_NEXT;
+			break;
+		case '[':
+			pstatus->factor -= 1.10;
+			break;
+		case ']':
+			pstatus->factor += 1.10;
+			break;
+		case 'c':
+			pstatus->factor *= 1.0 + 1.0 / 3.0;
+			break;
+		case 'e':
+			pstatus->echo ^= static_cast(unsigned long, -1);
+			break;
+		case '6':
+			if(pstatus->skval < 0)
+				pstatus->skval = 0;
+			pstatus->paused = 0;
+			pstatus->sktype = PCTRL_SKTIME;
+			pstatus->skval += 10 * 1000;
+			break;
+		case '9':
+			if(pstatus->skval < 0)
+				pstatus->skval = 0;
+			pstatus->paused = 0;
+			pstatus->sktype = PCTRL_SKTIME;
+			pstatus->skval += 60 * 1000;
+			break;
+		case 'q':
+			pstatus->brk = PCTRL_EXIT;
+			break;
+		case 'x':
+			pstatus->factor = 1;
+			break;
+		case 'y':
+		case 'z':
+			pstatus->factor /= 1.0 + 1.0 / 3.0;
+			break;
+		} /* switch */
+		pthread_mutex_unlock(&ps_lock);
+	}
 
-    return NULL;
+	return NULL;
 }
 
-void pctrl_exit(void) {
-    if(ctty < 0)
-        return;
-    pctrl_deactivate(0);
-    close(ctty);
-    return;
+void pctrl_exit(void)
+{
+	if(ctty < 0)
+		return;
+	pctrl_deactivate(0);
+	close(ctty);
+	return;
 }
 
-void pctrl_activate(struct pctrl_info *i) {
-    if(ctty < 0)
-        return;
-    pstatus = i;
-    memcpy(&tio_pad, &tio_default, sizeof(struct termios));
-    tio_pad.c_lflag &= ~(ECHO | ICANON);
-    tcsetattr(ctty, TCSANOW, &tio_pad);
-    return;
+void pctrl_activate(struct pctrl_info *i)
+{
+	if(ctty < 0)
+		return;
+	pstatus = i;
+	memcpy(&tio_pad, &tio_default, sizeof(struct termios));
+	tio_pad.c_lflag &= ~(ECHO | ICANON);
+	tcsetattr(ctty, TCSANOW, &tio_pad);
+	return;
 }
 
-void pctrl_deactivate(int sig) {
-    pthread_mutex_lock(&ps_lock);
-    pstatus = NULL;
-    pthread_mutex_unlock(&ps_lock);
-    if(ctty < 0)
-        return;
-    tcsetattr(ctty, TCSANOW, &tio_default);
-    if(sig > 0)
-        raise(sig);
-    return;
+void pctrl_deactivate(int sig)
+{
+	pthread_mutex_lock(&ps_lock);
+	pstatus = NULL;
+	pthread_mutex_unlock(&ps_lock);
+	if(ctty < 0)
+		return;
+	tcsetattr(ctty, TCSANOW, &tio_default);
+	if(sig > 0)
+		raise(sig);
+	return;
 }
 
 //=============================================================================
