@@ -21,5 +21,3 @@ reload: rpldev
 	-rem_drv rpldev;
 	cp rpldev rpldev.conf /usr/kernel/drv/;
 	add_drv rpldev;
-
-#<EOF>

@@ -7,5 +7,3 @@ SRCS  = rpldev.c
 .include <bsd.kmod.mk>
 
 CFLAGS += -Wno-pointer-arith -Wall
-
-#<<eof>>

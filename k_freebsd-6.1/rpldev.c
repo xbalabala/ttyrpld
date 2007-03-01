@@ -1,34 +1,36 @@
-/*=============================================================================
-ttyrpld - TTY replay daemon
-k_freebsd-6.1/rpldev.c - Kernel interface for RPLD
-  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+/*
+	ttyrpld/k_freebsd-6.1/rpldev.c
+	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions
+	are met:
 
-  1. Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright notice,
-     this list of conditions and the following disclaimer in the documentation
-     and/or other materials provided with the distribution.
-  3. Redistributions of modified code that are made available only in binary
-     form require sending a description to the ttyrpld project maintainer on
-     what has been changed.
-  4. Neither the names of the above-listed copyright holders nor the names of
-     any contributors may be used to endorse or promote products derived from
-     this software without specific prior written permission.
+	1. Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+	3. Redistributions of modified code that are made available only
+	   in binary form require sending a description to the ttyrpld
+	   project maintainer on what has been changed.
+	4. Neither the names of the above-listed copyright holders nor the
+	   names of any contributors may be used to endorse or promote
+	   products derived from this software without specific prior
+	   written permission.
 
-  NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
-  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A
-  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
-  CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-=============================================================================*/
+	NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND
+	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+	BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+*/
 #include <sys/param.h>
 #include <sys/conf.h>
 #include <sys/endian.h>
@@ -49,22 +51,23 @@ k_freebsd-6.1/rpldev.c - Kernel interface for RPLD
 #include "../include/rpl_ioctl.h"
 #include "../include/rpl_packet.h"
 
-#define IO_NDELAY 0x10 // from sys/vnode.h -- inclusion problems
+#define IO_NDELAY 0x10 /* from sys/vnode.h -- inclusion problems */
 
 #if __FreeBSD_version >= 600000
-#    define TTY_DEVNR(tty) htole32(mkdev_26(umajor(dev2udev((tty)->t_dev)), \
-                           uminor(dev2udev((tty)->t_dev))))
+#	define TTY_DEVNR(tty) \
+		htole32(mkdev_26(umajor(dev2udev((tty)->t_dev)), \
+		        uminor(dev2udev((tty)->t_dev))))
 #else
-#    define TTY_DEVNR(tty) htole32(mkdev_26(major((tty)->t_dev), \
-                           minor((tty)->t_dev)))
+#	define TTY_DEVNR(tty) htole32(mkdev_26(major((tty)->t_dev), \
+	                      minor((tty)->t_dev)))
 #endif
 
-// Module stuff
+/* Module stuff */
 static int kmd_event(module_t, int, void *);
 static int kmd_load(void);
 static int kmd_unload(void);
 
-// Stage 2 functions
+/* Stage 2 functions */
 static int rpldhc_init(struct cdev *, struct tty *);
 static int rpldhc_open(struct cdev *, struct tty *);
 static int rpldhc_read(const char *, int, struct tty *);
@@ -73,14 +76,14 @@ static int rpldhc_ioctl(struct tty *, u_long, void *);
 static int rpldhc_close(struct tty *);
 static int rpldhc_deinit(struct tty *);
 
-// Stage 3 functions
+/* Stage 3 functions */
 static int rpldev_open(struct cdev *, int, int, struct thread *);
 static int rpldev_read(struct cdev *, struct uio *, int);
 static int rpldev_ioctl(struct cdev *, u_long, caddr_t, int, struct thread *);
 //static int rpldev_poll()
 static int rpldev_close(struct cdev *, int, int, struct thread *);
 
-// Local functions
+/* Local functions */
 static inline size_t avail_R(void);
 static inline size_t avail_W(void);
 static inline int circular_get(struct uio *, size_t);
@@ -90,389 +93,413 @@ static inline void fill_time(struct timeval *);
 static inline unsigned int min_uint(unsigned int, unsigned int);
 static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
-// Variables
+/* Variables */
 static MALLOC_DEFINE(Buffer_malloc, "rpldev", "rpldev ring buffer");
 static struct mtx Buffer_lock, Open_lock;
 static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
 static size_t Bufsize = 32 * 1024;
 static unsigned int Open_count = 0;
 
-// Kernel module info stuff
+/* Kernel module info stuff */
 static int kmi_usecount = 0;
 static struct cdev *kmi_node;
 static struct cdevsw kmi_fops = {
-    .d_version = D_VERSION,
-    .d_name    = "rpldev",
+	.d_version = D_VERSION,
+	.d_name    = "rpldev",
 #if __FreeBSD_version < 600000
-    .d_maj     = MAJOR_AUTO,
+	.d_maj     = MAJOR_AUTO,
 #endif
-    .d_open    = rpldev_open,
-    .d_read    = rpldev_read,
-    .d_ioctl   = rpldev_ioctl,
-    .d_close   = rpldev_close,
-//    .d_poll    = rpldev_poll,
+	.d_open    = rpldev_open,
+	.d_read    = rpldev_read,
+	.d_ioctl   = rpldev_ioctl,
+	.d_close   = rpldev_close,
+//	.d_poll    = rpldev_poll,
 };
 static moduledata_t kmi_rpldev = {
-    .name   = "rpldev",
-    .evhand = kmd_event,
+	.name   = "rpldev",
+	.evhand = kmd_event,
 };
 
 DECLARE_MODULE(rpldev, kmi_rpldev, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
 
 //-----------------------------------------------------------------------------
-static int kmd_event(module_t mp, int type, void *data) {
-    int ret;
-    switch(type) {
-        case MOD_LOAD:
-            if((ret = kmd_load()) != 0)
-                kmd_unload();
-            return ret;
-        case MOD_UNLOAD:
-            return kmd_unload();
-    }
-    return EOPNOTSUPP;
+static int kmd_event(module_t mp, int type, void *data)
+{
+	int ret;
+	switch(type) {
+		case MOD_LOAD:
+			if((ret = kmd_load()) != 0)
+				kmd_unload();
+			return ret;
+		case MOD_UNLOAD:
+			return kmd_unload();
+	}
+	return EOPNOTSUPP;
 }
 
-static int kmd_load(void) {
-    mtx_init(&Buffer_lock, "rpldev", NULL, MTX_DEF);
-    mtx_init(&Open_lock, "rpldev", NULL, MTX_DEF);
-    if((kmi_node = make_dev(&kmi_fops, 0, UID_ROOT, 0, 0600, "rpl")) == NULL)
-        return ENOMEM;
-    return 0;
+static int kmd_load(void)
+{
+	mtx_init(&Buffer_lock, "rpldev", NULL, MTX_DEF);
+	mtx_init(&Open_lock, "rpldev", NULL, MTX_DEF);
+	kmi_node = make_dev(&kmi_fops, 0, UID_ROOT, 0, 0600, "rpl");
+	if(kmi_node == NULL)
+		return ENOMEM;
+	return 0;
 }
 
-static int kmd_unload(void) {
-    if(kmi_usecount || Open_count > 0)
-        return EBUSY;
-    if(kmi_node != NULL)
-        destroy_dev(kmi_node);
-    mtx_destroy(&Buffer_lock);
-    mtx_destroy(&Open_lock);
-    return 0;
+static int kmd_unload(void)
+{
+	if(kmi_usecount || Open_count > 0)
+		return EBUSY;
+	if(kmi_node != NULL)
+		destroy_dev(kmi_node);
+	mtx_destroy(&Buffer_lock);
+	mtx_destroy(&Open_lock);
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
-static int rpldhc_init(struct cdev *cd, struct tty *tty) {
-    struct rpldev_packet p;
+static int rpldhc_init(struct cdev *cd, struct tty *tty)
+{
+	struct rpldev_packet p;
 
-    if(tty == NULL)
-        return 0;
+	if(tty == NULL)
+		return 0;
 
-    p.dev   = TTY_DEVNR(tty);
-    p.size  = 0;
-    p.event = EVT_INIT;
-    p.magic = MAGIC_SIG;
-    fill_time(&p.time);
-    return circular_put_packet(&p, NULL, 0);
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = 0;
+	p.event = EVT_INIT;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, NULL, 0);
 }
 
-static int rpldhc_open(struct cdev *cd, struct tty *tty) {
-    struct rpldev_packet p;
+static int rpldhc_open(struct cdev *cd, struct tty *tty)
+{
+	struct rpldev_packet p;
 
-    if(tty == NULL)
-        return 0;
+	if(tty == NULL)
+		return 0;
 
-    p.dev   = TTY_DEVNR(tty);
-    p.size  = 0;
-    p.event = EVT_OPEN;
-    p.magic = MAGIC_SIG;
-    fill_time(&p.time);
-    return circular_put_packet(&p, NULL, 0);
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = 0;
+	p.event = EVT_OPEN;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, NULL, 0);
 }
 
-static int rpldhc_read(const char *buf, int count, struct tty *tty) {
-    struct rpldev_packet p;
+static int rpldhc_read(const char *buf, int count, struct tty *tty)
+{
+	struct rpldev_packet p;
 
-    if(tty == NULL || count == 0)
-        return 0;
+	if(tty == NULL || count == 0)
+		return 0;
 
-    p.dev   = TTY_DEVNR(tty);
-    p.size  = htole16(count);
-    p.event = EVT_READ;
-    p.magic = MAGIC_SIG;
-    fill_time(&p.time);
-    return circular_put_packet(&p, buf, count);
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = htole16(count);
+	p.event = EVT_READ;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_write(const char *buf, int count, struct tty *tty) {
-    struct rpldev_packet p;
+static int rpldhc_write(const char *buf, int count, struct tty *tty)
+{
+	struct rpldev_packet p;
 
-    if(tty == NULL || count == 0)
-        return 0;
+	if(tty == NULL || count == 0)
+		return 0;
 
-    p.dev   = TTY_DEVNR(tty);
-    p.size  = htole16(count);
-    p.event = EVT_WRITE;
-    p.magic = MAGIC_SIG;
-    fill_time(&p.time);
-    return circular_put_packet(&p, buf, count);
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = htole16(count);
+	p.event = EVT_WRITE;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_ioctl(struct tty *tty, u_long cmd, void *arg) {
-    struct rpldev_packet p;
-    uint32_t cmd32;
+static int rpldhc_ioctl(struct tty *tty, u_long cmd, void *arg)
+{
+	struct rpldev_packet p;
+	uint32_t cmd32;
 
-    if(tty == NULL)
-        return 0;
+	if(tty == NULL)
+		return 0;
 
-    cmd32   = cmd;
-    p.dev   = TTY_DEVNR(tty);
-    p.size  = htole16(sizeof(cmd32));
-    p.event = EVT_IOCTL;
-    p.magic = MAGIC_SIG;
-    fill_time(&p.time);
-    return circular_put_packet(&p, &cmd32, sizeof(cmd32));
+	cmd32   = cmd;
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = htole16(sizeof(cmd32));
+	p.event = EVT_IOCTL;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, &cmd32, sizeof(cmd32));
 }
 
-static int rpldhc_close(struct tty *tty) {
-    struct rpldev_packet p;
+static int rpldhc_close(struct tty *tty)
+{
+	struct rpldev_packet p;
 
-    if(tty == NULL)
-        return 0;
+	if(tty == NULL)
+		return 0;
 
-    p.dev   = TTY_DEVNR(tty);
-    p.size  = 0;
-    p.event = EVT_CLOSE;
-    p.magic = MAGIC_SIG;
-    fill_time(&p.time);
-    return circular_put_packet(&p, NULL, 0);
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = 0;
+	p.event = EVT_CLOSE;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, NULL, 0);
 }
 
-static int rpldhc_deinit(struct tty *tty) {
-    struct rpldev_packet p;
+static int rpldhc_deinit(struct tty *tty)
+{
+	struct rpldev_packet p;
 
-    p.dev   = TTY_DEVNR(tty);
-    p.size  = 0;
-    p.event = EVT_DEINIT;
-    p.magic = MAGIC_SIG;
-    fill_time(&p.time);
-    return circular_put_packet(&p, NULL, 0);
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = 0;
+	p.event = EVT_DEINIT;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, NULL, 0);
 }
 
 //-----------------------------------------------------------------------------
 static int rpldev_open(struct cdev *cd, int flag, int mode,
- struct thread *th)
+    struct thread *th)
 {
-    mtx_lock(&Open_lock);
-    if(Open_count) {
-        mtx_unlock(&Open_lock);
-        return EBUSY;
-    }
-    ++kmi_usecount; // it's not perfect - Linux is better doing this
-    ++Open_count;
-    mtx_unlock(&Open_lock);
+	mtx_lock(&Open_lock);
+	if(Open_count) {
+		mtx_unlock(&Open_lock);
+		return EBUSY;
+	}
+	++kmi_usecount; // it's not perfect - Linux is better doing this
+	++Open_count;
+	mtx_unlock(&Open_lock);
 
-    if((Buffer = malloc(Bufsize, Buffer_malloc, M_WAITOK)) == NULL) {
-        mtx_unlock(&Buffer_lock);
-        --kmi_usecount;
-        --Open_count;
-        return ENOMEM;
-    }
+	if((Buffer = malloc(Bufsize, Buffer_malloc, M_WAITOK)) == NULL) {
+		mtx_unlock(&Buffer_lock);
+		--kmi_usecount;
+		--Open_count;
+		return ENOMEM;
+	}
 
-    BufRP = BufWP = Buffer;
-    rpl_init   = rpldhc_init;
-    rpl_open   = rpldhc_open;
-    rpl_read   = rpldhc_read;
-    rpl_write  = rpldhc_write;
-    /* ioctl reporting is deactivated, because 1) a _lot_ more ioctls are
-    generated in *BSD compared to Linux, 2) ioctls are not yet interpreted by
-    userspace apps (ttyreplay). */
-    //rpl_ioctl  = rpldhc_ioctl;
-    rpl_close  = rpldhc_close;
-    rpl_deinit = rpldhc_deinit;
-    return 0;
+	BufRP = BufWP = Buffer;
+	rpl_init   = rpldhc_init;
+	rpl_open   = rpldhc_open;
+	rpl_read   = rpldhc_read;
+	rpl_write  = rpldhc_write;
+	/*
+	 * ioctl reporting is deactivated, because (1) a _lot_ more ioctls are
+	 * generated in *BSD compared to Linux, (2) ioctls are not yet
+	 * interpreted by userspace apps (ttyreplay).
+	 */
+//	rpl_ioctl  = rpldhc_ioctl;
+	rpl_close  = rpldhc_close;
+	rpl_deinit = rpldhc_deinit;
+	return 0;
 }
 
-static int rpldev_read(struct cdev *cd, struct uio *uio, int flags) {
-    size_t count;
-    int ret = 0;
+static int rpldev_read(struct cdev *cd, struct uio *uio, int flags)
+{
+	size_t count;
+	int ret = 0;
 
-    mtx_lock(&Buffer_lock);
-    if(Buffer == NULL)
-        goto out;
+	mtx_lock(&Buffer_lock);
+	if(Buffer == NULL)
+		goto out;
 
-    while(BufRP == BufWP) {
-        mtx_unlock(&Buffer_lock);
-        if(flags & IO_NDELAY)
-            return EWOULDBLOCK;
-        if((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
-            return ret;
-        ret = 0;
-        mtx_lock(&Buffer_lock);
-        if(Buffer == NULL)
-            goto out;
-    }
+	while(BufRP == BufWP) {
+		mtx_unlock(&Buffer_lock);
+		if(flags & IO_NDELAY)
+			return EWOULDBLOCK;
+		if((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
+			return ret;
+		ret = 0;
+		mtx_lock(&Buffer_lock);
+		if(Buffer == NULL)
+			goto out;
+	}
 
-    count = min_uint(uio->uio_resid, avail_R());
-    ret   = circular_get(uio, count);
+	count = min_uint(uio->uio_resid, avail_R());
+	ret   = circular_get(uio, count);
  out:
-    mtx_unlock(&Buffer_lock);
-    return ret;
+	mtx_unlock(&Buffer_lock);
+	return ret;
 }
 
 static int rpldev_ioctl(struct cdev *cd, u_long cmd, caddr_t data, int flags,
- struct thread *th)
+    struct thread *th)
 {
-    /* Linux does ioctls better: negative non-zero is error, and the rest is
-    some sort of success. Not so with BSD, wtf! Now I need to fiddle with an
-    extra pointer (data) to put a return value in, argh. */
-    size_t *ptr = (void *)data;
-    int ret = 0;
+	/*
+	 * Linux does ioctls better: negative non-zero is error, and the rest
+	 * is some sort of success. Not so with BSD. Now I need to fiddle with
+	 * an extra pointer (data) to put a return value in.
+	 */
+	size_t *ptr = (void *)data;
+	int ret = 0;
 
-    if(IOCGROUP(cmd) != RPL_IOC_MAGIC)
-        return ENOTTY;
-    if(ptr == NULL)
-        return EFAULT;
+	if(IOCGROUP(cmd) != RPL_IOC_MAGIC)
+		return ENOTTY;
+	if(ptr == NULL)
+		return EFAULT;
 
-    switch(cmd) {
-        case RPL_IOC_GETBUFSIZE:
-            *ptr = Bufsize; // BSDism, no put_user() like in Linux.
-            return 0;
-        case RPL_IOC_GETRAVAIL:
-            mtx_lock(&Buffer_lock);
-            if(Buffer == NULL)
-                goto out;
-            *ptr = avail_R();
-            mtx_unlock(&Buffer_lock);
-            return 0;
-        case RPL_IOC_GETWAVAIL:
-            mtx_lock(&Buffer_lock);
-            if(Buffer == NULL)
-                goto out;
-            *ptr = avail_W();
-            mtx_unlock(&Buffer_lock);
-            return 0;
-        case RPL_IOC_IDENTIFY:
-            *ptr = 0xC0FFEE;
-            return 0;
-        case RPL_IOC_SEEK:
-            mtx_lock(&Buffer_lock);
-            BufRP = Buffer + (BufRP - Buffer +
-                    min_uint(*ptr, avail_R())) % Bufsize;
-            mtx_unlock(&Buffer_lock);
-            return 0;
-        case RPL_IOC_FLUSH:
-            mtx_lock(&Buffer_lock);
-            BufRP = BufWP;
-            mtx_unlock(&Buffer_lock);
-            return 0;
-    }
+	switch(cmd) {
+		case RPL_IOC_GETBUFSIZE:
+			/* This is BSD. No put_user() like in Linux. */
+			*ptr = Bufsize;
+			return 0;
+		case RPL_IOC_GETRAVAIL:
+			mtx_lock(&Buffer_lock);
+			if(Buffer == NULL)
+				goto out;
+			*ptr = avail_R();
+			mtx_unlock(&Buffer_lock);
+			return 0;
+		case RPL_IOC_GETWAVAIL:
+			mtx_lock(&Buffer_lock);
+			if(Buffer == NULL)
+				goto out;
+			*ptr = avail_W();
+			mtx_unlock(&Buffer_lock);
+			return 0;
+		case RPL_IOC_IDENTIFY:
+			*ptr = 0xC0FFEE;
+			return 0;
+		case RPL_IOC_SEEK:
+			mtx_lock(&Buffer_lock);
+			BufRP = Buffer + (BufRP - Buffer +
+			        min_uint(*ptr, avail_R())) % Bufsize;
+			mtx_unlock(&Buffer_lock);
+			return 0;
+		case RPL_IOC_FLUSH:
+			mtx_lock(&Buffer_lock);
+			BufRP = BufWP;
+			mtx_unlock(&Buffer_lock);
+			return 0;
+	}
 
-    ret = ENOTTY;
+	ret = ENOTTY;
  out:
-    return ret;
+	return ret;
 }
 
 static int rpldev_close(struct cdev *cd, int flags, int fmt,
- struct thread *th)
+    struct thread *th)
 {
-    rpl_init   = NULL;
-    rpl_open   = NULL;
-    rpl_read   = NULL;
-    rpl_write  = NULL;
-    rpl_ioctl  = NULL;
-    rpl_close  = NULL;
-    rpl_deinit = NULL;
+	rpl_init   = NULL;
+	rpl_open   = NULL;
+	rpl_read   = NULL;
+	rpl_write  = NULL;
+	rpl_ioctl  = NULL;
+	rpl_close  = NULL;
+	rpl_deinit = NULL;
 
-    mtx_lock(&Buffer_lock);
-    free(Buffer, Buffer_malloc);
-    Buffer = NULL;
-    mtx_unlock(&Buffer_lock);
-    --kmi_usecount;
-    --Open_count;
-    return 0;
+	mtx_lock(&Buffer_lock);
+	free(Buffer, Buffer_malloc);
+	Buffer = NULL;
+	mtx_unlock(&Buffer_lock);
+	--kmi_usecount;
+	--Open_count;
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
-static inline size_t avail_R(void) {
-    if(BufWP >= BufRP)
-        return BufWP - BufRP;
-    return BufWP + Bufsize - BufRP;
+static inline size_t avail_R(void)
+{
+	if(BufWP >= BufRP)
+		return BufWP - BufRP;
+	return BufWP + Bufsize - BufRP;
 }
 
-static inline size_t avail_W(void) {
-    if(BufWP >= BufRP)
-        return BufRP + Bufsize - BufWP - 1;
-    return BufRP - BufWP - 1;
+static inline size_t avail_W(void)
+{
+	if(BufWP >= BufRP)
+		return BufRP + Bufsize - BufWP - 1;
+	return BufRP - BufWP - 1;
 }
 
-static inline int circular_get(struct uio *uio, size_t count) {
-    size_t x = Buffer + Bufsize - BufRP;
-    int ret;
+static inline int circular_get(struct uio *uio, size_t count)
+{
+	size_t x = Buffer + Bufsize - BufRP;
+	int ret;
 
-    if(count < x) {
-        if((ret = uiomove(BufRP, count, uio)) != 0)
-            return ret;
-        BufRP += count;
-    } else {
-        if((ret = uiomove(BufRP, x, uio)) != 0 ||
-         (ret = uiomove(Buffer, count - x, uio)) != 0)
-            return ret;
-        BufRP = Buffer + count - x;
-    }
+	if(count < x) {
+		if((ret = uiomove(BufRP, count, uio)) != 0)
+			return ret;
+		BufRP += count;
+	} else {
+		if((ret = uiomove(BufRP, x, uio)) != 0 ||
+		  (ret = uiomove(Buffer, count - x, uio)) != 0)
+			return ret;
+		BufRP = Buffer + count - x;
+	}
 
-    return 0;
+	return 0;
 }
 
-static inline void circular_put(const void *src, size_t count) {
-    size_t x = Buffer + Bufsize - BufWP;
+static inline void circular_put(const void *src, size_t count)
+{
+	size_t x = Buffer + Bufsize - BufWP;
 
-    if(count < x) {
-        memcpy(BufWP, src, count);
-        BufWP += count;
-    } else {
-        memcpy(BufWP, src, x);
-        memcpy(Buffer, src + x, count - x);
-        BufWP = Buffer + count - x;
-    }
+	if(count < x) {
+		memcpy(BufWP, src, count);
+		BufWP += count;
+	} else {
+		memcpy(BufWP, src, x);
+		memcpy(Buffer, src + x, count - x);
+		BufWP = Buffer + count - x;
+	}
 
-    return;
+	return;
 }
 
 static int circular_put_packet(struct rpldev_packet *p, const void *buf,
- size_t count)
+    size_t count)
 {
-    if(count > (size_t)(-sizeof(struct rpldev_packet) - 1))
-        return ENOSPC;
-    mtx_lock(&Buffer_lock);
-    if(Buffer == NULL) {
-        mtx_unlock(&Buffer_lock);
-        return 0;
-    }
-    if(avail_W() < sizeof(struct rpldev_packet) + count) {
-        mtx_unlock(&Buffer_lock);
-        return ENOSPC;
-    }
+	if(count > (size_t)(-sizeof(struct rpldev_packet) - 1))
+		return ENOSPC;
+	mtx_lock(&Buffer_lock);
+	if(Buffer == NULL) {
+		mtx_unlock(&Buffer_lock);
+		return 0;
+	}
+	if(avail_W() < sizeof(struct rpldev_packet) + count) {
+		mtx_unlock(&Buffer_lock);
+		return ENOSPC;
+	}
 
-    circular_put(p, sizeof(struct rpldev_packet));
-    if(count > 0)
-        circular_put(buf, count);
-    mtx_unlock(&Buffer_lock);
-    wakeup_one(&Buffer);
-    return count;
+	circular_put(p, sizeof(struct rpldev_packet));
+	if(count > 0)
+		circular_put(buf, count);
+	mtx_unlock(&Buffer_lock);
+	wakeup_one(&Buffer);
+	return count;
 }
 
-static inline void fill_time(struct timeval *tv) {
-    microtime(tv);
+static inline void fill_time(struct timeval *tv)
+{
+	microtime(tv);
 
-    if(sizeof(tv->tv_sec) == sizeof(uint32_t))
-        tv->tv_sec = htole32(tv->tv_sec);
-    else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
-        tv->tv_sec = htole64(tv->tv_sec);
+	if(sizeof(tv->tv_sec) == sizeof(uint32_t))
+		tv->tv_sec = htole32(tv->tv_sec);
+	else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
+		tv->tv_sec = htole64(tv->tv_sec);
 
-    if(sizeof(tv->tv_usec) == sizeof(uint32_t))
-        tv->tv_usec = htole32(tv->tv_usec);
-    else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
-        tv->tv_usec = htole64(tv->tv_usec);
-    return;
+	if(sizeof(tv->tv_usec) == sizeof(uint32_t))
+		tv->tv_usec = htole32(tv->tv_usec);
+	else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
+		tv->tv_usec = htole64(tv->tv_usec);
+	return;
 }
 
-static inline unsigned int min_uint(unsigned int a, unsigned int b) {
-    return (a < b) ? a : b;
+static inline unsigned int min_uint(unsigned int a, unsigned int b)
+{
+	return (a < b) ? a : b;
 }
 
-static inline uint32_t mkdev_26(unsigned long maj, unsigned long min) {
-    return (maj << 20) | (min & 0xFFFFF);
+static inline uint32_t mkdev_26(unsigned long maj, unsigned long min)
+{
+	return (maj << 20) | (min & 0xFFFFF);
 }
 
 //=============================================================================
