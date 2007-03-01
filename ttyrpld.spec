@@ -41,7 +41,7 @@ cd "$RPM_BUILD_DIR"/%name-%version/;
 make EXT_CFLAGS="$RPM_OPT_FLAGS" DEBUG=0 all doc;
 
 %install
-b="%{buildroot}";
+b="%buildroot";
 rm -Rf "$b";
 make ROOT="$b" PREFIX="%prefix" install;
 install -d "$b/usr/src/%name-%version-km/kpatch";
@@ -53,7 +53,7 @@ install -d "$b/%_sbindir";
 ln -s %_sysconfdir/init.d/rpld "$b/%_sbindir/rcrpld";
 
 %clean
-rm -Rf "%{buildroot}";
+rm -Rf "%buildroot";
 
 %post
 cat <<EOF
