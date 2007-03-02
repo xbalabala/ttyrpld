@@ -682,6 +682,7 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 	 */
 	char buf[MAXFNLEN];
 	struct stat sb;
+	int ret = 0;
 	void *dx;
 	char *de;
 
@@ -695,18 +696,20 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 		if(S_ISCHR(sb.st_mode) &&
 		  K26_MKDEV(COMPAT_MAJOR(sb.st_rdev), COMPAT_MINOR(sb.st_rdev)) == id) {
 			HX_strlcpy(dest, buf, len);
-			HXdir_close(dx);
-			return 1;
+			ret = 1;
+			break;
 		}
 		if(S_ISDIR(sb.st_mode)) {
 			snprintf(buf, sizeof(buf), "%s/%s", dir, de);
-			if(find_devnode_dive(id, dest, len, buf))
-				return 1;
+			if(find_devnode_dive(id, dest, len, buf)) {
+				ret = 1;
+				break;
+			}
 		}
 	}
 
 	HXdir_close(dx);
-	return 0;
+	return ret;
 }
 
 static char *getnamefromuid(uid_t uid, char *result, size_t len)
