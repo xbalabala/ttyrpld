@@ -10,7 +10,7 @@
   </tr>
   <tr>
     <td class="t2">GNU make</td>
-    <td class="t2">3.79</td>
+    <td class="t2">3.80</td>
     <td class="t2">3.81</td>
   </tr>
   <tr>
@@ -41,7 +41,7 @@
   </tr>
   <tr>
     <td class="t2">php</td>
-    <td class="t2">4.x</td>
+    <td class="t2">5.x</td>
     <td class="t2">-</td>
   </tr>
   <tr>
