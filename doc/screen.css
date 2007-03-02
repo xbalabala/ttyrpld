@@ -1,3 +1,4 @@
+/* Documentation */
 #content {
     background-color: #FFFFFF;
     border: 1px solid #AAAAAA;
@@ -116,4 +117,9 @@ ul {
     margin: .3em 0 0 1.5em;
     padding: 0;
     list-style-image: url(bullet.gif);
+}
+
+/* Website */
+.rssNewsItem {
+    font-weight: bold;
 }
