@@ -34,6 +34,6 @@ function h2($title) {
   </tr>
 </table></div>
 
-<hr style="display: none" />
+<hr style="display: none;" />
 
 <div id="content">

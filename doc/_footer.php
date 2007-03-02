@@ -1,6 +1,6 @@
 </div>
 
-<hr style="display: none" />
+<hr style="display: none;" />
 
 <div id="footer">
 

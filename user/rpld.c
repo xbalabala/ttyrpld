@@ -9,10 +9,10 @@
 	see the file named "LICENSE.LGPL2".
 */
 #include <sys/resource.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #if defined(__linux__) || defined(__sun)
-#    include <alloca.h>
+#	include <alloca.h>
 #endif
 #include <ctype.h>
 #include <errno.h>
@@ -78,17 +78,16 @@ static int read_config_bp(const char *, const char *);
 
 /* Variables */
 static struct {
-	int _running, dolog, max_fd;
+	int _running, dolog, infod_start, max_fd;
 	char *device;
 	long bsize;
-	int infod_start;
 } Opt = {
 	._running    = 1,
-	.dolog       = 1,
-	.max_fd      = -1, /* use system default */
 	.bsize       = 32 * 1024,
 	.device      = "/dev/misc/rpl /dev/rpl /devices/pseudo/rpldev@0:0",
+	.dolog       = 1,
 	.infod_start = 0,
+	.max_fd      = -1, /* use system default */
 };
 
 //-----------------------------------------------------------------------------
