@@ -9,33 +9,6 @@ types, including <i>vc</i>, bsd and unix98-style <i>pty</i>s (xterm/ssh),
 unavoidable for the default user. It runs with no overhead if the logging
 daemon is not active.</p>
 
-<h1>General info</h1>
-
-<table border="1">
-  <tr>
-    <td class="t1">License:</td>
-    <td class="t1"><ul>
-      <li>GNU Lesser General Public License (LGPL) version 2.x (userspace
-        programs)</li>
-      <li>GNU General Public License (GPL) version 2.x (Linux kernel
-        parts)</li>
-      <li>BSD-style (BSD kernel parts)</li>
-      <li>CDDL (Solaris kernel parts)</li>
-    </ul></td>
-  </tr>
-  <tr>
-    <td class="t2">Languages:</td>
-    <td class="t2">English, Dutch, French, German, Italian, Norwegian-Bokmål,
-      Persian (Farsi), Spanish, Swedish</td>
-  </tr>
-  <tr>
-    <td class="t1">Operating Systems:</td>
-    <td class="t1">Linux 2.6, FreeBSD 5.3/6.0/6.1, OpenBSD 3.9,
-      NetBSD 3.0, Solaris 11_SNV39(dev)<br />
-      (and possibly derivates)</td>
-  </tr>
-</table>
-
 <h1>Technical aspects</h1>
 
 <p><i>... which cause it to differ from existing solutions:</i></p>
@@ -78,5 +51,32 @@ space.)</p>
 
 <p class="block"><i>ttyreplay</i>: real-time log analyzer. Think of it as a
 simple video player.</p>
+
+<h1>Misc info</h1>
+
+<table border="1">
+  <tr>
+    <td class="t1">License:</td>
+    <td class="t1"><ul>
+      <li>GNU Lesser General Public License (LGPL) version 2.x (userspace
+        programs)</li>
+      <li>GNU General Public License (GPL) version 2.x (Linux kernel
+        parts)</li>
+      <li>BSD-style (BSD kernel parts)</li>
+      <li>CDDL (Solaris kernel parts)</li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td class="t2">Localization for:</td>
+    <td class="t2">English, Dutch, French, German, Italian, Norwegian-Bokmål,
+      Persian (Farsi), Spanish, Swedish</td>
+  </tr>
+  <tr>
+    <td class="t1">Operating Systems:</td>
+    <td class="t1">Linux 2.6, FreeBSD 5.3/6.0/6.1, OpenBSD 3.9,
+      NetBSD 3.0, Solaris 11_SNV39(dev)<br />
+      (and possibly derivates)</td>
+  </tr>
+</table>
 
 <?php include_once("_footer.php"); ?>
