@@ -8,6 +8,7 @@
 	Foundation; however ONLY version 2 of the License. For details,
 	see the file named "LICENSE.LGPL2".
 */
+#include <sys/resource.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #if defined(__linux__) || defined(__sun)
@@ -58,6 +59,7 @@ static int check_parent_directory(const char *);
 static void fill_info(struct tty *, const char *);
 
 static int init_device(const char *);
+static void init_fdtable(int);
 static int init_sighandler(void);
 static void sighandler_int(int);
 static void sighandler_alrm(int);
@@ -76,13 +78,14 @@ static int read_config_bp(const char *, const char *);
 
 /* Variables */
 static struct {
-	int _running, dolog;
+	int _running, dolog, max_fd;
 	char *device;
 	long bsize;
 	int infod_start;
 } Opt = {
 	._running    = 1,
 	.dolog       = 1,
+	.max_fd      = -1, /* use system default */
 	.bsize       = 32 * 1024,
 	.device      = "/dev/misc/rpl /dev/rpl /devices/pseudo/rpldev@0:0",
 	.infod_start = 0,
@@ -132,6 +135,9 @@ int main(int argc, const char **argv)
 		perror("Ttys = HXbtree_init()");
 		return EXIT_FAILURE;
 	}
+
+	if(Opt.max_fd > 4)
+		init_fdtable(Opt.max_fd);
 
 	if((fd = init_device(Opt.device)) < 0) {
 		fprintf(stderr, _("No device could be opened, aborting.\n"));
@@ -589,6 +595,18 @@ static int init_device(const char *in_devs)
 	return fd;
 }
 
+static void init_fdtable(int nfd)
+{
+	struct rlimit rl = {
+		.rlim_cur = nfd,
+		.rlim_max = nfd,
+	};
+	if(setrlimit(RLIMIT_NOFILE, &rl) != 0)
+		fprintf(stderr, _("Warning: Could not increase fd table size "
+		        "to %d: %s\n"), nfd, strerror(errno));
+	return;
+}
+
 static int init_sighandler(void)
 {
 	struct sigaction s_int, s_alrm, s_pipe;
@@ -797,6 +815,7 @@ static int read_config(const char *file)
         {.ln = "DEVICE",      .type = HXTYPE_STRING, .ptr = &Opt.device},
         {.ln = "DO_LOG",      .type = HXTYPE_BOOL,   .ptr = &Opt.dolog},
         {.ln = "INFOD_PORT",  .type = HXTYPE_STRING, .ptr = &GOpt.infod_port},
+        {.ln = "MAX_FD",      .type = HXTYPE_INT,    .ptr = &Opt.max_fd},
         {.ln = "START_INFOD", .type = HXTYPE_BOOL,   .ptr = &Opt.infod_start},
         {.ln = "OFMT",        .type = HXTYPE_STRING, .ptr = &GOpt.ofmt},
         {.ln = "USER",        .type = HXTYPE_NONE,   .ptr = &GOpt.user_id,
