@@ -42,6 +42,7 @@ enum {
 	C_LOGOPEN = 0,
 	C_BADPACKET,
 	C_PKTTYPE,
+	C_KERNEL,
 	C_MAX,
 };
 
@@ -703,8 +704,12 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 	void *dx;
 	char *de;
 
-	if((dx = HXdir_open(dir)) == NULL)
+	if((dx = HXdir_open(dir)) == NULL) {
+		if(rate_limit(C_KERNEL, 10))
+			notify(LOG_WARNING, _("Could not open %s: %s\n"),
+			       dir, strerror(errno));
 		return 0;
+	}
 
 	while((de = HXdir_read(dx)) != NULL) {
 		snprintf(buf, sizeof(buf), "%s/%s", dir, de);
