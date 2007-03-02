@@ -26,7 +26,7 @@ function h2($title) {
 <div style="background-color: #FFF6D5; border-bottom: 1px solid #808080;">
 <table style="margin: 0;">
   <tr>
-    <td style="vertical-align: middle; padding: 0 1em 0 2em;" valign="center"><a
+    <td style="vertical-align: middle; padding: 0 1em 0 2em;" valign="middle"><a
       href="http://ttyrpld.sourceforge.net/"><img src="ttyrpld.png"
       alt="ttyrpld logo" border="0" /></a></td>
     <td style="vertical-align: middle; font-size: 150%;">ttyrpld&nbsp;-
