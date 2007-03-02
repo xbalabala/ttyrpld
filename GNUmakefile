@@ -41,6 +41,11 @@ rpld: user/rpld.o user/infod.o user/rplctl.o user/rdsh.o user/lib.o
 rplctl: rpld
 	ln -fs $< $@;
 
+ptmx: user/ptmx.o
+	${VECHO_LD}
+	${Q}${LD} ${LDFLAGS} -o $@ $^ -lpthread;
+	${Q}${STRIP} -s $@;
+
 %.o: %.c
 	${VECHO_CC}
 	${Q}${CC} ${CFLAGS} -Wp,-MMD,$(@D)/.$(@F).d -c -o $@ $<;
