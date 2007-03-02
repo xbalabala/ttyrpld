@@ -41,7 +41,7 @@ else
   CFLAGS   += -O2 -finline-functions -fomit-frame-pointer
   CXXFLAGS += -O2 -finline-functions -fomit-frame-pointer
   ASFLAGS  += -O2 -finline-functions
-  STRIP    := strip
+  STRIP    := strip -s
 endif
 ifeq (${PROF},1)
   CFLAGS   += -pg -fprofile-arcs -ftest-coverage -fno-omit-frame-pointer
