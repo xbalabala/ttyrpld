@@ -20,25 +20,6 @@
 .code code {
     background-color: transparent;
 }
-.ident {
-    padding: .2em 1em;
-    background-color: #EEEEEE;
-    border-bottom: 1px solid #4B6983;
-    color: #000000;
-    margin: 0;
-}
-.titleN {
-    font: italic 256% "Times New Roman", "Times", serif;
-}
-.titleS {
-    font: 120% "Arial", "Helvetica", "Tahoma", "Verdana", sans-serif;
-}
-.titleV {
-    font: bold italic 180% "Times New Roman", "Times", serif;
-}
-.titleX {
-    font: bold italic 250% "Times New Roman", "Times", serif;
-}
 a {
     color: #002BB8;
     text-decoration: none;
@@ -56,9 +37,6 @@ body {
 }
 code {
     background-color: #F9F9F9;
-}
-tt {
-    background-color: #FF8080;
 }
 h1, h2 {
     margin: 0;

@@ -23,29 +23,6 @@
 .code code {
     background-color: transparent;
 }
-.ident {
-    padding: .2em 1em;
-    background-color: #BBC6D0;
-    border-bottom: 1px solid #4B6983;
-    color: #000000;
-    margin: 0;
-}
-.titleN {
-    font: bold italic 256% "Times New Roman", "Times", serif;
-    color: #4B6983;
-}
-.titleS {
-    font: 120% "Arial", "Helvetica", "Tahoma", "Verdana", sans-serif;
-    color: #4B6983;
-}
-.titleV {
-    font: bold italic 180% "Times New Roman", "Times", serif;
-    color: #4B6983;
-}
-.titleX {
-    font: bold italic 250% "Times New Roman", "Times", serif;
-    color: #FFFFFF;
-}
 a {
     color: #002BB8;
     text-decoration: none;
@@ -64,9 +41,6 @@ body {
 }
 code {
     background-color: #F9F9F9;
-}
-tt {
-    background-color: #FF8080;
 }
 h1, h2 {
     margin: 0;
