@@ -2,9 +2,9 @@
 
 <h1>Description</h1>
 
-<p class="block"><i>ttyrpld</i> is a mult-os kernel-level tty key- and
-screenlogger with (a)synchronous replay supprt. It supports most tty types,
-including <i>vc</i>, bsd and unix98-style <i>pty</i>s (xterm/ssh),
+<p class="block"><i>ttyrpld</i> is a multi-os kernel-level tty logger (key- and
+screenlogger for ttys) with (a)synchronous replay supprt. It supports most tty
+types, including <i>vc</i>, bsd and unix98-style <i>pty</i>s (xterm/ssh),
 <i>serial</i>, <i>isdn</i>, etc. Being implemented within the kernel makes it
 unavoidable for the default user. It runs with no overhead if the logging
 daemon is not active.</p>
@@ -15,8 +15,12 @@ daemon is not active.</p>
   <tr>
     <td class="t1">License:</td>
     <td class="t1"><ul>
-      <li>GNU Lesser General Public License (LGPL) version 2.1</li>
-      <li>BSD-style (for BSD parts)</li>
+      <li>GNU Lesser General Public License (LGPL) version 2.x (userspace
+        programs)</li>
+      <li>GNU General Public License (GPL) version 2.x (Linux kernel
+        parts)</li>
+      <li>BSD-style (BSD kernel parts)</li>
+      <li>CDDL (Solaris kernel parts)</li>
     </ul></td>
   </tr>
   <tr>
@@ -26,9 +30,9 @@ daemon is not active.</p>
   </tr>
   <tr>
     <td class="t1">Operating Systems:</td>
-    <td class="t1">Linux 2.4/2.6, FreeBSD 5.3/6.0/6.1, OpenBSD 3.9,
-      NetBSD 3.0<br />
-      (and possibly offsprings)</td>
+    <td class="t1">Linux 2.6, FreeBSD 5.3/6.0/6.1, OpenBSD 3.9,
+      NetBSD 3.0, Solaris 11_SNV39(dev)<br />
+      (and possibly derivates)</td>
   </tr>
 </table>
 
@@ -40,7 +44,7 @@ daemon is not active.</p>
 userspace and make it dependent on the user to activate the logging.
 Definitely, an intruder does not start e.g. <code>/usr/bin/script</code>
 voluntarily. I have only seen few other kernel-based loggers. One of them is
-outdated, others query the X86 keyboard driver using interrupt hijacking and
+outdated, others query the x86 keyboard driver using interrupt hijacking and
 fixed translation. This is very unportable, because it only catches raw AT
 keyboard scancodes, but not USB or even other keyboards (unless they are in
 compatibility mode), and it does not work at all for network traffic.</p>
