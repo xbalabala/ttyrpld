@@ -10,12 +10,12 @@
 <h1>Manpages</h1>
 
 <ul>
-  <li><a href="man_ttyreplay.1.php"><code>ttyreplay(1)</code></a></li>
-  <li><a href="man_rpldev.4.php"><code>rpldev(4)</code></a></li>
-  <li><a href="man_rpl.5.php"><code>rpl(5)</code></a></li>
-  <li><a href="man_ttyrpld.7.php"><code>ttyrpld(7)</code></a></li>
-  <li><a href="man_rplctl.8.php"><code>rplctl(8)</code></a></li>
-  <li><a href="man_rpld.8.php"><code>rpld(8)</code></a></li>
+  <li><a href="ttyreplay.1.php"><code>ttyreplay(1)</code></a></li>
+  <li><a href="rpldev.4.php"><code>rpldev(4)</code></a></li>
+  <li><a href="rpl.5.php"><code>rpl(5)</code></a></li>
+  <li><a href="ttyrpld.7.php"><code>ttyrpld(7)</code></a></li>
+  <li><a href="rplctl.8.php"><code>rplctl(8)</code></a></li>
+  <li><a href="rpld.8.php"><code>rpld(8)</code></a></li>
 </ul>
 
 <h1>Other documents</h1>

@@ -66,7 +66,7 @@ data is temporarily copied to before it is passed on. There is only one global
 ring buffer for all ttys, and I do not see the use of one buffer per tty as
 useful, for this would raise the memory and CPU overhead. Overall, the whole
 RPL structure speaks a compact binary protocol to minize overhead of data
-passing. See <a href="man_rpldev.4.php">rpldev(4)</a> for details on the
+passing. See <a href="rpldev.4.php">rpldev(4)</a> for details on the
 protocol.</p>
 
 <p class="block"><i>Excerpt from <code>k_linux-2.6/rpldev.c</code></i></p>
@@ -183,9 +183,9 @@ in <code>user/replay.c</code> which has been commented thoroughly.</p>
 <h1>See also</h1>
 
 <ul>
-  <li><a href="man_ttyreplay.1.php"><code>ttyreplay(1)</code></a></li>
-  <li><a href="man_rpldev.4.php"><code>rpldev(4)</code></a></li>
-  <li><a href="man_rpld.8.php"><code>rpld(8)</code></a></li>
+  <li><a href="ttyreplay.1.php"><code>ttyreplay(1)</code></a></li>
+  <li><a href="rpldev.4.php"><code>rpldev(4)</code></a></li>
+  <li><a href="rpld.8.php"><code>rpld(8)</code></a></li>
 </ul>
 
 <?php include_once("_footer.php"); ?>

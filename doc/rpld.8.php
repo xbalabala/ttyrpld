@@ -179,7 +179,7 @@ unrecognized keys are ignored.</p>
 <h1>See also</h1>
 
 <ul>
-  <li><a href="man_ttyreplay.1.php"><code>ttyreplay(1)</code></a></li>
+  <li><a href="ttyreplay.1.php"><code>ttyreplay(1)</code></a></li>
 </ul>
 
 <?php include_once("_footer.php"); ?>

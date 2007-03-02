@@ -3,7 +3,7 @@
 <h1>ttyrpld log file format</h1>
 
 <p class="block">The logfiles <i>rpld</i> creates are a small variation of the
-packet protocol as described in <a href="man_rpldev.4.php">rpldev(4)</a>. The
+packet protocol as described in <a href="rpldev.4.php">rpldev(4)</a>. The
 <code>-&gt;dev</code> field is not present. (Since ttyrpld v2.00, the timestamp
 is already added in the kernel.) All fields are little endian and packed, i.e.
 there are no alignment gaps. The structure is similar to the <code>struct
@@ -18,7 +18,7 @@ rpldev_packet</code>:</p>
 
 <p class="block">The <code>-&gt;magic</code> is always <code>0xEE</code>.</p>
 Possible values for <code>-&gt;event</code> equal those listed in <a
-href="man_rpldev.4.php">rpldev(4)</a>, plus the following:</p>
+href="rpldev.4.php">rpldev(4)</a>, plus the following:</p>
 
 <p class="code"><code>
 <b>enum</b> {<br />
@@ -65,7 +65,7 @@ required for proper replay with <i>ttyreplay</i>.</p>
 <h1>See also</h1>
 
 <ul>
-  <li><a href="man_rpldev.4.php"><code>rpldev(4)</code></a></li>
+  <li><a href="rpldev.4.php"><code>rpldev(4)</code></a></li>
 </ul>
 
 <?php include_once("_footer.php"); ?>

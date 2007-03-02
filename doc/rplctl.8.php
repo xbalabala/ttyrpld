@@ -146,7 +146,7 @@ the program used. It can (and should) be ignored by programs querying
 <h1>See also</h1>
 
 <ul>
-  <li><a href="man_rpld.8.php"><code>rpld(8)</code></a></li>
+  <li><a href="rpld.8.php"><code>rpld(8)</code></a></li>
 </ul>
 
 <?php include_once("_footer.php"); ?>

@@ -146,8 +146,8 @@ on pipes.</p>
 <h1>See also</h1>
 
 <ul>
-  <li><a href="man_rpl.5.php"><code>rpl(5)</code></li>
-  <li><a href="man_rpld.8.php"><code>rpld(8)</code></li>
+  <li><a href="rpl.5.php"><code>rpl(5)</code></li>
+  <li><a href="rpld.8.php"><code>rpld(8)</code></li>
 </ul>
 
 <?php include_once("_footer.php"); ?>

@@ -224,6 +224,6 @@ users get away with <code>insserv rpld</code>.</p>
 <h1>Device node</h1>
 
 <p class="block">Details are on the <a
-href="man_rpldev.4.php"><code>rpldev(4)</code></a> manpage.</p>
+href="rpldev.4.php"><code>rpldev(4)</code></a> manpage.</p>
 
 <?php include_once("_footer.php"); ?>
