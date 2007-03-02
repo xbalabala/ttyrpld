@@ -13,10 +13,15 @@
    height="512"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.44"
+   inkscape:version="0.45"
    version="1.0"
-   sodipodi:docbase="/home/jengelh/Coding/SVG"
-   sodipodi:docname="ttyrpld1.svg">
+   sodipodi:docbase="/home/jengelh/Coding/ttyrpld/doc"
+   sodipodi:docname="ttyrpld.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/jengelh/Coding/ttyrpld/doc/ttyrpld.png"
+   inkscape:export-xdpi="18.110001"
+   inkscape:export-ydpi="18.110001"
+   sodipodi:modified="TRUE">
   <defs
      id="defs4">
     <linearGradient
@@ -136,9 +141,9 @@
      objecttolerance="2"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.25"
-     inkscape:cx="297.21476"
-     inkscape:cy="194.80225"
+     inkscape:zoom="1"
+     inkscape:cx="246.5542"
+     inkscape:cy="280.67096"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      width="512px"
@@ -153,10 +158,10 @@
      inkscape:guide-points="false"
      inkscape:guide-bbox="false"
      inkscape:grid-bbox="true"
-     inkscape:window-width="862"
-     inkscape:window-height="582"
-     inkscape:window-x="19"
-     inkscape:window-y="0"
+     inkscape:window-width="1136"
+     inkscape:window-height="939"
+     inkscape:window-x="944"
+     inkscape:window-y="850"
      gridspacingx="4px"
      gridspacingy="4px" />
   <metadata
@@ -175,7 +180,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <path
-       style="fill:url(#linearGradient10842);fill-opacity:1.0;fill-rule:evenodd;stroke:black;stroke-width:0.99999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0.1882353;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:url(#linearGradient10842);fill-opacity:1.0;fill-rule:evenodd;stroke:black;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0.1882353;stroke-miterlimit:4;stroke-dasharray:none"
        d="M 256,20 C 232,20 208,48 208,48 L 48,208 C 48,208 20,232 20,256 C 20,280 48,304 48,304 L 208,464 C 208,464 232,492 256,492 C 280,492 304,464 304,464 L 464,304 C 464,304 492,280 492,256 C 492,232 464,208 464,208 L 304,48 C 304,48 280,20 256,20 z "
        id="path9056"
        sodipodi:nodetypes="ccczcczcczccz" />

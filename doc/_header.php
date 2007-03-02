@@ -1,45 +1,39 @@
 <?php
-  ob_start();
-  $man = $_GET["man"] == "y" || $_SERVER["argv"][1] == "man";
+$section_index = array(0, 0);
+function h1($title) {
+    global $section_index;
+    $section_index[1] = 0;
+    echo "<h1>", ++$section_index[0], " &nbsp; ",
+         htmlspecialchars($title, ENT_NOQUOTES), "</h1>";
+}
+function h2($title) {
+    global $section_index;
+    echo "<h2>", $section_index[0], ".", ++$section_index[1], " &nbsp; ",
+         htmlspecialchars($title, ENT_NOQUOTES), "</h2>";
+}
 ?>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="format-white.css" />
-<title>ttyrpld - TTY replay daemon</title>
+<title>ttyrpld - tty replay daemon</title>
+<link rel="stylesheet" href="screen.css" type="text/css" title="Default" />
+<link rel="alternate stylesheet" href="printer.css" type="text/css" media="screen" title="Print" />
+<link rel="stylesheet" href="printer.css" type="text/css" media="print" title="Print" />
 </head>
 
 <body>
 
-<div style="background-color: #FFF6D5; border-bottom: 1px solid #808080;
-padding: 5px;">
-<table>
+<div style="background-color: #FFF6D5; border-bottom: 1px solid #808080;">
+<table style="margin: 0;">
   <tr>
-    <td style="vertical-align: middle;" valign="center"><a
-        href="http://ttyrpld.sourceforge.net/"><img src="ttyrpld.png"
-        alt="ttyrpld logo" border="0" /></a></td>
-    <td style="vertical-align: middle;">ttyrpld&nbsp;- tty logging daemon</td>
+    <td style="vertical-align: middle; padding: 0 1em 0 2em;" valign="center"><a
+      href="http://ttyrpld.sourceforge.net/"><img src="ttyrpld.png"
+      alt="ttyrpld logo" border="0" /></a></td>
+    <td style="vertical-align: middle; font-size: 150%;">ttyrpld&nbsp;-
+      tty logging daemon</td>
   </tr>
 </table></div>
 
-<p align="center">
-<?php if(!$man) { ?>
-  <a href="index.php">News</a> |
-<?php } ?>
-  <a href="desc.php">Description</a> |
-  <a href="install.php">Install</a> |
-<?php if($man) { ?>
-  <a href="man_ttyreplay.1.php">ttyreplay(1)</a> |
-  <a href="man_rpldev.4.php">rpldev(4)</a> |
-  <a href="man_rpl.5.php">rpl(5)</a> |
-  <a href="man_ttyrpld.7.php">ttyrpld(7)</a> |
-  <a href="man_rplctl.8.php">rplctl(8)</a> |
-  <a href="man_rpld.8.php">rpld(8)</a> |
-  <a href="netlog.php">Netlogging</a> |
-  <a href="changes.php">Changelog</a> |
-<?php } ?>
-<a href="support.php">Support</a></p>
+<hr style="display: none" />
 
-<hr size="1" color="#404040" width="80%" />
-
-<table style="margin-right: 15px;">
+<div id="content">
