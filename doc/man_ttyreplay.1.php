@@ -30,7 +30,7 @@ play.</p>
     <td class="t2" nowrap="nowrap"><code><b>-F</b></code></td>
     <td class="t2">Live feed follow mode. Seek to the end of the file and
       tail-follow any new contents that are written to it. This does the same
-      as `<code>tail -f</code>` does with normal text logfiles.</td>
+      as <code>tail -f</code> does with normal text logfiles.</td>
   </tr>
   <tr>
     <td class="t1" nowrap="nowrap"><code><b>-J</b> <i>time</i></code></td>

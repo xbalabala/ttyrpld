@@ -329,7 +329,7 @@ testbed, because new bugs were expected.</p>
 <p><b>infod:</b></p>
 
 <ul class="clog">
-  <li class="star">fixed: doing `<code>rplctl -L</code>` on a tty which did not have a logfile associated crashed <i>rpld</i> (this was due to <code>basename_pp()</code>, introduced in 1.24)</li>
+  <li class="star">fixed: doing <code>rplctl -L</code> on a tty which did not have a logfile associated crashed <i>rpld</i> (this was due to <code>basename_pp()</code>, introduced in 1.24)</li>
   <li class="star">fixed: not all stats were zeroed</li>
   <li class="plus">added per-tty zeroing</li>
 </ul>
@@ -353,7 +353,7 @@ testbed, because new bugs were expected.</p>
 
 <ul class="clog">
   <li class="star">fixed: <code>etc-init.d-rpld</code> was copied to <code>/etc/init.d/etc-init.d-rpld</code> rather than <code>/etc/init.d/rpld</code></li>
-  <li class="plus">`<code>make install</code>` will not overwrite <code>/etc/rpld.conf</code> if it is modified</li>
+  <li class="plus"><code>make install</code> will not overwrite <code>/etc/rpld.conf</code> if it is modified</li>
 </ul>
 
 <h1>To 1.24 (released 2004-11-18)</h1>
@@ -402,7 +402,7 @@ Countless minor (sometimes major) adjustments.</p>
   <li class="star">corrected condition inversion in <code>G_skip()</code></li>
   <li class="plus">redesigned the locking scheme (which is needed between <i>rpld</i>&lt;-&gt;<i>infod</i>) down to one big lock (which is also taken less in certain places).</li>
   <li class="star"><code>log_write()</code> now uses a one-shot read</li>
-  <li class="plus">will now automatically create parent directories if needed (like `<code>mkdir -p</code>`)</li>
+  <li class="plus">will now automatically create parent directories if needed (like <code>mkdir -p</code>)</li>
   <li class="plus">sets umask so that the maximum permissions are <code>-wx------</code></li>
   <li class="plus">added <code>-i</code> option (counter <code>-I</code>)</li>
 </ul>
@@ -450,7 +450,7 @@ Countless minor (sometimes major) adjustments.</p>
 
 <ul class="clog">
   <li class="minus"><code>MARCH</code> and <code>MCPU</code> variables have been taken out, superseded by <code>EXT_CFLAGS</code></li>
-  <li class="star">"<code>kmod</code>" target will now `<code>rmmod rpldev</code>` before reloading it</li>
+  <li class="star">"<code>kmod</code>" target will now <code>rmmod rpldev</code> before reloading it</li>
 </ul>
 
 <h1>To 1.13.1 (released 2004-11-03)</h1>
@@ -538,7 +538,7 @@ recompile without reboot.)</p>
 <p><b>infod:</b></p>
 
 <ul class="clog">
-  <li class="star">the parsetext (`<code>rplctl -t</code>`) "status field" has been changed: from (A, D, S) to (A, J, D) to reflect the rplctl switches</li>
+  <li class="star">the parsetext (<code>rplctl -t</code>) "status field" has been changed: from (A, D, S) to (A, J, D) to reflect the rplctl switches</li>
   <li class="plus">will now print a '<code>?</code>' as status character if something got us corrupted</li>
 </ul>
 
@@ -582,7 +582,7 @@ recompile without reboot.)</p>
 <ul class="clog">
   <li class="star">fixed a race condition in <code>log_close()</code>, where everything above <code>pthread_mutex_lock()</code> should have been while the lock is held</li>
   <li class="plus">user changes on tty device (such as on vc-*) will be detected and now correctly put into separate files. (See <code>doc/rpld.html</code> for details.)</li>
-  <li class="star">fixed: a REMOVE request (`<code>rplctl -X</code>`) also triggered FLUSH (<code>-F</code>)</li>
+  <li class="star">fixed: a REMOVE request (<code>rplctl -X</code>) also triggered FLUSH (<code>-F</code>)</li>
 </ul>
 
 <p><b>infod:</b></p>
@@ -597,7 +597,7 @@ recompile without reboot.)</p>
 <ul class="clog">
   <li class="plus">added the <code>-L</code> switch to make <i>rplctl</i> ask a <code>IFP_GETINFO/_T</code> even if there are other arguments like <code>-ADFJX</code></li>
   <li class="plus">added the <code>-t</code> switch to use <code>IFP_GETINFO</code> instead of <code>IFP_GETINFO_T</code></li>
-  <li class="star">fixed: `<code>rplctl -X tty1 tty2</code>` actually did not show info for tty2 (normal arguments ignored if any option switches were found)</li>
+  <li class="star">fixed: <code>rplctl -X tty1 tty2</code> actually did not show info for tty2 (normal arguments ignored if any option switches were found)</li>
   <li class="plus">added the <code>-Z</code> switch to zero all stats counters</li>
 </ul>
 
@@ -719,7 +719,7 @@ recompile without reboot.)</p>
 
 <ul class="clog">
   <li class="plus">added follow modes (<code>-F</code>, <code>-f</code> options)<br />
-    <code>-F</code>: live feed (directly see what a user is typing), à la `<code>tail -f</code>`<br />
+    <code>-F</code>: live feed (directly see what a user is typing), à la <code>tail -f</code><br />
     <code>-f</code>: play file as normal and switch into <code>-F</code> when EOF is reached</li>
   <li class="plus">added error recovery</li>
 </ul>

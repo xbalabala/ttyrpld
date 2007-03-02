@@ -70,7 +70,7 @@ option.</p>
 
 <h1>Example output</h1>
 
-<p class="block">A command like `<code>rplctl</code>` could output this:</p>
+<p class="block">A command like <code>rplctl</code> could output this:</p>
 
 <p class="code"><code>
 A TTY &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;BYTES IN &nbsp; &nbsp; &nbsp; OUT FILENAME<br />
@@ -91,7 +91,7 @@ D pts-4 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 864 &nbsp; &nbsp; 52618 root/2
 
 <h1>sscanf() format</h1>
 
-<p class="block">On the other hand, `<code>rplctl -t</code>` could produce
+<p class="block">On the other hand, <code>rplctl -t</code> could produce
 this:</p>
 
 <p class="code"><code>

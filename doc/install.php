@@ -97,7 +97,7 @@ You can patch your kernel source tree by issuing these commands:</p>
 <b>$</b> make menuconfig;
 </code></p>
 
-<p class="block">Run `<code>make menuconfig</code>` or anything else that suits
+<p class="block">Run <code>make menuconfig</code> or anything else that suits
 your needs to choose "<code>TTY logging via rpldev</code>" in the
 "<code>Security options</code>" menu.</p>
 
@@ -126,8 +126,8 @@ the <code>src</code> packages, and use:</p>
 <b>$</b> make kernel<br />
 </code></p>
 
-<p class="block">For `<code>make kernel</code>` to work, various source
-packages may need to be installed.</p>
+<p class="block">For <code>make kernel</code> to work, various source packages
+may need to be installed.</p>
 
 <h1>Patching the kernel sources (OpenBSD and NetBSD)</h1>
 
@@ -152,10 +152,9 @@ packages may need to be installed.</p>
 
 <h1>Compiling the kernel module</h1>
 
-<p class="block">After having booted the new kernel, run `<code>make
-kmod</code>` in the root of the source directory. Note that you will need
-<i>GNU make</i>, version 3.80 or later. It will try to compile, load and
-install the module.</p>
+<p class="block">After having booted the new kernel, run <code>make kmod</code>
+in the root of the source directory. Note that you will need <i>GNU make</i>,
+version 3.80 or later. It will try to compile, load and install the module.</p>
 
 <p class="block">You can tune the location of the kernel sources and module
 installation path by using <code>KERNEL_DIR=xxx</code> and/or
@@ -173,8 +172,8 @@ kernel.</p>
 <p class="block">To load the module at boot time, edit your distribution
 specific startup scripts. A hint for SUSE users: it is in
 <code>/etc/sysconfig/kernel</code> in <code>MODULES_LOADED_ON_BOOT</code>. If
-you do not know where, ask someone who knows or simply put a `<code>modprobe
-rpldev</code>` into <code>/etc/init.d/boot.local</code>. However, the supplied
+you do not know where, ask someone who knows or simply put a <code>modprobe
+rpldev</code> into <code>/etc/init.d/boot.local</code>. However, the supplied
 <code>etc-init.d-rpld</code> script (to be put as
 <code>/etc/init.d/rpld</code>) (for Linux/LSB) will be so kind to automatically
 load it.</p>
@@ -184,24 +183,24 @@ only.</p>
 
 <h1>Compiling the user-space applications</h1>
 
-<p class="block">To compile the user-space tools, run `<code>make</code>` (BSD:
-`<code>gmake</code>`) without any arguments. This will build <code>rpld</code>
+<p class="block">To compile the user-space tools, run <code>make</code> (BSD:
+<code>gmake</code>) without any arguments. This will build <code>rpld</code>
 and <code>ttyreplay</code> (the daemon and the log analyzer). If you want to
 build HTML and TXT documentation from the PHP files, you need to use
-`<code>gmake doc</code>`.</p>
+<code>gmake doc</code>.</p>
 
 <h1>Installing</h1>
 
-<p class="block">A `<code>make install</code>` target is provided and will
+<p class="block">A <code>make install</code> target is provided and will
 install <i>ttyrpld</i> into various places in <code>${ROOT}${PREFIX}</code>.
 This probably needs some explanation: <code>ROOT</code> is a make variable
 which is prepended to all copy operations, etc., so you can use for example
-`<code>make install ROOT=/var/netboot</code>` to have everything installed
-under this alternative root directory.</p>
+<code>make install ROOT=/var/netboot</code> to have everything installed under
+this alternative root directory.</p>
 
 <p class="block">The <code>PREFIX</code> make variable works almost the same,
-but is also used when constructing files. That is, if you run `<code>make
-install PREFIX=/altdisk</code>`, the init script will be adjusted to contain
+but is also used when constructing files. That is, if you run <code>make
+install PREFIX=/altdisk</code>, the init script will be adjusted to contain
 <code>/altdisk/usr/sbin/rpld</code>. By default, <code>PREFIX</code> contains
 <code>/usr/local</code>, so that binaries are installed to
 <code>/usr/local/sbin</code>. If you passed <code>PREFIX=/usr</code> instead,
@@ -220,7 +219,7 @@ overwritten.</p>
 <p class="block">The init script (only Linux) will always get installed to
 <code>${ROOT}/etc/init.d/</code>! However, it is not automatically activated to
 be run on bootup. Check your distribution's manual on how to do this. SUSE
-users get away with `<code>insserv rpld</code>`.</p>
+users get away with <code>insserv rpld</code>.</p>
 
 <h1>Device node</h1>
 

@@ -104,7 +104,7 @@ explicitly excluded because they do not seem to generate any data.)</p>
 <p class="block"><i>rpld</i> will divert logging of a tty to a new file when
 the tty inode is opened the next time and if the owner of it has changed. This
 will make logins on <code>/dev/tty</code><i>N</i> go to the right file. Note
-that `<code>su</code>` does not change the ownership, so both sessions (normal
+that <code>su</code> does not change the ownership, so both sessions (normal
 and <code>su</code>'ed) will go into the same file.  (And that's good, because
 it then logs by "real person" rather than login name.) The byte count
 statistics are zeroed upon change detection.</p>

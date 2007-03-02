@@ -12,9 +12,9 @@ The kernel hotplug framework and <i>udev</i> will then create a device node in
 
 <p class="block">On FreeBSD, devfs takes care of all this, so when the module
 is loaded, a working <code>/dev/rpl</code> is also present. For OpenBSD and
-NetBSD, it always loads at <code>char(228,0)</code>. Use `<code>mknod /dev/rpl
-c 228 0</code>` to create the node. It should be made mode <code>0400</code>
-and owned by the low-privileged user that is set in <code>rpld.conf</code>.</p>
+NetBSD, it always loads at <code>char(228,0)</code>. Use <code>mknod /dev/rpl c
+228 0</code> to create the node. It should be made mode <code>0400</code> and
+owned by the low-privileged user that is set in <code>rpld.conf</code>.</p>
 
 <h1>Module parameters (Linux)</h1>
 
