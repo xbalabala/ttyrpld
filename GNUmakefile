@@ -88,7 +88,7 @@ uninstall:
 	rm -f ${ROOT}${PREFIX}/share/locale/*/LC_MESSAGES/ttyrpld.mo;
 
 clean:
-	rm -f user/*.o rpld rplctl ttyreplay;
+	rm -f user/*.o rpld rplctl ttyreplay ptmx;
 
 distclean: clean
 	rm -f doc/*.html doc/*.txt user/.*.d;
