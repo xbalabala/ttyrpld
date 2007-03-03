@@ -17,17 +17,17 @@ real-time.</p>
 
 <table border="1">
   <tr>
-    <td class="t1" nowrap="nowrap"><code><b>-D</b> <i>dev</i></code></td>
+    <td class="t1n"><code>-D <i>dev</i></code></td>
     <td class="t1">Path to the rpl device, e.g. <code>/dev/rpl</code>.</td>
   </tr>
   <tr>
-    <td class="t2" nowrap="nowrap"><code><b>-I</b></code></td>
+    <td class="t2n"><code>-I</code></td>
     <td class="t2">Start the <i>infod</i> component if it is not automatically
       started when the <code>INFOD_START</code> configuration variable is
       set.</td>
   </tr>
   <tr>
-    <td class="t1" nowrap="nowrap"><code><b>-O</b> <i>string</i></code></td>
+    <td class="t1n"><code>-O <i>string</i></code></td>
     <td class="t1">Overrides the hardcoded and configuration file values
       (processed so far) for the log file naming scheme. You can use the
       printf-like placeholders explained below.  Subsequent <code>-c</code> may
@@ -36,31 +36,31 @@ real-time.</p>
       <code>-O</code>/<code>OFMT</code>.</td>
   </tr>
   <tr>
-    <td class="t2" nowrap="nowrap"><code><b>-Q</b></code></td>
+    <td class="t2n"><code>-Q</code></td>
     <td class="t2">All ttys start in deactivated mode (rather than activated).
       They can then be activated when needed.  Byte-counting is done in either
       case.</td>
   </tr>
   <tr>
-    <td class="t1" nowrap="nowrap"><code><b>-U</b> <i>user</i></code></td>
+    <td class="t1n"><code>-U <i>user</i></code></td>
     <td class="t1">Drop all privilegues and change to <i>user</i> after
       initialization (memory lock, creating and opening RPL device). This can
       be either a username or a numeric UID.</td>
   </tr>
   <tr>
-    <td class="t2" nowrap="nowrap"><code><b>-c</b> <i>file</i></code></td>
+    <td class="t2n"><code>-c <i>file</i></code></td>
     <td class="t2">Load configuration variables from <i>file</i>. The in-memory
       copies of the variables are not changed if no such var name is found in
       the file. Unknown var names in the configuration file are also
       ignored.</td>
   </tr>
   <tr>
-    <td class="t1" nowrap="nowrap"><code><b>-s</b></code></td>
+    <td class="t1n"><code>-s</code></td>
     <td class="t1">Print warnings and error messages to <i>syslog</i> rather
       than <code>stderr</code>.</td>
   </tr>
   <tr>
-    <td class="t2" nowrap="nowrap"><code><b>-v</b></code></td>
+    <td class="t2"><code>-v</code></td>
     <td class="t2">Print statistics about recorded packets on
       <code>stdout</code> while <i>rpld</i> is running. This option overrides
       <code>-s</code>.</td>

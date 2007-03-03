@@ -21,47 +21,47 @@ option.</p>
 
 <table border="1">
   <tr>
-    <td class="t1" nowrap="nowrap"><code><b>-A</b> <i>tty</i></code></td>
+    <td class="t1n"><code>-A <i>tty</i></code></td>
     <td class="t1">Activate logging for the given tty.  It can be a filename
       (which must exist) or a device number using
       "<code>=MAJOR,MINOR</code>".</td>
   </tr>
   <tr>
-    <td class="t2" nowrap="nowrap"><code><b>-D</b> <i>tty</i></code></td>
+    <td class="t2n"><code>-D <i>tty</i></code></td>
     <td class="t2">Deactivate logging for the given tty.</td>
   </tr>
   <tr>
-    <td class="t1" nowrap="nowrap"><code><b>-L</b> [<i>tty</i>]</td>
+    <td class="t1n"><code>-L <b>[</b><i>tty</i><b>]</b></td>
     <td class="t1">Explicitly request a listing of all ttys currently active or
       have option set. If a <i>tty</i> is given, only display info for that
       particular one.</td>
   </tr>
   <tr>
-    <td class="t2" nowrap="nowrap"><code><b>-S</b> <i>tty</i></code></td>
+    <td class="t2n"><code>-S <i>tty</i></code></td>
     <td class="t2">Deactivate logging for the given tty until it is
       deinitialized.</td>
   </tr>
   <tr>
-    <td class="t1" nowrap="nowrap"><code><b>-X</b> <i>tty</i></code></td>
+    <td class="t1n"><code>-X <i>tty</i></code></td>
     <td class="t1">Call <code>log_close()</code> for the given tty. <i>rpld</i>
       will close the logfile, and necessarily open up a new one whenever new
       activity is detected (and logging this terminal is not deactivated) on
       that terminal.</td>
   </tr>
   <tr>
-    <td class="t2" nowrap="nowrap"><code><b>-Z</b> [<i>tty</i>]</code></td>
+    <td class="t2n"><code>-Z <b>[</b><i>tty</i><b>]</b></code></td>
     <td class="t2">Zero all packet and byte counters, both of <i>rpld</i> and
       every single tty. If a <i>tty</i> is given, only zeroes the stats of that
       tty.</td>
   </tr>
   <tr>
-    <td class="t1" nowrap="nowrap"><code><b>-f</b> <i>socket</i></code></td>
+    <td class="t1n"><code>-f <i>socket</i></code></td>
     <td class="t1">Path to the <i>infod</i> socket to connect to. The default
       is <code>/var/run/.rplinfo_socket</code> or <code>INFOD_PORT</code> in
       the <code>rpld.conf</code> configuration file.</td>
   </tr>
   <tr>
-    <td class="t2" nowrap="nowrap"><code><b>-t</b></td>
+    <td class="t2n"><code>-t</td>
     <td class="t2">Generate output suitable for <code>sscanf()</code>,
       <code>split()</code> or anything that deals best with simple text
       strings. See below for details on the output format.</td>

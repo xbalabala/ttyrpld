@@ -75,15 +75,23 @@ table {
     border-spacing: 0;
     margin: 1em;
 }
-table td.t1 {
+table td.t1, table td.t1n, table th.t1 {
     background-color: #F8F8FA;
     border: 1px solid #AAAAAA;
     vertical-align: top;
 }
-table td.t2 {
+table td.t2, table td.t2n, table th.t2 {
     background-color: #F8F8F8;
     border: 1px solid #AAAAAA;
     vertical-align: top;
+}
+table td.t1n, table td.t2n {
+    white-space: nowrap;
+}
+th {
+    font-weight: bold;
+    text-align: left;
+    vertical-align: bottom;
 }
 ul {
     line-height: 1.5em;

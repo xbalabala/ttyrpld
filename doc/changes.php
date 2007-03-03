@@ -8,9 +8,9 @@ releases.</p>
 
 <table border="1">
   <tr>
-    <td class="t1" valign="bottom"><i>Operating system</i></td>
-    <td class="t1" valign="bottom"><i>last time KPATCHes changed:</i></td>
-    <td class="t1" valign="bottom"><i>last time rpldev changed:</i></td>
+    <th class="t1">Operating system</th>
+    <th class="t1">last time KPATCHes changed:</th>
+    <th class="t1">last time rpldev changed:</th>
   </tr>
   <tr>
     <td class="t2">Linux</td>

@@ -4,9 +4,9 @@
 
 <table border="1">
   <tr>
-    <td class="t1"><i>Component</i></td>
-    <td class="t1"><i>Minimum</i></td>
-    <td class="t1"><i>Recommended</i>, or better</td>
+    <th class="t1">Component</th>
+    <th class="t1">Minimum</th>
+    <th class="t1">Recommended, or better</th>
   </tr>
   <tr>
     <td class="t2">GNU make</td>
