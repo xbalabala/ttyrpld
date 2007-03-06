@@ -45,7 +45,7 @@
 #define TTY_DEVNR(tty) \
 	cpu_to_le32(mkdev_26((tty)->driver->major, \
 	(tty)->driver->minor_start + (tty)->index))
-#endif
+
 #ifndef SEEK_SET
 #	define SEEK_SET 0
 #endif
