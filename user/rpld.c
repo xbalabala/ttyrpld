@@ -767,7 +767,7 @@ static int get_options(int *argc, const char ***argv)
          .help = _("Start INFOD subcomponent")},
         {.sh = 'O', .type = HXTYPE_STRING, .ptr = &GOpt.ofmt,
          .help = _("Override OFMT variable"), .htyp = _("string")},
-        {.sh = 'Q', .type = HXTYPE_NONE, .ptr = &Opt.dolog, .val = 0,
+        {.sh = 'Q', .type = HXTYPE_VAL, .ptr = &Opt.dolog, .val = 0,
          .help = _("Deactivate logging, only do bytecounting")},
         {.sh = 'U', .type = HXTYPE_STRING, .cb = getopt_username,
          .help = _("User to change to"), .htyp = _("user")},
