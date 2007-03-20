@@ -712,8 +712,10 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 	}
 
 	while((de = HXdir_read(dx)) != NULL) {
+		if(*de == '.')
+			continue;
 		snprintf(buf, sizeof(buf), "%s/%s", dir, de);
-		if(*de == '.' || stat(buf, &sb) != 0 || S_ISLNK(sb.st_mode))
+		if(stat(buf, &sb) != 0 || S_ISLNK(sb.st_mode))
 			continue;
 		if(S_ISCHR(sb.st_mode) &&
 		  K26_MKDEV(COMPAT_MAJOR(sb.st_rdev), COMPAT_MINOR(sb.st_rdev)) == id) {
