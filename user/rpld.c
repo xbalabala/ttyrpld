@@ -528,7 +528,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 		/* Usually this is [MAJOR:MINOR] */
 		HX_strlcpy(sdev, full_dev, sizeof(sdev));
 
-	while(i < sizeof(sdev)) {
+	while(i < sizeof(sdev) && sdev[i] != '\0') {
 		if(sdev[i] == '/')
 			sdev[i] = '-';
 		++i;
