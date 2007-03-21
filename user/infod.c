@@ -190,7 +190,7 @@ static void getinfo_text_all(int fd)
 	Stats.deinit, Stats.read, Stats.write, Stats.ioctl,
 	Stats.badpack);
 
-	trav = HXbtrav_init(Ttys, NULL);
+	trav = HXbtrav_init(Ttys);
 	while((node = HXbtraverse(trav)) != NULL)
 		getinfo_text_one(fd, node->data);
 
@@ -242,7 +242,7 @@ static void getinfo_bin_all(int fd)
 	         Stats.init, Stats.open, Stats.close, Stats.deinit, Stats.read,
 	         Stats.write, Stats.in, Stats.out, Stats.ioctl, Stats.badpack);
 
-	trav = HXbtrav_init(Ttys, NULL);
+	trav = HXbtrav_init(Ttys);
 	while((node = HXbtraverse(trav)) != NULL)
 		getinfo_bin_one(fd, node->data);
 
@@ -282,7 +282,7 @@ static void zero_counters(uint32_t dev)
 {
 	pthread_mutex_lock(&Ttys_lock);
 	if(dev == 0) {
-		struct HXbtrav *trav = HXbtrav_init(Ttys, NULL);
+		struct HXbtrav *trav = HXbtrav_init(Ttys);
 		const struct HXbtree_node *node;
 
 		while((node = HXbtraverse(trav)) != NULL) {

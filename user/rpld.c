@@ -56,7 +56,7 @@ static int evt_open(struct rpldev_packet *, struct tty *, int);
 static void log_open(struct tty *);
 static void log_write(struct rpldev_packet *, struct tty *, int);
 
-static int check_parent_directory(const char *);
+static int check_parent_directory(const hmc_t *);
 static void fill_info(struct tty *, const char *);
 
 static int init_device(const char *);
@@ -445,7 +445,7 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 }
 
 //-----------------------------------------------------------------------------
-static int check_parent_directory(const char *s)
+static int check_parent_directory(const hmc_t *s)
 {
 	char *path = alloca(strlen(s) + 1), *p;
 
@@ -460,15 +460,9 @@ static int check_parent_directory(const char *s)
 
 static void fill_info(struct tty *tty, const char *aux_sdev)
 {
-	char full_dev[MAXFNLEN], sdev[MAXFNLEN], buf[MAXFNLEN],
-	     fmday[16], fmtime[16], user[64];
-	struct HXoption catalog[] = {
-		{.sh = 'd', .type = HXTYPE_STRING, .ptr = fmday},
-		{.sh = 'l', .type = HXTYPE_STRING, .ptr = sdev},
-		{.sh = 't', .type = HXTYPE_STRING, .ptr = fmtime},
-		{.sh = 'u', .type = HXTYPE_STRING, .ptr = user},
-		HXOPT_TABLEEND,
-	};
+	struct HXbtree *catalog;
+	char full_dev[MAXFNLEN], sdev[MAXFNLEN],
+		fmday[16], fmtime[16], user[64];
 	const char *pbase = NULL;
 	struct stat sb;
 	int i = 0;
@@ -552,8 +546,14 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 		strftime(fmtime, sizeof(fmtime), "%H%M%S", &now_tm);
 	}
 
-	HX_strrep5(GOpt.ofmt, catalog, buf, sizeof(buf));
-	HX_strclone(&tty->log, buf);
+	hmc_free(tty->log);
+	catalog  = HXformat_init();
+	HXformat_add(catalog, "DATE", fmday,  HXTYPE_STRING);
+	HXformat_add(catalog, "TIME", fmtime, HXTYPE_STRING);
+	HXformat_add(catalog, "TTY",  sdev,   HXTYPE_STRING);
+	HXformat_add(catalog, "USER", user,   HXTYPE_STRING);
+	HXformat_aprintf(catalog, &tty->log, GOpt.ofmt);
+	HXformat_free(catalog);
 	return;
 }
 

@@ -5,11 +5,11 @@
 #include <pthread.h>
 #include "rpl_stdint.h"
 #include <libHX.h>
-#if !defined(_LIBHX_H) || _LIBHX_H < 20060225
+#if !defined(_LIBHX_H) || _LIBHX_H < 20070320
 #	error ----------------------------------------
 #	error You need a newer version of libHX
-#	error (at least 1.8.0)
-#	error http:/jengelh.hopto.org/coding/libHX.php
+#	error (at least 1.10.0)
+#	error URL: jengelh.hopto.org/p/libHX/
 #	error ----------------------------------------
 #endif
 
@@ -37,7 +37,8 @@ struct tty {
 	uid_t uid;
 	int fd, status;
 	unsigned long in, out;
-	char *log, *sdev, *full_dev;
+	hmc_t *log;
+	char *sdev, *full_dev;
 };
 
 enum {
