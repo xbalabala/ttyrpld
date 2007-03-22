@@ -5,13 +5,6 @@
 #include <pthread.h>
 #include "rpl_stdint.h"
 #include <libHX.h>
-#if !defined(_LIBHX_H) || _LIBHX_H < 20070320
-#	error ----------------------------------------
-#	error You need a newer version of libHX
-#	error (at least 1.10.0)
-#	error URL: jengelh.hopto.org/p/libHX/
-#	error ----------------------------------------
-#endif
 
 /* Definitions */
 #define RECEIVE_FULL(fd, ptr, sz) \
