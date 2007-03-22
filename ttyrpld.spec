@@ -37,13 +37,15 @@ Summary:        Documentation for ttyrpld
 %setup
 
 %build
-cd "$RPM_BUILD_DIR"/%name-%version/;
-make EXT_CFLAGS="$RPM_OPT_FLAGS" DEBUG=0 all doc;
+./autogen.sh;
+%configure
 
 %install
 b="%buildroot";
 rm -Rf "$b";
-make ROOT="$b" PREFIX="%prefix" install;
+mkdir "$b";
+make install DESTDIR="$b";
+
 install -d "$b/usr/src/%name-%version-km/kpatch";
 install -d "$b/usr/src/%name-%version-km/include";
 cp -av k_linux-2.[46] "$b/usr/src/%name-%version-km/";
@@ -51,9 +53,6 @@ cp -av kpatch/linux* "$b/usr/src/%name-%version-km/kpatch/";
 cp -av include/rpl_{ioctl,packet}.h "$b/usr/src/%name-%version-km/include/";
 install -d "$b/%_sbindir";
 ln -s %_sysconfdir/init.d/rpld "$b/%_sbindir/rcrpld";
-
-%clean
-rm -Rf "%buildroot";
 
 %post
 cat <<EOF

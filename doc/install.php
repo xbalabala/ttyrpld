@@ -9,16 +9,6 @@
     <th class="t1">Recommended, or better</th>
   </tr>
   <tr>
-    <td class="t2">GNU make</td>
-    <td class="t2">3.80</td>
-    <td class="t2">3.81</td>
-  </tr>
-  <tr>
-    <td class="t1">BSD make<br />
-      (only applies to *BSD targets)</td>
-    <td class="t1" colspan="2"><i>as shipped with your distribution</i></td>
-  </tr>
-  <tr>
     <td class="t2"><a
       href="http://jengelh.hopto.org/coding/libHX.php">libHX</a></td>
     <td class="t2">1.8.0</li>
@@ -152,9 +142,9 @@ may need to be installed.</p>
 
 <h1>Compiling the kernel module</h1>
 
-<p class="block">After having booted the new kernel, run <code>make kmod</code>
-in the root of the source directory. Note that you will need <i>GNU make</i>,
-version 3.80 or later. It will try to compile, load and install the module.</p>
+<p class="block">After having booted the new kernel, change to the appropriate
+<code>k_</code> directory for your operating system and run
+<code>make</code>.</p>
 
 <p class="block">You can tune the location of the kernel sources and module
 installation path by using <code>KERNEL_DIR=xxx</code> and/or

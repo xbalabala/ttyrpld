@@ -1,0 +1,14 @@
+# -*- Makefile -*-
+
+targets = $(patsubst %.php,%.html,$(wildcard *.php)) \
+          $(patsubst %.php,%.txt,$(wildcard *.php))
+
+CLEANFILES = $(targets)
+
+all: $(targets)
+
+%.html: %.php
+	php -q $< man | perl -pe 's{href="([^/]*?)\.php"}{href="$$1.html"}' >$@;
+
+%.txt: %.html
+	w3m -dump $< >$@;
