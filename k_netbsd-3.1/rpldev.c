@@ -58,7 +58,7 @@
 extern int rpldev_mod_lkmentry(struct lkm_table *, int, int);
 static int kmd_event(struct lkm_table *, int);
 
-/* Stage 2 functinos */
+/* Stage 2 functions */
 static int rpldhc_init(dev_t, struct tty *);
 static int rpldhc_open(struct tty *);
 static int rpldhc_read(const char *, int, struct tty *);
