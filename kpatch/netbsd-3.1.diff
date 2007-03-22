@@ -1,6 +1,7 @@
-diff --fast -Ndpru sys~/arch/alpha/a12/a12dc.c sys/arch/alpha/a12/a12dc.c
---- sys~/arch/alpha/a12/a12dc.c	2004-08-30 17:05:15.000000000 +0200
-+++ sys/arch/alpha/a12/a12dc.c	2006-02-25 18:56:24.000000000 +0100
+Index: netbsd_sys-3.1/arch/alpha/a12/a12dc.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/alpha/a12/a12dc.c
++++ netbsd_sys-3.1/arch/alpha/a12/a12dc.c
 @@ -107,6 +107,7 @@ CFATTACH_DECL(a12dc, sizeof(struct a12dc
  extern	struct cfdriver a12dc_cd;
  
@@ -29,9 +30,10 @@ diff --fast -Ndpru sys~/arch/alpha/a12/a12dc.c sys/arch/alpha/a12/a12dc.c
  int
  a12dcclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/alpha/alpha/promcons.c sys/arch/alpha/alpha/promcons.c
---- sys~/arch/alpha/alpha/promcons.c	2003-06-30 00:28:03.000000000 +0200
-+++ sys/arch/alpha/alpha/promcons.c	2006-02-25 18:58:02.000000000 +0100
+Index: netbsd_sys-3.1/arch/alpha/alpha/promcons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/alpha/alpha/promcons.c
++++ netbsd_sys-3.1/arch/alpha/alpha/promcons.c
 @@ -54,6 +54,7 @@ __KERNEL_RCSID(0, "$NetBSD: promcons.c,v
  #ifdef _PMAP_MAY_USE_PROM_CONSOLE
  
@@ -60,9 +62,10 @@ diff --fast -Ndpru sys~/arch/alpha/alpha/promcons.c sys/arch/alpha/alpha/promcon
  int
  promclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/amiga/dev/ite.c sys/arch/amiga/dev/ite.c
---- sys~/arch/amiga/dev/ite.c	2005-03-02 09:14:26.000000000 +0100
-+++ sys/arch/amiga/dev/ite.c	2006-02-25 18:58:14.000000000 +0100
+Index: netbsd_sys-3.1/arch/amiga/dev/ite.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/amiga/dev/ite.c
++++ netbsd_sys-3.1/arch/amiga/dev/ite.c
 @@ -190,6 +190,7 @@ CFATTACH_DECL(ite, sizeof(struct ite_sof
  extern struct cfdriver ite_cd;
  
@@ -91,9 +94,10 @@ diff --fast -Ndpru sys~/arch/amiga/dev/ite.c sys/arch/amiga/dev/ite.c
  int
  iteclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/amiga/dev/mfc.c sys/arch/amiga/dev/mfc.c
---- sys~/arch/amiga/dev/mfc.c	2004-04-25 08:23:41.000000000 +0200
-+++ sys/arch/amiga/dev/mfc.c	2006-02-26 13:20:10.000000000 +0100
+Index: netbsd_sys-3.1/arch/amiga/dev/mfc.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/amiga/dev/mfc.c
++++ netbsd_sys-3.1/arch/amiga/dev/mfc.c
 @@ -241,6 +241,7 @@ CFATTACH_DECL(mfcp, sizeof(struct mfcp_s
  #endif
  
@@ -123,9 +127,10 @@ diff --fast -Ndpru sys~/arch/amiga/dev/mfc.c sys/arch/amiga/dev/mfc.c
  /*ARGSUSED*/
  int
  mfcsclose(dev_t dev, int flag, int mode, struct proc *p)
-diff --fast -Ndpru sys~/arch/amiga/dev/msc.c sys/arch/amiga/dev/msc.c
---- sys~/arch/amiga/dev/msc.c	2004-04-25 08:23:41.000000000 +0200
-+++ sys/arch/amiga/dev/msc.c	2006-02-25 21:11:03.000000000 +0100
+Index: netbsd_sys-3.1/arch/amiga/dev/msc.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/amiga/dev/msc.c
++++ netbsd_sys-3.1/arch/amiga/dev/msc.c
 @@ -217,6 +217,7 @@ CFATTACH_DECL(msc, sizeof(struct device)
      mscmatch, mscattach, NULL, NULL);
  
@@ -158,9 +163,10 @@ diff --fast -Ndpru sys~/arch/amiga/dev/msc.c sys/arch/amiga/dev/msc.c
  
  int
  mscclose(dev_t dev, int flag, int mode, struct proc *p)
-diff --fast -Ndpru sys~/arch/amiga/dev/ser.c sys/arch/amiga/dev/ser.c
---- sys~/arch/amiga/dev/ser.c	2003-08-07 18:26:44.000000000 +0200
-+++ sys/arch/amiga/dev/ser.c	2006-02-26 13:19:37.000000000 +0100
+Index: netbsd_sys-3.1/arch/amiga/dev/ser.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/amiga/dev/ser.c
++++ netbsd_sys-3.1/arch/amiga/dev/ser.c
 @@ -81,6 +81,7 @@ CFATTACH_DECL(ser, sizeof(struct ser_sof
  extern struct cfdriver ser_cd;
  
@@ -193,9 +199,10 @@ diff --fast -Ndpru sys~/arch/amiga/dev/ser.c sys/arch/amiga/dev/ser.c
  /*ARGSUSED*/
  int
  serclose(dev_t dev, int flag, int mode, struct proc *p)
-diff --fast -Ndpru sys~/arch/arc/dev/pccons.c sys/arch/arc/dev/pccons.c
---- sys~/arch/arc/dev/pccons.c	2005-01-22 08:35:34.000000000 +0100
-+++ sys/arch/arc/dev/pccons.c	2006-02-26 13:20:42.000000000 +0100
+Index: netbsd_sys-3.1/arch/arc/dev/pccons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/arc/dev/pccons.c
++++ netbsd_sys-3.1/arch/arc/dev/pccons.c
 @@ -176,6 +176,7 @@ void pccnpollc(dev_t, int);
  extern struct cfdriver pc_cd;
  
@@ -225,9 +232,10 @@ diff --fast -Ndpru sys~/arch/arc/dev/pccons.c sys/arch/arc/dev/pccons.c
  int
  pcclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/arm/ep93xx/epcom.c sys/arch/arm/ep93xx/epcom.c
---- sys~/arch/arm/ep93xx/epcom.c	2004-12-29 07:31:32.000000000 +0100
-+++ sys/arch/arm/ep93xx/epcom.c	2006-02-26 13:21:41.000000000 +0100
+Index: netbsd_sys-3.1/arch/arm/ep93xx/epcom.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/arm/ep93xx/epcom.c
++++ netbsd_sys-3.1/arch/arm/ep93xx/epcom.c
 @@ -159,6 +159,7 @@ static struct cnm_state epcom_cnm_state;
  extern struct cfdriver epcom_cd;
  
@@ -260,9 +268,10 @@ diff --fast -Ndpru sys~/arch/arm/ep93xx/epcom.c sys/arch/arm/ep93xx/epcom.c
  int
  epcomclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/arm/footbridge/footbridge_com.c sys/arch/arm/footbridge/footbridge_com.c
---- sys~/arch/arm/footbridge/footbridge_com.c	2003-06-30 00:28:09.000000000 +0200
-+++ sys/arch/arm/footbridge/footbridge_com.c	2006-02-26 13:22:08.000000000 +0100
+Index: netbsd_sys-3.1/arch/arm/footbridge/footbridge_com.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/arm/footbridge/footbridge_com.c
++++ netbsd_sys-3.1/arch/arm/footbridge/footbridge_com.c
 @@ -124,6 +124,7 @@ CFATTACH_DECL(fcom, sizeof(struct fcom_s
  extern struct cfdriver fcom_cd;
  
@@ -295,9 +304,10 @@ diff --fast -Ndpru sys~/arch/arm/footbridge/footbridge_com.c sys/arch/arm/footbr
  int
  fcomclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/arm/iomd/console/console.c sys/arch/arm/iomd/console/console.c
---- sys~/arch/arm/iomd/console/console.c	2003-07-15 02:24:43.000000000 +0200
-+++ sys/arch/arm/iomd/console/console.c	2006-02-25 18:58:52.000000000 +0100
+Index: netbsd_sys-3.1/arch/arm/iomd/console/console.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/arm/iomd/console/console.c
++++ netbsd_sys-3.1/arch/arm/iomd/console/console.c
 @@ -138,6 +138,7 @@ int vconsole_blankcounter=BLANKINIT;
   * Device switch
   */
@@ -329,9 +339,10 @@ diff --fast -Ndpru sys~/arch/arm/iomd/console/console.c sys/arch/arm/iomd/consol
  /*
   * int physconclose(dev_t dev, int flag, int mode, struct proc *p)
   *
-diff --fast -Ndpru sys~/arch/arm/ixp12x0/ixp12x0_com.c sys/arch/arm/ixp12x0/ixp12x0_com.c
---- sys~/arch/arm/ixp12x0/ixp12x0_com.c	2003-08-07 18:26:53.000000000 +0200
-+++ sys/arch/arm/ixp12x0/ixp12x0_com.c	2006-02-26 13:22:43.000000000 +0100
+Index: netbsd_sys-3.1/arch/arm/ixp12x0/ixp12x0_com.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/arm/ixp12x0/ixp12x0_com.c
++++ netbsd_sys-3.1/arch/arm/ixp12x0/ixp12x0_com.c
 @@ -147,6 +147,7 @@ struct ixpcom_softc* ixpcom_sc = NULL;
  extern struct cfdriver ixpcom_cd;
  
@@ -364,9 +375,10 @@ diff --fast -Ndpru sys~/arch/arm/ixp12x0/ixp12x0_com.c sys/arch/arm/ixp12x0/ixp1
  int
  ixpcomclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/arm/s3c2xx0/sscom.c sys/arch/arm/s3c2xx0/sscom.c
---- sys~/arch/arm/s3c2xx0/sscom.c	2003-08-07 18:26:54.000000000 +0200
-+++ sys/arch/arm/s3c2xx0/sscom.c	2006-02-26 13:23:10.000000000 +0100
+Index: netbsd_sys-3.1/arch/arm/s3c2xx0/sscom.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/arm/s3c2xx0/sscom.c
++++ netbsd_sys-3.1/arch/arm/s3c2xx0/sscom.c
 @@ -162,6 +162,7 @@ __KERNEL_RCSID(0, "$NetBSD: sscom.c,v 1.
  #include <dev/cons.h>
  
@@ -399,9 +411,10 @@ diff --fast -Ndpru sys~/arch/arm/s3c2xx0/sscom.c sys/arch/arm/s3c2xx0/sscom.c
  int
  sscomclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/arm/sa11x0/sa11x0_com.c sys/arch/arm/sa11x0/sa11x0_com.c
---- sys~/arch/arm/sa11x0/sa11x0_com.c	2003-08-07 18:26:54.000000000 +0200
-+++ sys/arch/arm/sa11x0/sa11x0_com.c	2006-02-26 13:23:52.000000000 +0100
+Index: netbsd_sys-3.1/arch/arm/sa11x0/sa11x0_com.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/arm/sa11x0/sa11x0_com.c
++++ netbsd_sys-3.1/arch/arm/sa11x0/sa11x0_com.c
 @@ -114,6 +114,7 @@ __KERNEL_RCSID(0, "$NetBSD: sa11x0_com.c
  #include "sacom.h"
  
@@ -434,9 +447,10 @@ diff --fast -Ndpru sys~/arch/arm/sa11x0/sa11x0_com.c sys/arch/arm/sa11x0/sa11x0_
  int
  sacomclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/atari/dev/ite.c sys/arch/atari/dev/ite.c
---- sys~/arch/atari/dev/ite.c	2005-03-02 09:14:26.000000000 +0100
-+++ sys/arch/atari/dev/ite.c	2006-02-25 19:00:11.000000000 +0100
+Index: netbsd_sys-3.1/arch/atari/dev/ite.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/atari/dev/ite.c
++++ netbsd_sys-3.1/arch/atari/dev/ite.c
 @@ -188,6 +188,7 @@ CFATTACH_DECL(ite, sizeof(struct ite_sof
  extern struct cfdriver	ite_cd;
  
@@ -465,9 +479,10 @@ diff --fast -Ndpru sys~/arch/atari/dev/ite.c sys/arch/atari/dev/ite.c
  int
  iteclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/atari/dev/ser.c sys/arch/atari/dev/ser.c
---- sys~/arch/atari/dev/ser.c	2005-02-11 07:21:21.000000000 +0100
-+++ sys/arch/atari/dev/ser.c	2006-02-26 13:24:21.000000000 +0100
+Index: netbsd_sys-3.1/arch/atari/dev/ser.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/atari/dev/ser.c
++++ netbsd_sys-3.1/arch/atari/dev/ser.c
 @@ -263,6 +263,7 @@ CFATTACH_DECL(ser, sizeof(struct ser_sof
  extern struct cfdriver ser_cd;
  
@@ -500,9 +515,10 @@ diff --fast -Ndpru sys~/arch/atari/dev/ser.c sys/arch/atari/dev/ser.c
  int
  serclose(dev, flag, mode, p)
  	dev_t		dev;
-diff --fast -Ndpru sys~/arch/atari/dev/zs.c sys/arch/atari/dev/zs.c
---- sys~/arch/atari/dev/zs.c	2004-03-25 11:17:19.000000000 +0100
-+++ sys/arch/atari/dev/zs.c	2006-02-26 13:27:45.000000000 +0100
+Index: netbsd_sys-3.1/arch/atari/dev/zs.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/atari/dev/zs.c
++++ netbsd_sys-3.1/arch/atari/dev/zs.c
 @@ -229,6 +229,7 @@ extern struct cfdriver zs_cd;
  
  /* {b,c}devsw[] function prototypes */
@@ -532,9 +548,10 @@ diff --fast -Ndpru sys~/arch/atari/dev/zs.c sys/arch/atari/dev/zs.c
  /*
   * Close a zs serial port.
   */
-diff --fast -Ndpru sys~/arch/bebox/isa/pccons.c sys/arch/bebox/isa/pccons.c
---- sys~/arch/bebox/isa/pccons.c	2004-03-13 18:31:33.000000000 +0100
-+++ sys/arch/bebox/isa/pccons.c	2006-02-26 13:28:05.000000000 +0100
+Index: netbsd_sys-3.1/arch/bebox/isa/pccons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/bebox/isa/pccons.c
++++ netbsd_sys-3.1/arch/bebox/isa/pccons.c
 @@ -232,6 +232,7 @@ extern struct cfdriver pcconskbd_cd;
  #endif
  
@@ -567,9 +584,10 @@ diff --fast -Ndpru sys~/arch/bebox/isa/pccons.c sys/arch/bebox/isa/pccons.c
  int
  pcclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/evbarm/dev/plcom.c sys/arch/evbarm/dev/plcom.c
---- sys~/arch/evbarm/dev/plcom.c	2003-08-07 18:27:20.000000000 +0200
-+++ sys/arch/evbarm/dev/plcom.c	2006-02-26 13:28:38.000000000 +0100
+Index: netbsd_sys-3.1/arch/evbarm/dev/plcom.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/evbarm/dev/plcom.c
++++ netbsd_sys-3.1/arch/evbarm/dev/plcom.c
 @@ -177,6 +177,7 @@ int	plcominit	(bus_space_tag_t, bus_addr
  			    bus_space_handle_t *);
  
@@ -602,9 +620,10 @@ diff --fast -Ndpru sys~/arch/evbarm/dev/plcom.c sys/arch/evbarm/dev/plcom.c
  int
  plcomclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/hp300/dev/dcm.c sys/arch/hp300/dev/dcm.c
---- sys~/arch/hp300/dev/dcm.c	2005-03-14 13:50:33.000000000 +0100
-+++ sys/arch/hp300/dev/dcm.c	2006-02-26 13:29:33.000000000 +0100
+Index: netbsd_sys-3.1/arch/hp300/dev/dcm.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/hp300/dev/dcm.c
++++ netbsd_sys-3.1/arch/hp300/dev/dcm.c
 @@ -364,6 +364,7 @@ int	dcmdefaultrate = DEFAULT_BAUD_RATE;
  int	dcmconbrdbusy = 0;
  
@@ -637,9 +656,10 @@ diff --fast -Ndpru sys~/arch/hp300/dev/dcm.c sys/arch/hp300/dev/dcm.c
  /*ARGSUSED*/
  static int
  dcmclose(dev_t dev, int flag, int mode, struct proc *p)
-diff --fast -Ndpru sys~/arch/hp300/dev/ite.c sys/arch/hp300/dev/ite.c
---- sys~/arch/hp300/dev/ite.c	2005-02-19 17:31:49.000000000 +0100
-+++ sys/arch/hp300/dev/ite.c	2006-02-26 13:30:49.000000000 +0100
+Index: netbsd_sys-3.1/arch/hp300/dev/ite.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/hp300/dev/ite.c
++++ netbsd_sys-3.1/arch/hp300/dev/ite.c
 @@ -167,6 +167,7 @@ CFATTACH_DECL(ite, sizeof(struct ite_sof
  static struct kbdmap *ite_km;
  
@@ -669,9 +689,10 @@ diff --fast -Ndpru sys~/arch/hp300/dev/ite.c sys/arch/hp300/dev/ite.c
  /*ARGSUSED*/
  static int
  iteclose(dev_t dev, int flag, int mode, struct proc *p)
-diff --fast -Ndpru sys~/arch/hp700/dev/pdc.c sys/arch/hp700/dev/pdc.c
---- sys~/arch/hp700/dev/pdc.c	2004-12-13 03:14:13.000000000 +0100
-+++ sys/arch/hp700/dev/pdc.c	2006-02-25 21:02:24.000000000 +0100
+Index: netbsd_sys-3.1/arch/hp700/dev/pdc.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/hp700/dev/pdc.c
++++ netbsd_sys-3.1/arch/hp700/dev/pdc.c
 @@ -77,6 +77,7 @@ extern struct cfdriver pdc_cd;
  static int pdc_attached;
  
@@ -706,9 +727,10 @@ diff --fast -Ndpru sys~/arch/hp700/dev/pdc.c sys/arch/hp700/dev/pdc.c
  int
  pdcclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/hpcmips/tx/txcom.c sys/arch/hpcmips/tx/txcom.c
---- sys~/arch/hpcmips/tx/txcom.c	2004-06-12 17:39:33.000000000 +0200
-+++ sys/arch/hpcmips/tx/txcom.c	2006-02-26 13:31:16.000000000 +0100
+Index: netbsd_sys-3.1/arch/hpcmips/tx/txcom.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/hpcmips/tx/txcom.c
++++ netbsd_sys-3.1/arch/hpcmips/tx/txcom.c
 @@ -178,6 +178,7 @@ CFATTACH_DECL(txcom, sizeof(struct txcom
      txcom_match, txcom_attach, NULL, NULL);
  
@@ -741,9 +763,10 @@ diff --fast -Ndpru sys~/arch/hpcmips/tx/txcom.c sys/arch/hpcmips/tx/txcom.c
  int
  txcomclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/i386/isa/pccons.c sys/arch/i386/isa/pccons.c
---- sys~/arch/i386/isa/pccons.c	2005-02-03 22:08:58.000000000 +0100
-+++ sys/arch/i386/isa/pccons.c	2006-02-26 13:31:35.000000000 +0100
+Index: netbsd_sys-3.1/arch/i386/isa/pccons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/i386/isa/pccons.c
++++ netbsd_sys-3.1/arch/i386/isa/pccons.c
 @@ -228,6 +228,7 @@ extern struct cfdriver pcconskbd_cd;
  #endif
  
@@ -776,9 +799,10 @@ diff --fast -Ndpru sys~/arch/i386/isa/pccons.c sys/arch/i386/isa/pccons.c
  int
  pcclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/luna68k/dev/siotty.c sys/arch/luna68k/dev/siotty.c
---- sys~/arch/luna68k/dev/siotty.c	2004-04-25 08:23:41.000000000 +0200
-+++ sys/arch/luna68k/dev/siotty.c	2006-02-26 13:34:24.000000000 +0100
+Index: netbsd_sys-3.1/arch/luna68k/dev/siotty.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/luna68k/dev/siotty.c
++++ netbsd_sys-3.1/arch/luna68k/dev/siotty.c
 @@ -100,6 +100,7 @@ CFATTACH_DECL(siotty, sizeof(struct siot
  extern struct cfdriver siotty_cd;
  
@@ -808,9 +832,10 @@ diff --fast -Ndpru sys~/arch/luna68k/dev/siotty.c sys/arch/luna68k/dev/siotty.c
  int
  sioclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/macppc/dev/ofcons.c sys/arch/macppc/dev/ofcons.c
---- sys~/arch/macppc/dev/ofcons.c	2003-11-04 20:18:05.000000000 +0100
-+++ sys/arch/macppc/dev/ofcons.c	2006-02-26 13:34:45.000000000 +0100
+Index: netbsd_sys-3.1/arch/macppc/dev/ofcons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/macppc/dev/ofcons.c
++++ netbsd_sys-3.1/arch/macppc/dev/ofcons.c
 @@ -71,6 +71,7 @@ CFATTACH_DECL(macofcons, sizeof(struct o
  extern struct cfdriver macofcons_cd;
  
@@ -840,9 +865,10 @@ diff --fast -Ndpru sys~/arch/macppc/dev/ofcons.c sys/arch/macppc/dev/ofcons.c
  int
  ofcclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/macppc/dev/z8530tty.c sys/arch/macppc/dev/z8530tty.c
---- sys~/arch/macppc/dev/z8530tty.c	2003-12-04 14:05:16.000000000 +0100
-+++ sys/arch/macppc/dev/z8530tty.c	2006-02-26 13:35:08.000000000 +0100
+Index: netbsd_sys-3.1/arch/macppc/dev/z8530tty.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/macppc/dev/z8530tty.c
++++ netbsd_sys-3.1/arch/macppc/dev/z8530tty.c
 @@ -241,6 +241,7 @@ CFATTACH_DECL(zstty, sizeof(struct zstty
  extern struct cfdriver zstty_cd;
  
@@ -875,9 +901,10 @@ diff --fast -Ndpru sys~/arch/macppc/dev/z8530tty.c sys/arch/macppc/dev/z8530tty.
  /*
   * Close a zs serial port.
   */
-diff --fast -Ndpru sys~/arch/mips/alchemy/dev/aucom.c sys/arch/mips/alchemy/dev/aucom.c
---- sys~/arch/mips/alchemy/dev/aucom.c	2004-05-01 21:03:59.000000000 +0200
-+++ sys/arch/mips/alchemy/dev/aucom.c	2006-02-26 13:35:29.000000000 +0100
+Index: netbsd_sys-3.1/arch/mips/alchemy/dev/aucom.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/mips/alchemy/dev/aucom.c
++++ netbsd_sys-3.1/arch/mips/alchemy/dev/aucom.c
 @@ -228,6 +228,7 @@ void	comdiag(void *);
  extern struct cfdriver com_cd;
  
@@ -910,9 +937,10 @@ diff --fast -Ndpru sys~/arch/mips/alchemy/dev/aucom.c sys/arch/mips/alchemy/dev/
  int
  comclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/mips/sibyte/dev/sbjcn.c sys/arch/mips/sibyte/dev/sbjcn.c
---- sys~/arch/mips/sibyte/dev/sbjcn.c	2003-08-07 18:28:35.000000000 +0200
-+++ sys/arch/mips/sibyte/dev/sbjcn.c	2006-02-26 13:36:25.000000000 +0100
+Index: netbsd_sys-3.1/arch/mips/sibyte/dev/sbjcn.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/mips/sibyte/dev/sbjcn.c
++++ netbsd_sys-3.1/arch/mips/sibyte/dev/sbjcn.c
 @@ -173,6 +173,7 @@ void	sbjcn_cnpollc(dev_t dev, int on);
  extern struct cfdriver sbjcn_cd;
  
@@ -945,9 +973,10 @@ diff --fast -Ndpru sys~/arch/mips/sibyte/dev/sbjcn.c sys/arch/mips/sibyte/dev/sb
  int
  sbjcnclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/mips/sibyte/dev/sbscn.c sys/arch/mips/sibyte/dev/sbscn.c
---- sys~/arch/mips/sibyte/dev/sbscn.c	2003-08-07 18:28:35.000000000 +0200
-+++ sys/arch/mips/sibyte/dev/sbscn.c	2006-02-26 13:37:02.000000000 +0100
+Index: netbsd_sys-3.1/arch/mips/sibyte/dev/sbscn.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/mips/sibyte/dev/sbscn.c
++++ netbsd_sys-3.1/arch/mips/sibyte/dev/sbscn.c
 @@ -184,6 +184,7 @@ void	sbscn_cnpollc(dev_t dev, int on);
  extern struct cfdriver sbscn_cd;
  
@@ -980,9 +1009,10 @@ diff --fast -Ndpru sys~/arch/mips/sibyte/dev/sbscn.c sys/arch/mips/sibyte/dev/sb
  int
  sbscnclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/pc532/dev/scn.c sys/arch/pc532/dev/scn.c
---- sys~/arch/pc532/dev/scn.c	2005-02-22 15:46:47.000000000 +0100
-+++ sys/arch/pc532/dev/scn.c	2006-02-26 13:37:49.000000000 +0100
+Index: netbsd_sys-3.1/arch/pc532/dev/scn.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/pc532/dev/scn.c
++++ netbsd_sys-3.1/arch/pc532/dev/scn.c
 @@ -140,6 +140,7 @@ CFATTACH_DECL(scn, sizeof(struct scn_sof
  extern struct cfdriver scn_cd;
  
@@ -1014,9 +1044,10 @@ diff --fast -Ndpru sys~/arch/pc532/dev/scn.c sys/arch/pc532/dev/scn.c
  
  /*ARGSUSED*/
  int
-diff --fast -Ndpru sys~/arch/pmax/dev/dc.c sys/arch/pmax/dev/dc.c
---- sys~/arch/pmax/dev/dc.c	2004-04-25 08:23:41.000000000 +0200
-+++ sys/arch/pmax/dev/dc.c	2006-02-26 13:38:15.000000000 +0100
+Index: netbsd_sys-3.1/arch/pmax/dev/dc.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/pmax/dev/dc.c
++++ netbsd_sys-3.1/arch/pmax/dev/dc.c
 @@ -94,6 +94,7 @@ __KERNEL_RCSID(0, "$NetBSD: dc.c,v 1.78 
  extern struct cfdriver dc_cd;
  
@@ -1046,9 +1077,10 @@ diff --fast -Ndpru sys~/arch/pmax/dev/dc.c sys/arch/pmax/dev/dc.c
  /*ARGSUSED*/
  int
  dcclose(dev, flag, mode, p)
-diff --fast -Ndpru sys~/arch/pmax/dev/dtop.c sys/arch/pmax/dev/dtop.c
---- sys~/arch/pmax/dev/dtop.c	2003-08-07 18:29:08.000000000 +0200
-+++ sys/arch/pmax/dev/dtop.c	2006-02-25 21:18:20.000000000 +0100
+Index: netbsd_sys-3.1/arch/pmax/dev/dtop.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/pmax/dev/dtop.c
++++ netbsd_sys-3.1/arch/pmax/dev/dtop.c
 @@ -229,6 +229,7 @@ CFATTACH_DECL(dtop, sizeof(struct dtop_s
  extern struct cfdriver dtop_cd;
  
@@ -1077,9 +1109,10 @@ diff --fast -Ndpru sys~/arch/pmax/dev/dtop.c sys/arch/pmax/dev/dtop.c
  /*ARGSUSED*/
  int
  dtopclose(dev, flag, mode, p)
-diff --fast -Ndpru sys~/arch/pmax/dev/rcons.c sys/arch/pmax/dev/rcons.c
---- sys~/arch/pmax/dev/rcons.c	2003-08-07 18:29:10.000000000 +0200
-+++ sys/arch/pmax/dev/rcons.c	2006-02-25 21:19:19.000000000 +0100
+Index: netbsd_sys-3.1/arch/pmax/dev/rcons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/pmax/dev/rcons.c
++++ netbsd_sys-3.1/arch/pmax/dev/rcons.c
 @@ -84,6 +84,7 @@ static void	rcons_later __P((void*));
  #endif
  
@@ -1108,9 +1141,10 @@ diff --fast -Ndpru sys~/arch/pmax/dev/rcons.c sys/arch/pmax/dev/rcons.c
  /* ARGSUSED */
  int
  rconsclose(dev, flag, mode, p)
-diff --fast -Ndpru sys~/arch/pmax/tc/scc.c sys/arch/pmax/tc/scc.c
---- sys~/arch/pmax/tc/scc.c	2004-08-26 20:08:04.000000000 +0200
-+++ sys/arch/pmax/tc/scc.c	2006-02-26 13:38:38.000000000 +0100
+Index: netbsd_sys-3.1/arch/pmax/tc/scc.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/pmax/tc/scc.c
++++ netbsd_sys-3.1/arch/pmax/tc/scc.c
 @@ -209,6 +209,7 @@ CFATTACH_DECL(scc, sizeof (struct scc_so
  extern struct cfdriver scc_cd;
  
@@ -1140,9 +1174,10 @@ diff --fast -Ndpru sys~/arch/pmax/tc/scc.c sys/arch/pmax/tc/scc.c
  /*ARGSUSED*/
  int
  sccclose(dev, flag, mode, p)
-diff --fast -Ndpru sys~/arch/sh3/dev/sci.c sys/arch/sh3/dev/sci.c
---- sys~/arch/sh3/dev/sci.c	2005-03-11 08:08:33.000000000 +0100
-+++ sys/arch/sh3/dev/sci.c	2006-02-26 13:38:55.000000000 +0100
+Index: netbsd_sys-3.1/arch/sh3/dev/sci.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sh3/dev/sci.c
++++ netbsd_sys-3.1/arch/sh3/dev/sci.c
 @@ -264,6 +264,7 @@ extern struct cfdriver sci_cd;
  static int sci_attached;
  
@@ -1175,9 +1210,10 @@ diff --fast -Ndpru sys~/arch/sh3/dev/sci.c sys/arch/sh3/dev/sci.c
  int
  sciclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/sh3/dev/scif.c sys/arch/sh3/dev/scif.c
---- sys~/arch/sh3/dev/scif.c	2004-12-13 03:14:13.000000000 +0100
-+++ sys/arch/sh3/dev/scif.c	2006-02-26 13:39:14.000000000 +0100
+Index: netbsd_sys-3.1/arch/sh3/dev/scif.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sh3/dev/scif.c
++++ netbsd_sys-3.1/arch/sh3/dev/scif.c
 @@ -271,6 +271,7 @@ extern struct cfdriver scif_cd;
  static int scif_attached;
  
@@ -1210,9 +1246,10 @@ diff --fast -Ndpru sys~/arch/sh3/dev/scif.c sys/arch/sh3/dev/scif.c
  int
  scifclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/sh5/dev/scif.c sys/arch/sh5/dev/scif.c
---- sys~/arch/sh5/dev/scif.c	2004-12-13 03:34:03.000000000 +0100
-+++ sys/arch/sh5/dev/scif.c	2006-02-26 13:39:36.000000000 +0100
+Index: netbsd_sys-3.1/arch/sh5/dev/scif.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sh5/dev/scif.c
++++ netbsd_sys-3.1/arch/sh5/dev/scif.c
 @@ -263,6 +263,7 @@ CFATTACH_DECL(scif, sizeof(struct scif_s
  extern struct cfdriver scif_cd;
  
@@ -1245,9 +1282,10 @@ diff --fast -Ndpru sys~/arch/sh5/dev/scif.c sys/arch/sh5/dev/scif.c
  int
  scifclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/shark/shark/pccons.c sys/arch/shark/shark/pccons.c
---- sys~/arch/shark/shark/pccons.c	2005-01-05 11:25:43.000000000 +0100
-+++ sys/arch/shark/shark/pccons.c	2006-02-26 13:40:06.000000000 +0100
+Index: netbsd_sys-3.1/arch/shark/shark/pccons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/shark/shark/pccons.c
++++ netbsd_sys-3.1/arch/shark/shark/pccons.c
 @@ -398,6 +398,7 @@ CFATTACH_DECL(pc, sizeof(struct pc_softc
  extern struct cfdriver pc_cd;
  
@@ -1277,9 +1315,10 @@ diff --fast -Ndpru sys~/arch/shark/shark/pccons.c sys/arch/shark/shark/pccons.c
  
  /*
  **++
-diff --fast -Ndpru sys~/arch/sparc/dev/kd.c sys/arch/sparc/dev/kd.c
---- sys~/arch/sparc/dev/kd.c	2004-03-17 18:04:59.000000000 +0100
-+++ sys/arch/sparc/dev/kd.c	2006-02-25 21:33:06.000000000 +0100
+Index: netbsd_sys-3.1/arch/sparc/dev/kd.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sparc/dev/kd.c
++++ netbsd_sys-3.1/arch/sparc/dev/kd.c
 @@ -104,6 +104,7 @@ static void kd_init(struct kd_softc *);
  static void kd_cons_input(int);
  
@@ -1311,9 +1350,10 @@ diff --fast -Ndpru sys~/arch/sparc/dev/kd.c sys/arch/sparc/dev/kd.c
  int
  kdclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/sparc64/dev/kd.c sys/arch/sparc64/dev/kd.c
---- sys~/arch/sparc64/dev/kd.c	2005-02-25 20:16:45.000000000 +0100
-+++ sys/arch/sparc64/dev/kd.c	2006-02-25 21:34:22.000000000 +0100
+Index: netbsd_sys-3.1/arch/sparc64/dev/kd.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sparc64/dev/kd.c
++++ netbsd_sys-3.1/arch/sparc64/dev/kd.c
 @@ -71,6 +71,7 @@ __KERNEL_RCSID(0, "$NetBSD: kd.c,v 1.33 
  #include <sparc64/dev/cons.h>
  
@@ -1345,9 +1385,10 @@ diff --fast -Ndpru sys~/arch/sparc64/dev/kd.c sys/arch/sparc64/dev/kd.c
  int
  kdclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/sparc64/dev/pcons.c sys/arch/sparc64/dev/pcons.c
---- sys~/arch/sparc64/dev/pcons.c	2004-03-21 16:08:24.000000000 +0100
-+++ sys/arch/sparc64/dev/pcons.c	2006-02-26 13:40:32.000000000 +0100
+Index: netbsd_sys-3.1/arch/sparc64/dev/pcons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sparc64/dev/pcons.c
++++ netbsd_sys-3.1/arch/sparc64/dev/pcons.c
 @@ -69,6 +69,7 @@ CFATTACH_DECL(pcons, sizeof(struct pcons
  extern struct cfdriver pcons_cd;
  
@@ -1377,9 +1418,10 @@ diff --fast -Ndpru sys~/arch/sparc64/dev/pcons.c sys/arch/sparc64/dev/pcons.c
  int
  pconsclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/sparc64/dev/sab.c sys/arch/sparc64/dev/sab.c
---- sys~/arch/sparc64/dev/sab.c	2004-09-13 16:32:38.000000000 +0200
-+++ sys/arch/sparc64/dev/sab.c	2006-02-26 13:40:52.000000000 +0100
+Index: netbsd_sys-3.1/arch/sparc64/dev/sab.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sparc64/dev/sab.c
++++ netbsd_sys-3.1/arch/sparc64/dev/sab.c
 @@ -166,6 +166,7 @@ CFATTACH_DECL(sabtty, sizeof(struct sabt
  extern struct cfdriver sabtty_cd;
  
@@ -1409,9 +1451,10 @@ diff --fast -Ndpru sys~/arch/sparc64/dev/sab.c sys/arch/sparc64/dev/sab.c
  int
  sabclose(dev, flags, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/arch/sun2/dev/kd.c sys/arch/sun2/dev/kd.c
---- sys~/arch/sun2/dev/kd.c	2005-01-22 16:36:09.000000000 +0100
-+++ sys/arch/sun2/dev/kd.c	2006-02-25 21:37:06.000000000 +0100
+Index: netbsd_sys-3.1/arch/sun2/dev/kd.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sun2/dev/kd.c
++++ netbsd_sys-3.1/arch/sun2/dev/kd.c
 @@ -103,6 +103,7 @@ static void kd_cons_input(int);
  static int  kdcngetc(dev_t);
  
@@ -1443,9 +1486,10 @@ diff --fast -Ndpru sys~/arch/sun2/dev/kd.c sys/arch/sun2/dev/kd.c
  int 
  kdclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/sun2/dev/pcons.c sys/arch/sun2/dev/pcons.c
---- sys~/arch/sun2/dev/pcons.c	2005-01-22 16:36:09.000000000 +0100
-+++ sys/arch/sun2/dev/pcons.c	2006-02-26 13:41:09.000000000 +0100
+Index: netbsd_sys-3.1/arch/sun2/dev/pcons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sun2/dev/pcons.c
++++ netbsd_sys-3.1/arch/sun2/dev/pcons.c
 @@ -72,6 +72,7 @@ static int pconsprobe(void);
  extern struct consdev *cn_tab;
  
@@ -1475,9 +1519,10 @@ diff --fast -Ndpru sys~/arch/sun2/dev/pcons.c sys/arch/sun2/dev/pcons.c
  int 
  pconsclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/sun3/dev/kd.c sys/arch/sun3/dev/kd.c
---- sys~/arch/sun3/dev/kd.c	2005-01-22 16:36:10.000000000 +0100
-+++ sys/arch/sun3/dev/kd.c	2006-02-25 21:38:22.000000000 +0100
+Index: netbsd_sys-3.1/arch/sun3/dev/kd.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/sun3/dev/kd.c
++++ netbsd_sys-3.1/arch/sun3/dev/kd.c
 @@ -94,6 +94,7 @@ static void kd_init(struct kd_softc *);
  static void kd_cons_input(int);
  
@@ -1509,9 +1554,10 @@ diff --fast -Ndpru sys~/arch/sun3/dev/kd.c sys/arch/sun3/dev/kd.c
  int 
  kdclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/vax/uba/qv.c sys/arch/vax/uba/qv.c
---- sys~/arch/vax/uba/qv.c	2004-02-13 12:36:20.000000000 +0100
-+++ sys/arch/vax/uba/qv.c	2006-02-25 21:31:00.000000000 +0100
+Index: netbsd_sys-3.1/arch/vax/uba/qv.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/vax/uba/qv.c
++++ netbsd_sys-3.1/arch/vax/uba/qv.c
 @@ -272,6 +272,7 @@ extern u_short q_key[], q_shift_key[], q
  extern char *q_special[], q_font[];
  
@@ -1540,9 +1586,10 @@ diff --fast -Ndpru sys~/arch/vax/uba/qv.c sys/arch/vax/uba/qv.c
  /*
   * Close a QVSS line.
   */
-diff --fast -Ndpru sys~/arch/vax/vax/gencons.c sys/arch/vax/vax/gencons.c
---- sys~/arch/vax/vax/gencons.c	2003-07-15 04:15:03.000000000 +0200
-+++ sys/arch/vax/vax/gencons.c	2006-02-25 21:31:31.000000000 +0100
+Index: netbsd_sys-3.1/arch/vax/vax/gencons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/vax/vax/gencons.c
++++ netbsd_sys-3.1/arch/vax/vax/gencons.c
 @@ -80,6 +80,7 @@ static	int gencnparam __P((struct tty *,
  static	void gencnstart __P((struct tty *));
  
@@ -1571,9 +1618,10 @@ diff --fast -Ndpru sys~/arch/vax/vax/gencons.c sys/arch/vax/vax/gencons.c
  int
  gencnclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/x68k/dev/com.c sys/arch/x68k/dev/com.c
---- sys~/arch/x68k/dev/com.c	2005-01-18 08:28:46.000000000 +0100
-+++ sys/arch/x68k/dev/com.c	2006-02-26 13:41:29.000000000 +0100
+Index: netbsd_sys-3.1/arch/x68k/dev/com.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/x68k/dev/com.c
++++ netbsd_sys-3.1/arch/x68k/dev/com.c
 @@ -171,6 +171,7 @@ extern struct cfdriver xcom_cd;
  int com_attached;
  
@@ -1606,9 +1654,10 @@ diff --fast -Ndpru sys~/arch/x68k/dev/com.c sys/arch/x68k/dev/com.c
  int
  comclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/arch/x68k/dev/ite.c sys/arch/x68k/dev/ite.c
---- sys~/arch/x68k/dev/ite.c	2005-01-18 08:27:20.000000000 +0100
-+++ sys/arch/x68k/dev/ite.c	2006-02-25 21:39:33.000000000 +0100
+Index: netbsd_sys-3.1/arch/x68k/dev/ite.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/x68k/dev/ite.c
++++ netbsd_sys-3.1/arch/x68k/dev/ite.c
 @@ -196,6 +196,7 @@ CFATTACH_DECL(ite, sizeof(struct ite_sof
  extern struct cfdriver ite_cd;
  
@@ -1637,10 +1686,11 @@ diff --fast -Ndpru sys~/arch/x68k/dev/ite.c sys/arch/x68k/dev/ite.c
  /*ARGSUSED*/
  int 
  iteclose(dev_t dev, int flag, int mode, struct proc *p)
-diff --fast -Ndpru sys~/arch/xen/xen/xencons.c sys/arch/xen/xen/xencons.c
---- sys~/arch/xen/xen/xencons.c	2005-04-28 13:26:20.000000000 +0200
-+++ sys/arch/xen/xen/xencons.c	2006-02-26 13:42:15.000000000 +0100
-@@ -83,6 +83,7 @@ CFATTACH_DECL(xencons, sizeof(struct xen
+Index: netbsd_sys-3.1/arch/xen/xen/xencons.c
+===================================================================
+--- netbsd_sys-3.1.orig/arch/xen/xen/xencons.c
++++ netbsd_sys-3.1/arch/xen/xen/xencons.c
+@@ -135,6 +135,7 @@ CFATTACH_DECL(xencons, sizeof(struct xen
  extern struct cfdriver xencons_cd;
  
  dev_type_open(xencons_open);
@@ -1648,7 +1698,7 @@ diff --fast -Ndpru sys~/arch/xen/xen/xencons.c sys/arch/xen/xen/xencons.c
  dev_type_close(xencons_close);
  dev_type_read(xencons_read);
  dev_type_write(xencons_write);
-@@ -94,7 +95,7 @@ dev_type_poll(xencons_poll);
+@@ -146,7 +147,7 @@ dev_type_poll(xencons_poll);
  const struct cdevsw xencons_cdevsw = {
  	xencons_open, xencons_close, xencons_read, xencons_write,
  	xencons_ioctl, xencons_stop, xencons_tty, xencons_poll,
@@ -1657,7 +1707,7 @@ diff --fast -Ndpru sys~/arch/xen/xen/xencons.c sys/arch/xen/xen/xencons.c
  };
  
  
-@@ -204,6 +205,15 @@ xencons_open(dev_t dev, int flag, int mo
+@@ -268,6 +269,15 @@ xencons_open(dev_t dev, int flag, int mo
  	return ((*tp->t_linesw->l_open)(dev, tp));
  }
  
@@ -1673,9 +1723,10 @@ diff --fast -Ndpru sys~/arch/xen/xen/xencons.c sys/arch/xen/xen/xencons.c
  int
  xencons_close(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/dev/arcbios/arcbios_tty.c sys/dev/arcbios/arcbios_tty.c
---- sys~/dev/arcbios/arcbios_tty.c	2005-02-27 01:26:58.000000000 +0100
-+++ sys/dev/arcbios/arcbios_tty.c	2006-02-25 21:42:11.000000000 +0100
+Index: netbsd_sys-3.1/dev/arcbios/arcbios_tty.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/arcbios/arcbios_tty.c
++++ netbsd_sys-3.1/dev/arcbios/arcbios_tty.c
 @@ -55,6 +55,7 @@ void	arcbios_tty_poll(void *);
  int	arcbios_tty_param(struct tty *, struct termios *);
  
@@ -1704,9 +1755,10 @@ diff --fast -Ndpru sys~/dev/arcbios/arcbios_tty.c sys/dev/arcbios/arcbios_tty.c
  int
  arcbios_ttyclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/dev/dec/dz.c sys/dev/dec/dz.c
---- sys~/dev/dec/dz.c	2005-02-27 01:26:59.000000000 +0100
-+++ sys/dev/dec/dz.c	2006-02-26 13:43:15.000000000 +0100
+Index: netbsd_sys-3.1/dev/dec/dz.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/dec/dz.c
++++ netbsd_sys-3.1/dev/dec/dz.c
 @@ -140,6 +140,7 @@ static unsigned	dzmctl(struct dz_softc *
  static void	dzscan(void *);
  
@@ -1736,9 +1788,10 @@ diff --fast -Ndpru sys~/dev/dec/dz.c sys/dev/dec/dz.c
  /*ARGSUSED*/
  int
  dzclose(dev_t dev, int flag, int mode, struct proc *p)
-diff --fast -Ndpru sys~/dev/hpc/biconsdev.c sys/dev/hpc/biconsdev.c
---- sys~/dev/hpc/biconsdev.c	2003-08-07 18:30:57.000000000 +0200
-+++ sys/dev/hpc/biconsdev.c	2006-02-25 21:43:44.000000000 +0100
+Index: netbsd_sys-3.1/dev/hpc/biconsdev.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/hpc/biconsdev.c
++++ netbsd_sys-3.1/dev/hpc/biconsdev.c
 @@ -87,6 +87,7 @@ void	biconsdevattach(int);
  static	void biconsdev_output(struct tty *);
  
@@ -1767,9 +1820,10 @@ diff --fast -Ndpru sys~/dev/hpc/biconsdev.c sys/dev/hpc/biconsdev.c
  int
  biconsdevclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/dev/ic/cd18xx.c sys/dev/ic/cd18xx.c
---- sys~/dev/ic/cd18xx.c	2005-02-27 01:27:01.000000000 +0100
-+++ sys/dev/ic/cd18xx.c	2006-02-25 21:47:23.000000000 +0100
+Index: netbsd_sys-3.1/dev/ic/cd18xx.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/ic/cd18xx.c
++++ netbsd_sys-3.1/dev/ic/cd18xx.c
 @@ -141,6 +141,7 @@ void cdtty_stsoft(struct cd18xx_softc *,
  void cd18xx_softintr(void *);
  
@@ -1806,9 +1860,10 @@ diff --fast -Ndpru sys~/dev/ic/cd18xx.c sys/dev/ic/cd18xx.c
  /*
   * cdttyclose:  close syscall for cdtty terminals..
   */
-diff --fast -Ndpru sys~/dev/ic/clmpcc.c sys/dev/ic/clmpcc.c
---- sys~/dev/ic/clmpcc.c	2005-02-27 01:27:01.000000000 +0100
-+++ sys/dev/ic/clmpcc.c	2006-02-26 13:43:49.000000000 +0100
+Index: netbsd_sys-3.1/dev/ic/clmpcc.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/ic/clmpcc.c
++++ netbsd_sys-3.1/dev/ic/clmpcc.c
 @@ -98,6 +98,7 @@ static int 	clmpcc_modem_control(struct 
  extern struct cfdriver clmpcc_cd;
  
@@ -1838,9 +1893,10 @@ diff --fast -Ndpru sys~/dev/ic/clmpcc.c sys/dev/ic/clmpcc.c
  int
  clmpccclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/dev/ic/com.c sys/dev/ic/com.c
---- sys~/dev/ic/com.c	2005-02-27 01:27:01.000000000 +0100
-+++ sys/dev/ic/com.c	2006-02-26 13:16:42.000000000 +0100
+Index: netbsd_sys-3.1/dev/ic/com.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/ic/com.c
++++ netbsd_sys-3.1/dev/ic/com.c
 @@ -186,6 +186,7 @@ void	comdiag(void *);
  extern struct cfdriver com_cd;
  
@@ -1873,9 +1929,10 @@ diff --fast -Ndpru sys~/dev/ic/com.c sys/dev/ic/com.c
  int
  comclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/dev/ic/cy.c sys/dev/ic/cy.c
---- sys~/dev/ic/cy.c	2005-02-27 01:27:01.000000000 +0100
-+++ sys/dev/ic/cy.c	2006-02-25 21:49:27.000000000 +0100
+Index: netbsd_sys-3.1/dev/ic/cy.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/ic/cy.c
++++ netbsd_sys-3.1/dev/ic/cy.c
 @@ -55,6 +55,7 @@ int	cy_speed(speed_t, int *, int *, int)
  extern struct cfdriver cy_cd;
  
@@ -1904,9 +1961,10 @@ diff --fast -Ndpru sys~/dev/ic/cy.c sys/dev/ic/cy.c
  /*
   * close routine. returns zero if successful, else error code
   */
-diff --fast -Ndpru sys~/dev/ic/z8530tty.c sys/dev/ic/z8530tty.c
---- sys~/dev/ic/z8530tty.c	2005-02-27 01:27:03.000000000 +0100
-+++ sys/dev/ic/z8530tty.c	2006-02-26 13:44:22.000000000 +0100
+Index: netbsd_sys-3.1/dev/ic/z8530tty.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/ic/z8530tty.c
++++ netbsd_sys-3.1/dev/ic/z8530tty.c
 @@ -257,6 +257,7 @@ CFATTACH_DECL(zstty, sizeof(struct zstty
  extern struct cfdriver zstty_cd;
  
@@ -1939,9 +1997,10 @@ diff --fast -Ndpru sys~/dev/ic/z8530tty.c sys/dev/ic/z8530tty.c
  /*
   * Close a zs serial port.
   */
-diff --fast -Ndpru sys~/dev/marvell/gtmpsc.c sys/dev/marvell/gtmpsc.c
---- sys~/dev/marvell/gtmpsc.c	2005-02-27 01:27:21.000000000 +0100
-+++ sys/dev/marvell/gtmpsc.c	2006-02-26 13:44:41.000000000 +0100
+Index: netbsd_sys-3.1/dev/marvell/gtmpsc.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/marvell/gtmpsc.c
++++ netbsd_sys-3.1/dev/marvell/gtmpsc.c
 @@ -161,6 +161,7 @@ STATIC void gtmpsc_iflush(gtmpsc_softc_t
  STATIC void gtmpsc_shutdownhook(void *);
  
@@ -1974,9 +2033,10 @@ diff --fast -Ndpru sys~/dev/marvell/gtmpsc.c sys/dev/marvell/gtmpsc.c
  int
  gtmpscclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/dev/ofw/ofcons.c sys/dev/ofw/ofcons.c
---- sys~/dev/ofw/ofcons.c	2005-02-27 01:27:32.000000000 +0100
-+++ sys/dev/ofw/ofcons.c	2006-02-26 13:44:56.000000000 +0100
+Index: netbsd_sys-3.1/dev/ofw/ofcons.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/ofw/ofcons.c
++++ netbsd_sys-3.1/dev/ofw/ofcons.c
 @@ -70,6 +70,7 @@ CFATTACH_DECL(ofcons, sizeof(struct ofco
  extern struct cfdriver ofcons_cd;
  
@@ -2006,9 +2066,10 @@ diff --fast -Ndpru sys~/dev/ofw/ofcons.c sys/dev/ofw/ofcons.c
  int
  ofcons_close(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/dev/pci/cz.c sys/dev/pci/cz.c
---- sys~/dev/pci/cz.c	2005-02-27 01:27:32.000000000 +0100
-+++ sys/dev/pci/cz.c	2006-02-25 21:41:37.000000000 +0100
+Index: netbsd_sys-3.1/dev/pci/cz.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/pci/cz.c
++++ netbsd_sys-3.1/dev/pci/cz.c
 @@ -196,6 +196,7 @@ void	cztty_diag(void *arg);
  extern struct cfdriver cz_cd;
  
@@ -2040,9 +2101,10 @@ diff --fast -Ndpru sys~/dev/pci/cz.c sys/dev/pci/cz.c
  /*
   * czttyclose:
   *
-diff --fast -Ndpru sys~/dev/qbus/dhu.c sys/dev/qbus/dhu.c
---- sys~/dev/qbus/dhu.c	2005-02-26 13:45:06.000000000 +0100
-+++ sys/dev/qbus/dhu.c	2006-02-26 13:45:18.000000000 +0100
+Index: netbsd_sys-3.1/dev/qbus/dhu.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/qbus/dhu.c
++++ netbsd_sys-3.1/dev/qbus/dhu.c
 @@ -183,6 +183,7 @@ CFATTACH_DECL(dhu, sizeof(struct dhu_sof
      dhu_match, dhu_attach, NULL, NULL);
  
@@ -2072,9 +2134,10 @@ diff --fast -Ndpru sys~/dev/qbus/dhu.c sys/dev/qbus/dhu.c
  /*ARGSUSED*/
  int
  dhuclose(dev, flag, mode, p)
-diff --fast -Ndpru sys~/dev/qbus/dl.c sys/dev/qbus/dl.c
---- sys~/dev/qbus/dl.c	2005-02-26 13:45:06.000000000 +0100
-+++ sys/dev/qbus/dl.c	2006-02-26 13:45:31.000000000 +0100
+Index: netbsd_sys-3.1/dev/qbus/dl.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/qbus/dl.c
++++ netbsd_sys-3.1/dev/qbus/dl.c
 @@ -155,6 +155,7 @@ CFATTACH_DECL(dl, sizeof(struct dl_softc
      dl_match, dl_attach, NULL, NULL);
  
@@ -2104,9 +2167,10 @@ diff --fast -Ndpru sys~/dev/qbus/dl.c sys/dev/qbus/dl.c
  /*ARGSUSED*/
  int
  dlclose(dev_t dev, int flag, int mode, struct proc *p)
-diff --fast -Ndpru sys~/dev/qbus/qd.c sys/dev/qbus/qd.c
---- sys~/dev/qbus/qd.c	2005-02-26 13:45:06.000000000 +0100
-+++ sys/dev/qbus/qd.c	2006-02-25 21:56:15.000000000 +0100
+Index: netbsd_sys-3.1/dev/qbus/qd.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/qbus/qd.c
++++ netbsd_sys-3.1/dev/qbus/qd.c
 @@ -339,6 +339,7 @@ void qdearly(void);
  int qdpolling = 0;
  
@@ -2138,9 +2202,10 @@ diff --fast -Ndpru sys~/dev/qbus/qd.c sys/dev/qbus/qd.c
  /*ARGSUSED*/
  int
  qdclose(dev, flag, mode, p)
-diff --fast -Ndpru sys~/dev/sbus/magma.c sys/dev/sbus/magma.c
---- sys~/dev/sbus/magma.c	2005-02-27 01:27:48.000000000 +0100
-+++ sys/dev/sbus/magma.c	2006-02-26 13:45:57.000000000 +0100
+Index: netbsd_sys-3.1/dev/sbus/magma.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/sbus/magma.c
++++ netbsd_sys-3.1/dev/sbus/magma.c
 @@ -186,6 +186,7 @@ extern struct cfdriver mtty_cd;
  extern struct cfdriver mbpp_cd;
  
@@ -2170,9 +2235,10 @@ diff --fast -Ndpru sys~/dev/sbus/magma.c sys/dev/sbus/magma.c
  /*
   * close routine. returns zero if successful, else error code
   */
-diff --fast -Ndpru sys~/dev/sbus/spif.c sys/dev/sbus/spif.c
---- sys~/dev/sbus/spif.c	2005-02-27 01:27:48.000000000 +0100
-+++ sys/dev/sbus/spif.c	2006-02-26 13:46:17.000000000 +0100
+Index: netbsd_sys-3.1/dev/sbus/spif.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/sbus/spif.c
++++ netbsd_sys-3.1/dev/sbus/spif.c
 @@ -87,6 +87,7 @@ extern struct cfdriver stty_cd;
  extern struct cfdriver sbpp_cd;
  
@@ -2211,9 +2277,10 @@ diff --fast -Ndpru sys~/dev/sbus/spif.c sys/dev/sbus/spif.c
  int
  stty_close(dev, flags, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/dev/usb/ucom.c sys/dev/usb/ucom.c
---- sys~/dev/usb/ucom.c	2004-09-13 14:55:49.000000000 +0200
-+++ sys/dev/usb/ucom.c	2006-02-26 13:46:32.000000000 +0100
+Index: netbsd_sys-3.1/dev/usb/ucom.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/usb/ucom.c
++++ netbsd_sys-3.1/dev/usb/ucom.c
 @@ -136,6 +136,7 @@ struct ucom_softc {
  };
  
@@ -2246,9 +2313,10 @@ diff --fast -Ndpru sys~/dev/usb/ucom.c sys/dev/usb/ucom.c
  int
  ucomclose(dev_t dev, int flag, int mode, usb_proc_ptr p)
  {
-diff --fast -Ndpru sys~/dev/wscons/wsdisplay.c sys/dev/wscons/wsdisplay.c
---- sys~/dev/wscons/wsdisplay.c	2005-02-27 01:27:52.000000000 +0100
-+++ sys/dev/wscons/wsdisplay.c	2006-02-25 22:00:31.000000000 +0100
+Index: netbsd_sys-3.1/dev/wscons/wsdisplay.c
+===================================================================
+--- netbsd_sys-3.1.orig/dev/wscons/wsdisplay.c
++++ netbsd_sys-3.1/dev/wscons/wsdisplay.c
 @@ -165,6 +165,7 @@ CFATTACH_DECL(wsdisplay_noemul, sizeof (
      wsdisplay_noemul_match, wsdisplay_noemul_attach, NULL, NULL);
  
@@ -2287,9 +2355,10 @@ diff --fast -Ndpru sys~/dev/wscons/wsdisplay.c sys/dev/wscons/wsdisplay.c
  int
  wsdisplayclose(dev_t dev, int flag, int mode, struct proc *p)
  {
-diff --fast -Ndpru sys~/kern/tty.c sys/kern/tty.c
---- sys~/kern/tty.c	2005-02-26 22:34:55.000000000 +0100
-+++ sys/kern/tty.c	2006-02-26 14:15:50.000000000 +0100
+Index: netbsd_sys-3.1/kern/tty.c
+===================================================================
+--- netbsd_sys-3.1.orig/kern/tty.c
++++ netbsd_sys-3.1/kern/tty.c
 @@ -61,6 +61,7 @@ __KERNEL_RCSID(0, "$NetBSD: tty.c,v 1.17
  #include <sys/kprintf.h>
  #include <sys/namei.h>
@@ -2401,9 +2470,10 @@ diff --fast -Ndpru sys~/kern/tty.c sys/kern/tty.c
  		}
  		/*
  		 * If nothing fancy need be done, grab those characters we
-diff --fast -Ndpru sys~/kern/tty_pty.c sys/kern/tty_pty.c
---- sys~/kern/tty_pty.c	2005-02-26 22:34:55.000000000 +0100
-+++ sys/kern/tty_pty.c	2006-02-25 18:03:56.000000000 +0100
+Index: netbsd_sys-3.1/kern/tty_pty.c
+===================================================================
+--- netbsd_sys-3.1.orig/kern/tty_pty.c
++++ netbsd_sys-3.1/kern/tty_pty.c
 @@ -105,6 +105,7 @@ dev_type_poll(ptcpoll);
  dev_type_kqfilter(ptckqfilter);
  
@@ -2441,9 +2511,10 @@ diff --fast -Ndpru sys~/kern/tty_pty.c sys/kern/tty_pty.c
  int
  ptsclose(dev, flag, mode, p)
  	dev_t dev;
-diff --fast -Ndpru sys~/miscfs/specfs/spec_vnops.c sys/miscfs/specfs/spec_vnops.c
---- sys~/miscfs/specfs/spec_vnops.c	2005-09-26 22:22:55.000000000 +0200
-+++ sys/miscfs/specfs/spec_vnops.c	2006-02-26 12:49:37.000000000 +0100
+Index: netbsd_sys-3.1/miscfs/specfs/spec_vnops.c
+===================================================================
+--- netbsd_sys-3.1.orig/miscfs/specfs/spec_vnops.c
++++ netbsd_sys-3.1/miscfs/specfs/spec_vnops.c
 @@ -735,14 +735,17 @@ spec_close(v)
  		 * of forcably closing the device, otherwise we only
  		 * close on last reference.
@@ -2467,9 +2538,10 @@ diff --fast -Ndpru sys~/miscfs/specfs/spec_vnops.c sys/miscfs/specfs/spec_vnops.
  		break;
  
  	case VBLK:
-diff --fast -Ndpru sys~/sys/conf.h sys/sys/conf.h
---- sys~/sys/conf.h	2005-02-03 20:20:01.000000000 +0100
-+++ sys/sys/conf.h	2006-02-26 12:54:02.000000000 +0100
+Index: netbsd_sys-3.1/sys/conf.h
+===================================================================
+--- netbsd_sys-3.1.orig/sys/conf.h
++++ netbsd_sys-3.1/sys/conf.h
 @@ -85,6 +85,7 @@ struct cdevsw {
  	paddr_t		(*d_mmap)(dev_t, off_t, int);
  	int		(*d_kqfilter)(dev_t dev, struct knote *kn);
@@ -2486,9 +2558,10 @@ diff --fast -Ndpru sys~/sys/conf.h sys/sys/conf.h
  #define	dev_type_read(n)	int n (dev_t, struct uio *, int)
  #define	dev_type_write(n)	int n (dev_t, struct uio *, int)
  #define	dev_type_ioctl(n) \
-diff --fast -Ndpru sys~/sys/km_rpldev.h sys/sys/km_rpldev.h
---- sys~/sys/km_rpldev.h	1970-01-01 01:00:00.000000000 +0100
-+++ sys/sys/km_rpldev.h	2006-02-26 14:16:53.000000000 +0100
+Index: netbsd_sys-3.1/sys/km_rpldev.h
+===================================================================
+--- /dev/null
++++ netbsd_sys-3.1/sys/km_rpldev.h
 @@ -0,0 +1,47 @@
 +/*=============================================================================
 +TTY replay daemon
@@ -2537,9 +2610,10 @@ diff --fast -Ndpru sys~/sys/km_rpldev.h sys/sys/km_rpldev.h
 +#endif // _SYS_KM_RPLDEV_H
 +
 +//=============================================================================
-diff --fast -Ndpru sys~/sys/tty.h sys/sys/tty.h
---- sys~/sys/tty.h	2005-02-03 20:20:02.000000000 +0100
-+++ sys/sys/tty.h	2006-02-26 13:13:56.000000000 +0100
+Index: netbsd_sys-3.1/sys/tty.h
+===================================================================
+--- netbsd_sys-3.1.orig/sys/tty.h
++++ netbsd_sys-3.1/sys/tty.h
 @@ -232,6 +232,7 @@ void	 ttwakeup(struct tty *);
  int	 ttwrite(struct tty *, struct uio *, int);
  void	 ttychars(struct tty *);
