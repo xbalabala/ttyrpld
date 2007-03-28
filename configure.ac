@@ -6,6 +6,7 @@ AC_PROG_CC
 
 AC_HAVE_HEADERS(alloca.h)
 AC_CHECK_HEADER([libHX.h], [], AC_MSG_ERROR([Need at least libHX 1.10]), [
+#include <libHX.h>
 #if !defined(_LIBHX_H) || _LIBHX_H < 20070320
 #	error ----------------------------------------
 #	error You need a newer version of libHX
