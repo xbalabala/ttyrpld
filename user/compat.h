@@ -1,14 +1,9 @@
 #ifndef TTYRPLD_COMPAT_H
 #define TTYRPLD_COMPAT_H 1
 
-#if defined(__OpenBSD__)
-#	/* lacks it */
-#	define rpld_getpwnam(user, rbuf, buffer, buflen) getpwnam(user)
-#	define rpld_getpwuid(uid, rbuf, buffer, buflen)  getpwuid(uid)
-#elif defined(__sun__)
-#	define rpld_getpwnam getpwnam_r
-#	define rpld_getpwuid getpwuid_r
-#elif defined(__linux__) || defined(__FreeBSD__)
+#include "config.h"
+
+#if defined(HAVE_GETPWUID5)
 static inline struct passwd *rpld_getpwnam(const char *user,
     struct passwd *buffer, char *resbuf, size_t buflen)
 {
@@ -24,6 +19,12 @@ static inline struct passwd *rpld_getpwuid(uid_t uid, struct passwd *resbuf,
 	getpwuid_r(uid, resbuf, buffer, buflen, &ret);
 	return ret;
 }
+#elif defined(HAVE_GETPWUID4)
+#	define rpld_getpwnam getpwnam_r
+#	define rpld_getpwuid getpwuid_r
+#else
+#	define rpld_getpwnam(user, rbuf, buffer, buflen) getpwnam(user)
+#	define rpld_getpwuid(uid, rbuf, buffer, buflen)  getpwuid(uid)
 #endif
 
 #endif /* TTYRPLD_COMPAT_H */

@@ -16,6 +16,8 @@ AC_CHECK_HEADER([libHX.h], [], AC_MSG_ERROR([Need at least libHX 1.10]), [
 #endif
 ])
 
+m4_sinclude(m4lib/getpwuid.m4)
+
 AC_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
