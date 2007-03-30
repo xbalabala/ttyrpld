@@ -58,14 +58,10 @@
 #define SKIP_PTM(tty)   if(IS_PTY_MASTER(tty)) return 0;
 
 /* Stage 2 functions */
-static int rpldhc_init(struct tty_struct *, struct tty_struct *, struct file *);
 static int rpldhc_open(struct tty_struct *, struct tty_struct *, struct file *);
 static int rpldhc_read(const char __user *, size_t, struct tty_struct *);
 static int rpldhc_write(const char __user *, size_t, struct tty_struct *);
-static int rpldhc_ioctl(struct tty_struct *, struct tty_struct *, unsigned int,
-	unsigned long);
-static int rpldhc_close(struct tty_struct *, struct tty_struct *);
-static int rpldhc_deinit(struct tty_struct *, struct tty_struct *);
+static int rpldhc_lclose(struct tty_struct *, struct tty_struct *);
 
 /* Stage 3 functions */
 static int     rpldev_open(struct inode *, struct file *);
@@ -144,47 +140,9 @@ module_init(rpldev_init);
 module_exit(rpldev_exit);
 
 //-----------------------------------------------------------------------------
-static int rpldhc_init(struct tty_struct *tty, struct tty_struct *ctl,
-    struct file *filp)
-{
-	/*
-	 * Called from drivers/char/tty_io.c:init_dev() when the refcount of a
-	 * tty raises from zero to one. Usually, an EVT_OPEN follows an
-	 * EVT_INIT.
-	 */
-	struct rpldev_packet p;
-	char dev[MAXFNLEN], *full_dev;
-	int len;
-
-	SKIP_PTM(tty);
-
-	p.dev   = TTY_DEVNR(tty);
-	p.event = EVT_INIT;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-
-	/*
-	 * "/dev/tty" is an evil case, because its ownership is not the same as
-	 * that of a better node, e.g. /dev/tty1. Do not pass it to userspace.
-	 */
-	if(filp->f_dentry->d_inode->i_rdev == MKDEV(TTYAUX_MAJOR, 0) ||
-	  IS_ERR(full_dev = d_path(filp->f_dentry, filp->f_vfsmnt,
-	  dev, sizeof(dev)))) {
-		p.size = 0;
-		return circular_put_packet(&p, NULL, 0);
-	}
-
-	p.size = cpu_to_le16(len = strlen(full_dev));
-	return circular_put_packet(&p, full_dev, len);
-}
-
 static int rpldhc_open(struct tty_struct *tty, struct tty_struct *ctl,
     struct file *filp)
 {
-	/*
-	 * Called from drivers/char/tty_io.c:tty_open() whenever an open() on a
-	 * tty succeeds.
-	 */
 	struct rpldev_packet p;
 	char dev[MAXFNLEN], *full_dev;
 	int len;
@@ -196,6 +154,10 @@ static int rpldhc_open(struct tty_struct *tty, struct tty_struct *ctl,
 	p.magic = MAGIC_SIG;
 	fill_time(&p.time);
 
+	/*
+	 * "/dev/tty" is an evil case, because its ownership is not the same as
+	 * that of a better node, e.g. /dev/tty1. Do not pass it to userspace.
+	 */
 	if(filp->f_dentry->d_inode->i_rdev == MKDEV(TTYAUX_MAJOR, 0) ||
 	  IS_ERR(full_dev = d_path(filp->f_dentry, filp->f_vfsmnt,
 	  dev, sizeof(dev)))) {
@@ -260,38 +222,7 @@ static int rpldhc_write(const char __user *buf, size_t count,
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_ioctl(struct tty_struct *tty, struct tty_struct *ctl,
-    unsigned int cmd, unsigned long arg)
-{
-	struct rpldev_packet p;
-	uint32_t cmd32;
-
-	SKIP_PTM(tty);
-
-	cmd32   = cmd;
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = cpu_to_le16(sizeof(cmd32));
-	p.event = EVT_IOCTL;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, &cmd32, sizeof(cmd32));
-}
-
-static int rpldhc_close(struct tty_struct *tty, struct tty_struct *other)
-{
-	struct rpldev_packet p;
-
-	SKIP_PTM(tty);
-
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = 0;
-	p.event = EVT_CLOSE;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
-static int rpldhc_deinit(struct tty_struct *tty, struct tty_struct *other)
+static int rpldhc_lclose(struct tty_struct *tty, struct tty_struct *other)
 {
 	struct rpldev_packet p;
 
@@ -300,7 +231,7 @@ static int rpldhc_deinit(struct tty_struct *tty, struct tty_struct *other)
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = EVT_DEINIT;
+	p.event = EVT_LCLOSE;
 	p.magic = MAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
@@ -337,17 +268,13 @@ static int rpldev_open(struct inode *inode, struct file *filp)
 	 * (from the tty driver to the rpldev ring buffer) when there is no one
 	 * to read.
 	 */
-	rpl_init   = rpldhc_init;
 	rpl_open   = rpldhc_open;
 	rpl_read   = rpldhc_read;
 	rpl_write  = rpldhc_write;
-	rpl_close  = rpldhc_close;
-	rpl_deinit = rpldhc_deinit;
+	rpl_lclose = rpldhc_lclose;
 
-	if(Enable_ioctl_proc)
-		rpl_ioctl = rpldhc_ioctl;
-
-	/* The inode's times are changed as follows:
+	/*
+	 * The inode's times are changed as follows:
 	 *       Access Time: if data is read from the device
 	 * Inode Change Time: when the device is successfully opened
 	 * Modification Time: whenever the device is opened
@@ -470,13 +397,10 @@ static unsigned int rpldev_poll(struct file *filp, poll_table *wait)
 
 static int rpldev_close(struct inode *inode, struct file *filp)
 {
-	rpl_init   = NULL;
 	rpl_open   = NULL;
 	rpl_read   = NULL;
 	rpl_write  = NULL;
-	rpl_ioctl  = NULL;
-	rpl_close  = NULL;
-	rpl_deinit = NULL;
+	rpl_lclose = NULL;
 
 	down(&Buffer_lock);
 	vfree(Buffer);

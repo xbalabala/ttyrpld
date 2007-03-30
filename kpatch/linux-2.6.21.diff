@@ -1,33 +1,28 @@
-diff --fast -Ndpru linux-2.6.17~/drivers/char/tty_io.c linux-2.6.17+/drivers/char/tty_io.c
---- linux-2.6.17~/drivers/char/tty_io.c	2006-06-06 02:57:02.000000000 +0200
-+++ linux-2.6.17+/drivers/char/tty_io.c	2006-06-19 00:14:04.291237000 +0200
-@@ -106,6 +106,25 @@
+Index: linux-2.6.21-rc5/drivers/char/tty_io.c
+===================================================================
+--- linux-2.6.21-rc5.orig/drivers/char/tty_io.c
++++ linux-2.6.21-rc5/drivers/char/tty_io.c
+@@ -104,6 +104,19 @@
  
  #include <linux/kmod.h>
  
 +#ifdef CONFIG_RPLDHK
-+#    include <linux/compiler.h>
-+#    include <linux/km_rpldev.h>
-+int (*rpl_init)(struct tty_struct *, struct tty_struct *, struct file *) = NULL;
++#	include <linux/compiler.h>
++#	include <linux/km_rpldev.h>
 +int (*rpl_open)(struct tty_struct *, struct tty_struct *, struct file *) = NULL;
-+int (*rpl_read)(const char __user *, size_t, struct tty_struct *) = NULL;
-+int (*rpl_write)(const char __user *, size_t, struct tty_struct *) = NULL;
-+int (*rpl_close)(struct tty_struct *, struct tty_struct *) = NULL;
-+int (*rpl_deinit)(struct tty_struct *, struct tty_struct *) = NULL;
-+int (*rpl_ioctl)(struct tty_struct *, struct tty_struct *, unsigned int, unsigned long) = NULL;
-+EXPORT_SYMBOL(rpl_init);
++int (*rpl_read)(const char __user *, size_t, struct tty_struct *)        = NULL;
++int (*rpl_write)(const char __user *, size_t, struct tty_struct *)       = NULL;
++int (*rpl_lclose)(struct tty_struct *, struct tty_struct *)              = NULL;
 +EXPORT_SYMBOL(rpl_open);
 +EXPORT_SYMBOL(rpl_read);
 +EXPORT_SYMBOL(rpl_write);
-+EXPORT_SYMBOL(rpl_close);
-+EXPORT_SYMBOL(rpl_deinit);
-+EXPORT_SYMBOL(rpl_ioctl);
++EXPORT_SYMBOL(rpl_lclose);
 +#endif
 +
  #undef TTY_DEBUG_HANGUP
  
  #define TTY_PARANOIA_CHECK 1
-@@ -1294,8 +1313,16 @@ static ssize_t tty_read(struct file * fi
+@@ -1671,8 +1684,16 @@ static ssize_t tty_read(struct file * fi
  		i = -EIO;
  	tty_ldisc_deref(ld);
  	unlock_kernel();
@@ -35,84 +30,59 @@ diff --fast -Ndpru linux-2.6.17~/drivers/char/tty_io.c linux-2.6.17+/drivers/cha
 +	if(i > 0) {
  		inode->i_atime = current_fs_time(inode->i_sb);
 +#ifdef CONFIG_RPLDHK
-+                {
-+                    typeof(rpl_read) tmp = rpl_read;
-+                    if(tmp != NULL)
-+                        tmp(buf, i, tty);
-+                }
++		{
++			typeof(rpl_read) tmp = rpl_read;
++			if(tmp != NULL)
++				tmp(buf, i, tty);
++		}
 +#endif
 +        }
  	return i;
  }
  
-@@ -1380,6 +1407,13 @@ static inline ssize_t do_tty_write(
- 		struct inode *inode = file->f_dentry->d_inode;
- 		inode->i_mtime = current_fs_time(inode->i_sb);
- 		ret = written;
+@@ -1802,8 +1823,16 @@ static ssize_t tty_write(struct file * f
+ 	ld = tty_ldisc_ref_wait(tty);		
+ 	if (!ld->write)
+ 		ret = -EIO;
+-	else
++	else {
+ 		ret = do_tty_write(ld->write, tty, file, buf, count);
 +#ifdef CONFIG_RPLDHK
-+                {
-+                    typeof(rpl_write) tmp = rpl_write;
-+                    if(tmp != NULL)
-+                        tmp(buf - ret, ret, tty);
-+                }
++		{
++			typeof(rpl_write) tmp = rpl_write;
++			if(tmp != NULL)
++				tmp(buf, ret, tty);
++		}
 +#endif
- 	}
- 	mutex_unlock(&tty->atomic_write_lock);
++	}
+ 	tty_ldisc_deref(ld);
  	return ret;
-@@ -1454,7 +1488,7 @@ static inline void tty_line_name(struct 
-  * relaxed for the (most common) case of reopening a tty.
+ }
+@@ -1893,7 +1922,7 @@ static void tty_line_name(struct tty_dri
   */
+ 
  static int init_dev(struct tty_driver *driver, int idx,
 -	struct tty_struct **ret_tty)
 +	struct tty_struct **ret_tty, struct file *filp)
  {
  	struct tty_struct *tty, *o_tty;
- 	struct termios *tp, **tp_loc, *o_tp, **o_tp_loc;
-@@ -1613,6 +1647,13 @@ static int init_dev(struct tty_driver *d
- 		tty_ldisc_enable(o_tty);
- 	}
- 	tty_ldisc_enable(tty);
-+#ifdef CONFIG_RPLDHK
-+        {
-+            typeof(rpl_init) tmp = rpl_init;
-+            if(tmp != NULL)
-+                tmp(tty, o_tty, filp);
-+        }
-+#endif
- 	goto success;
- 
- 	/*
-@@ -1942,6 +1983,14 @@ static void release_dev(struct file * fi
- 
- 	mutex_unlock(&tty_mutex);
- 
-+#ifdef CONFIG_RPLDHK
-+        {
-+            typeof(rpl_close) tmp = rpl_close;
-+            if(tmp != NULL)
-+                tmp(tty, o_tty);
-+        }
-+#endif
-+
- 	/* check whether both sides are closing ... */
- 	if (!tty_closing || (o_tty && !o_tty_closing))
- 		return;
-@@ -1958,6 +2007,14 @@ static void release_dev(struct file * fi
- 	clear_bit(TTY_DONT_FLIP, &tty->flags);
+ 	struct ktermios *tp, **tp_loc, *o_tp, **o_tp_loc;
+@@ -2419,6 +2448,14 @@ static void release_dev(struct file * fi
+ 	clear_bit(TTY_LDISC, &tty->flags);
  	cancel_delayed_work(&tty->buf.work);
  
 +#ifdef CONFIG_RPLDHK
-+        {
-+            typeof(rpl_deinit) tmp = rpl_deinit;
-+            if(tmp != NULL)
-+                tmp(tty, o_tty);
-+        }
++	{
++		typeof(rpl_lclose) tmp = rpl_lclose;
++		if(tmp != NULL)
++			tmp(tty, o_tty);
++	}
 +#endif
 +
  	/*
  	 * Wait for ->hangup_work and ->buf.work handlers to terminate
  	 */
-@@ -2086,7 +2143,7 @@ retry_open:
+@@ -2558,7 +2595,7 @@ retry_open:
  		return -ENODEV;
  	}
  got_driver:
@@ -121,22 +91,22 @@ diff --fast -Ndpru linux-2.6.17~/drivers/char/tty_io.c linux-2.6.17+/drivers/cha
  	mutex_unlock(&tty_mutex);
  	if (retval)
  		return retval;
-@@ -2140,6 +2197,14 @@ got_driver:
- 		tty->session = current->signal->session;
- 		tty->pgrp = process_group(current);
- 	}
+@@ -2613,6 +2650,14 @@ got_driver:
+ 	spin_unlock_irq(&current->sighand->siglock);
+ 	mutex_unlock(&tty_mutex);
+ 	put_pid(old_pgrp);
 +
 +#ifdef CONFIG_RPLDHK
-+        {
-+            typeof(rpl_open) tmp = rpl_open;
-+            if(tmp != NULL)
-+                tmp(tty, current->signal->tty, filp);
-+        }
++	{
++		typeof(rpl_open) tmp = rpl_open;
++		if(tmp != NULL)
++			tmp(tty, current->signal->tty, filp);
++	}
 +#endif
  	return 0;
  }
  
-@@ -2174,7 +2239,7 @@ static int ptmx_open(struct inode * inod
+@@ -2659,7 +2704,7 @@ static int ptmx_open(struct inode * inod
  	up(&allocated_ptys_lock);
  
  	mutex_lock(&tty_mutex);
@@ -145,56 +115,11 @@ diff --fast -Ndpru linux-2.6.17~/drivers/char/tty_io.c linux-2.6.17+/drivers/cha
  	mutex_unlock(&tty_mutex);
  	
  	if (retval)
-@@ -2523,6 +2588,14 @@ int tty_ioctl(struct inode * inode, stru
- 	    tty->driver->subtype == PTY_TYPE_MASTER)
- 		real_tty = tty->link;
- 
-+#ifdef CONFIG_RPLDHK_IOCTL
-+        {
-+            typeof(rpl_ioctl) tmp = rpl_ioctl;
-+            if(tmp != NULL)
-+                tmp(tty, real_tty, cmd, arg);
-+        }
-+#endif
-+
- 	/*
- 	 * Break handling by driver
- 	 */
-diff --fast -Ndpru linux-2.6.17~/include/linux/km_rpldev.h linux-2.6.17+/include/linux/km_rpldev.h
---- linux-2.6.17~/include/linux/km_rpldev.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.17+/include/linux/km_rpldev.h	2006-06-19 00:14:04.291237000 +0200
-@@ -0,0 +1,50 @@
-+/*=============================================================================
-+ttyrpld - TTY replay daemon
-+include/linux/km_rpldev.h - Stage 1 RPL interface
-+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-+
-+  Redistribution and use in source and binary forms, with or without
-+  modification, are permitted provided that the following conditions are met:
-+
-+  1. Redistributions of source code must retain the above copyright notice,
-+     this list of conditions and the following disclaimer.
-+  2. Redistributions in binary form must reproduce the above copyright notice,
-+     this list of conditions and the following disclaimer in the documentation
-+     and/or other materials provided with the distribution.
-+  3. Redistributions of modified code that are made available only in binary
-+     form require sending a description to the ttyrpld project maintainer on
-+     what has been changed.
-+  4. Neither the names of the above-listed copyright holders nor the names of
-+     any contributors may be used to endorse or promote products derived from
-+     this software without specific prior written permission.
-+
-+  NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
-+  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A
-+  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
-+  CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-+  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-+=============================================================================*/
+Index: linux-2.6.21-rc5/include/linux/km_rpldev.h
+===================================================================
+--- /dev/null
++++ linux-2.6.21-rc5/include/linux/km_rpldev.h
+@@ -0,0 +1,14 @@
 +#ifndef _LINUX_KM_RPLDEV_H
 +#define _LINUX_KM_RPLDEV_H 1
 +
@@ -203,40 +128,27 @@ diff --fast -Ndpru linux-2.6.17~/include/linux/km_rpldev.h linux-2.6.17+/include
 +struct file;
 +struct tty_struct;
 +
-+extern int (*rpl_init)(struct tty_struct *, struct tty_struct *, struct file *);
 +extern int (*rpl_open)(struct tty_struct *, struct tty_struct *, struct file *);
 +extern int (*rpl_read)(const char __user *, size_t, struct tty_struct *);
 +extern int (*rpl_write)(const char __user *, size_t, struct tty_struct *);
-+extern int (*rpl_close)(struct tty_struct *, struct tty_struct *);
-+extern int (*rpl_deinit)(struct tty_struct *, struct tty_struct *);
-+extern int (*rpl_ioctl)(struct tty_struct *, struct tty_struct *, unsigned int, unsigned long);
++extern int (*rpl_lclose)(struct tty_struct *, struct tty_struct *);
 +
-+#endif // _LINUX_KM_RPLDEV_H
-+
-+//=============================================================================
-diff --fast -Ndpru linux-2.6.17~/security/Kconfig linux-2.6.17+/security/Kconfig
---- linux-2.6.17~/security/Kconfig	2006-06-06 02:57:02.000000000 +0200
-+++ linux-2.6.17+/security/Kconfig	2006-06-19 00:14:04.291237000 +0200
-@@ -101,5 +101,22 @@ config SECURITY_SECLVL
++#endif /* _LINUX_KM_RPLDEV_H */
+Index: linux-2.6.21-rc5/security/Kconfig
+===================================================================
+--- linux-2.6.21-rc5.orig/security/Kconfig
++++ linux-2.6.21-rc5/security/Kconfig
+@@ -95,5 +95,13 @@ config SECURITY_ROOTPLUG
  
  source security/selinux/Kconfig
  
 +config RPLDHK
-+    bool "rpldev hooks for tty logging"
-+    help
-+        Allows you to log any traffic running over the TTY driver.
-+        It is way more useful, because it cannot be fooled by empty
-+        or bogus .bash_history entries or even an SSH encrypted
-+        channel.
-+
-+config RPLDHK_IOCTL
-+    bool "Enable ioctl processing"
-+    depends on RPLDHK
-+    help
-+        ioctls are currently not recognized by ttyreplay, so it makes
-+        not too much sense to record them. Say N here if you do not
-+        want to have the kernel generate ioctl events and instead save
-+        a few CPU instructions.
++	bool "rpldev hooks for tty logging"
++	---help---
++		Allows you to log any traffic running over the TTY driver.
++		It is way more useful, because it cannot be fooled by empty
++		or bogus .bash_history entries or even an SSH encrypted
++		channel.
 +
  endmenu
  

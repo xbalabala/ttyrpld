@@ -213,7 +213,7 @@ static int replay_file(int fd, const char *name)
 			read_through(fd, STDERR_FILENO, packet.size);
 			fprintf(stderr, "\e[0m\n"); // ]
 			break;
-		case EVT_DEINIT:
+		case EVT_LCLOSE:
 			fprintf(stderr, "\n\e[1;37;42m%s\e[0m\n", // ]]
 			        _("<tty device has been closed>"));
 			read_nullfm(fd, packet.size);

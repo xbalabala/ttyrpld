@@ -28,19 +28,16 @@ functions, when it shall go into action. That way, there is no overhead (read:
 <p class="code"><code>
 <b>#</b>ifdef CONFIG_RPLDHK<br />
 <b>#</b> &nbsp; &nbsp;include &lt;linux/km_rpldev.h&gt;<br />
-<b>int (*</b>rpl_init<b>)</b>(<b>struct</b> tty_struct <b>*</b>, <b>struct</b> tty_struct <b>*</b>);<br />
 <b>int (*</b>rpl_open<b>)</b>(<b>struct</b> tty_struct <b>*</b>, <b>struct</b> tty_struct <b>*</b>);<br />
 <b>int (*</b>rpl_read<b>)</b>(<b>const char __user *</b>, <b>size_t</b>, <b>struct</b> tty_struct <b>*</b>);<br />
 <b>int (*</b>rpl_write<b>)</b>(<b>const char __user *</b>, <b>size_t</b>, <b>struct</b> tty_struct <b>*</b>);<br />
-<b>int (*</b>rpl_close<b>)</b>(<b>struct</b> tty_struct <b>*</b>, <b>struct</b> tty_struct <b>*</b>);<br />
-<b>int (*</b>rpl_deinit<b>)</b>(<b>struct</b> tty_struct <b>*</b>, <b>struct</b> tty_struct <b>*</b>);<br />
-<b>int (*</b>rpl_ioctl<b>)</b>(<b>struct</b> tty_struct <b>*</b>, <b>struct</b> tty_struct <b>*</b>, <b>unsigned int</b>, <b>unsigned long</b>);<br />
+<b>int (*</b>rpl_lclose<b>)</b>(<b>struct</b> tty_struct <b>*</b>, <b>struct</b> tty_struct <b>*</b>);<br />
 <b>#</b>endif</code></p>
 
 <p class="code"><code>
 <b>#</b>ifdef CONFIG_RPLDHK<br />
 <b>if</b>(rpl_write <b>!=</b> NULL)<br />
-&nbsp; &nbsp; rpl_write(buf, i, tty);<br />
+&nbsp; &nbsp; rpl_write(buf, ret, tty);<br />
 <b>#</b>endif</code></p>
 
 <p class="block"><code>tty_write()</code>, etc. is the spot to take, because

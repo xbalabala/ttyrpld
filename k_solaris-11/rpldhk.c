@@ -33,19 +33,14 @@
 static int rpldhk_open(struct queue *, dev_t *, int, int, struct cred *);
 static int rpldhk_read(struct queue *, struct msgb *);
 static int rpldhk_write(struct queue *, struct msgb *);
-static int rpldhk_fdclose(struct queue *, int, struct cred *);
-static int rpldhk_close(struct queue *, int, struct cred *);
+static int rpldhk_lclose(struct queue *, int, struct cred *);
 static int rpldhk_trap(void);
 static void rpldhk_packet(struct queue *, struct msgb *, int);
 
 /* Variables */
-int (*rpl_init)(struct queue *);
-int (*rpl_open)(struct queue *);
 int (*rpl_read)(const char *, size_t, struct queue *);
 int (*rpl_write)(const char *, size_t, struct queue *);
-int (*rpl_ioctl)(struct queue *);
-int (*rpl_close)(struct queue *);
-int (*rpl_deinit)(struct queue *);
+int (*rpl_lclose)(struct queue *);
 
 /* Module info */
 static struct module_info rpldhk_minfo = {
@@ -60,8 +55,7 @@ static struct module_info rpldhk_minfo = {
 static struct qinit rpldhk_rdinit = {
 	.qi_qopen    = rpldhk_open,
 	.qi_putp     = rpldhk_read,
-	.qi_qfdclose = rpldhk_fdclose,
-	.qi_qclose   = rpldhk_close,
+	.qi_qclose   = rpldhk_lclose,
 	.qi_minfo    = &rpldhk_minfo,
 };
 
@@ -73,7 +67,6 @@ static struct qinit rpldhk_wrinit = {
 	 */
 	.qi_qopen    = rpldhk_trap,
 	.qi_putp     = rpldhk_write,
-	.qi_qfdclose = rpldhk_trap,
 	.qi_qclose   = rpldhk_trap,
 	.qi_minfo    = &rpldhk_minfo,
 };
@@ -121,16 +114,6 @@ int _fini(void)
 static int rpldhk_open(struct queue *q, dev_t *dev, int oflag, int sflag,
     struct cred *cred)
 {
-	if(q->q_ptr == NULL) {
-		typeof(rpl_init) tmp = rpl_init;
-		if(tmp != NULL)
-			tmp(q);
-		q->q_ptr = (void *)0x1337cac0;
-	} else {
-		typeof(rpl_open) tmp = rpl_open;
-		if(tmp != NULL)
-			rpl_open(q);
-	}
 	qprocson(q);
 	return 0;
 }
@@ -149,21 +132,12 @@ static int rpldhk_write(struct queue *q, struct msgb *mp)
 	return 0;
 }
 
-static int rpldhk_fdclose(struct queue *q, int flag, struct cred *cred)
+static int rpldhk_lclose(struct queue *q, int flag, struct cred *cred)
 {
-	typeof(rpl_close) tmp = rpl_close;
-	if(tmp)
-	tmp(q);
-	return 0;
-}
-
-static int rpldhk_close(struct queue *q, int flag, struct cred *cred)
-{
-	typeof(rpl_deinit) tmp = rpl_deinit;
+	typeof(rpl_lclose) tmp = rpl_lclose;
 	qprocsoff(q);
 	if(tmp)
 		tmp(q);
-	q->q_ptr = NULL;
 	return 0;
 }
 
@@ -196,5 +170,3 @@ static void rpldhk_packet(struct queue *q, struct msgb *mp, int wr)
 	}
 	return;
 }
-
-//=============================================================================

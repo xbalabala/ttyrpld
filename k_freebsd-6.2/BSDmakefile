@@ -5,5 +5,3 @@ SRCS = rpldev.c
 
 .include <bsd.kmod.mk>
 CFLAGS += -funit-at-a-time -Wno-pointer-arith -Wall
-
-#<<eof>>

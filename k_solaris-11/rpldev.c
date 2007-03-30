@@ -44,13 +44,9 @@ static int rpldev_detach(dev_info_t *, ddi_detach_cmd_t);
 static int rpldev_getinfo(dev_info_t *, ddi_info_cmd_t, void *, void **);
 
 /* Stage 2 functions */
-static int rpldhc_init(struct queue *);
-static int rpldhc_open(struct queue *);
 static int rpldhc_read(const char *, size_t, struct queue *);
 static int rpldhc_write(const char *, size_t, struct queue *);
-//static int rpldhc_ioctl(void);
-static int rpldhc_close(struct queue *);
-static int rpldhc_deinit(struct queue *);
+static int rpldhc_lclose(struct queue *);
 
 /* Stage 3 functions */
 static int rpldev_open(dev_t *, int, int, struct cred *);
@@ -132,14 +128,12 @@ int _init(void)
 	mutex_init(&Buffer_lock, NULL, MUTEX_DRIVER, NULL);
 	mutex_init(&Open_lock, NULL, MUTEX_DRIVER, NULL);
 	cv_init(&Buffer_wait, NULL, CV_DRIVER, NULL);
-	cmn_err(CE_NOTE, "rpldev: _init\n");
 	return mod_install(&rpldev_modlinkage);
 }
 
 int _fini(void)
 {
 	int ret;
-	cmn_err(CE_NOTE, "rpldev: _fini\n");
 	if((ret = mod_remove(&rpldev_modlinkage)) == 0) {
 		mutex_destroy(&Buffer_lock);
 		mutex_destroy(&Open_lock);
@@ -150,13 +144,11 @@ int _fini(void)
 
 int _info(struct modinfo *i)
 {
-	cmn_err(CE_NOTE, "rpldev: _info\n");
 	return mod_info(&rpldev_modlinkage, i);
 }
 
 static int rpldev_attach(dev_info_t *dip, ddi_attach_cmd_t cmd)
 {
-	cmn_err(CE_NOTE, "rpldev: rpldev_attach\n");
 	switch(cmd) {
 	case DDI_ATTACH:
 		rpldev_dip = dip;
@@ -176,7 +168,6 @@ static int rpldev_attach(dev_info_t *dip, ddi_attach_cmd_t cmd)
 
 static int rpldev_detach(dev_info_t *dip, ddi_detach_cmd_t cmd)
 {
-	cmn_err(CE_NOTE, "rpldev: rpldev_detach\n");
 	switch(cmd) {
 		case DDI_DETACH:
 			rpldev_dip = NULL;
@@ -192,7 +183,6 @@ static int rpldev_detach(dev_info_t *dip, ddi_detach_cmd_t cmd)
 static int rpldev_getinfo(dev_info_t *dip, ddi_info_cmd_t cmd, void *arg,
     void **resultp)
 {
-	cmn_err(CE_NOTE, "rpldev: rpldev_getinfo\n");
 	switch(cmd) {
 		case DDI_INFO_DEVT2DEVINFO:
 			*resultp = rpldev_dip;
@@ -206,30 +196,6 @@ static int rpldev_getinfo(dev_info_t *dip, ddi_info_cmd_t cmd, void *arg,
 }
 
 //-----------------------------------------------------------------------------
-static int rpldhc_init(struct queue *q)
-{
-	struct rpldev_packet p;
-
-	p.dev   = TTY_DEVNR(q);
-	p.size  = 0;
-	p.event = EVT_INIT;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
-static int rpldhc_open(struct queue *q)
-{
-	struct rpldev_packet p;
-
-	p.dev   = TTY_DEVNR(q);
-	p.size  = 0;
-	p.event = EVT_OPEN;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
 static int rpldhc_read(const char *buf, size_t count, struct queue *q)
 {
 	struct rpldev_packet p;
@@ -260,25 +226,13 @@ static int rpldhc_write(const char *buf, size_t count, struct queue *q)
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_close(struct queue *q)
+static int rpldhc_lclose(struct queue *q)
 {
 	struct rpldev_packet p;
 
 	p.dev   = TTY_DEVNR(q);
 	p.size  = 0;
-	p.event = EVT_CLOSE;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
-static int rpldhc_deinit(struct queue *q)
-{
-	struct rpldev_packet p;
-
-	p.dev   = TTY_DEVNR(q);
-	p.size  = 0;
-	p.event = EVT_DEINIT;
+	p.event = EVT_LCLOSE;
 	p.magic = MAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
@@ -301,16 +255,9 @@ static int rpldev_open(dev_t *devp, int flag, int otyp, struct cred *credp)
 	}
 
 	BufRP = BufWP = Buffer;
-	rpl_init   = rpldhc_init;
-	rpl_open   = rpldhc_open;
 	rpl_read   = rpldhc_read;
 	rpl_write  = rpldhc_write;
-//	rpl_ioctl  = rpldhc_ioctl;
-	rpl_close  = rpldhc_close;
-	rpl_deinit = rpldhc_deinit;
-	strcpy(Buffer, "Just some random bytes to test the functionality");
-	BufWP += strlen(Buffer);
-	cmn_err(CE_NOTE, "rpldev: opened\n");
+	rpl_lclose = rpldhc_lclose;
 	return 0;
 }
 
@@ -323,30 +270,30 @@ static int rpldev_read(dev_t dev, struct uio *uio, struct cred *credp)
 	if(Buffer == NULL)
 		goto out;
 
-	cmn_err(CE_NOTE, "rpldev: read\n");
+//	cmn_err(CE_NOTE, "rpldev: read\n");
 	while(BufRP == BufWP) {
 		mutex_exit(&Buffer_lock);
 		if(uio->uio_fmode & (FNDELAY | FNONBLOCK))
 			return EAGAIN;
-		cmn_err(CE_NOTE, "rpldev: waiting in read\n");
+//		cmn_err(CE_NOTE, "rpldev: waiting in read\n");
 		mutex_enter(&Buffer_lock);
 		ret = cv_wait_sig(&Buffer_wait, &Buffer_lock);
 		mutex_exit(&Buffer_lock);
 		if(ret == 0)
 			return EINTR;
-		cmn_err(CE_NOTE, "rpldev: acquiring in read\n");
+//		cmn_err(CE_NOTE, "rpldev: acquiring in read\n");
 		ret = 0;
 		mutex_enter(&Buffer_lock);
 		if(Buffer == NULL)
 			goto out;
 	}
 
-	cmn_err(CE_NOTE, "rpldev_read: jo, resid=%d, avail=%d\n",
-	 (int)uio->uio_resid, (int)avail_R());
+//	cmn_err(CE_NOTE, "rpldev_read: jo, resid=%d, avail=%d\n",
+//	        (int)uio->uio_resid, (int)avail_R());
 	count = min_uint(uio->uio_resid, avail_R());
-	cmn_err(CE_NOTE, "rpldev_read: jo, count=%d\n", (int)count);
+//	cmn_err(CE_NOTE, "rpldev_read: jo, count=%d\n", (int)count);
 	ret   = circular_get(uio, count);
-	cmn_err(CE_NOTE, "rpldev_read: jo, ret=%d\n", (int)ret);
+//	cmn_err(CE_NOTE, "rpldev_read: jo, ret=%d\n", (int)ret);
  out:
 	mutex_exit(&Buffer_lock);
 	return ret;
@@ -400,8 +347,8 @@ static int rpldev_ioctl(dev_t dev, int cmd, intptr_t arg, int mode,
 static int rpldev_chpoll(dev_t dev, short requested_events, int any_yet,
     short *available_events, struct pollhead **pollhd)
 {
-	cmn_err(CE_NOTE, "rpldev: chpoll rq %d BufRP %p BufWP %p\n",
-	        requested_events, BufRP, BufWP);
+//	cmn_err(CE_NOTE, "rpldev: chpoll rq %d BufRP %p BufWP %p\n",
+//	        requested_events, BufRP, BufWP);
 	if((requested_events & (POLLIN | POLLRDNORM)) && BufRP != BufWP) {
 		*available_events = POLLIN | POLLRDNORM;
 		return 0;
@@ -415,20 +362,16 @@ static int rpldev_chpoll(dev_t dev, short requested_events, int any_yet,
 
 static int rpldev_close(dev_t dev, int flag, int otyp, struct cred *credp)
 {
-	rpl_init   = NULL;
-	rpl_open   = NULL;
 	rpl_read   = NULL;
 	rpl_write  = NULL;
-	rpl_ioctl  = NULL;
-	rpl_close  = NULL;
-	rpl_deinit = NULL;
+	rpl_lclose = NULL;
 
 	mutex_enter(&Buffer_lock);
 	ddi_umem_free(Buffer_cookie);
 	Buffer = NULL;
 	mutex_exit(&Buffer_lock);
 	--Open_count;
-	cmn_err(CE_NOTE, "rpldev: close\n");
+//	cmn_err(CE_NOTE, "rpldev: close\n");
 	return 0;
 }
 

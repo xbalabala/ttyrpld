@@ -75,8 +75,8 @@ option.</p>
 <p class="code"><code>
 A TTY &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;BYTES IN &nbsp; &nbsp; &nbsp; OUT FILENAME<br />
 ==========================================================================<br />
-&nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2159 &nbsp; &nbsp; 81129 ttyrpld 2.12/Linux<br />
-&nbsp; IOCD: 0/118/117/0 &nbsp;RW: 1851/1396 &nbsp;I: 0 &nbsp;B: 0<br />
+&nbsp; (bytes) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2159 &nbsp; &nbsp; 81129 ttyrpld 2.19/Linux<br />
+&nbsp; (packets) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;14 &nbsp; &nbsp; &nbsp; 250<br />
 --------------------------------------------------------------------------<br />
 D tty7 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;937 &nbsp; &nbsp; &nbsp; &nbsp; 0 root/20050328.224208.tty7<br />
 D pts-1 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; 586 boinc/20050328.224219.pts-1<br />
@@ -95,8 +95,8 @@ D pts-4 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 864 &nbsp; &nbsp; 52618 root/2
 this:</p>
 
 <p class="code"><code>
-ttyrpld 2.12<br />
-format 3<br />
+ttyrpld 2.19<br />
+format 4<br />
 0 144 143 0 3347 2496 3756 122881 0 0<br />
 D 4 7 tty7 1507 0 /var/log/rpl/root/20050328.224208.tty7<br />
 D 136 1 pts-1 0 1241 /var/log/rpl/boinc/20050328.224219.pts-1<br />
@@ -112,17 +112,13 @@ the program used. It can (and should) be ignored by programs querying
 %lu</code>". The fields are (in this order):</p>
 
 <ul>
-  <li><code>EVT_INIT</code>&nbsp;-- tty first opens</li>
   <li><code>EVT_OPEN</code>&nbsp;-- number of <code>open()</code> operation on
     any tty</li>
-  <li><code>EVT_CLOSE</code>&nbsp;-- number of <code>close()</code> operations
-    on any tty</li>
-  <li><code>EVT_DEINIT</code>&nbsp;-- tty deallocation</li>
-  <li><code>EVT_READ</code>&nbsp;-- packets read from <i>rpldev</i></li>
-  <li><code>EVT_WRITE</code>&nbsp;-- packets read from <i>rpldev</i></li>
+  <li><code>EVT_LCLOSE</code>&nbsp;-- final tty closes</li>
   <li><code>EVT_READ</code>&nbsp;-- payload bytecount</li>
   <li><code>EVT_WRITE</code>&nbsp;-- payload bytecount</li>
-  <li><code>EVT_IOCTL</code> packets received</li>
+  <li><code>EVT_READ</code>&nbsp;-- packets read from <i>rpldev</i></li>
+  <li><code>EVT_WRITE</code>&nbsp;-- packets read from <i>rpldev</i></li>
   <li>packets considered bad (i.e. bad magic)&nbsp;-- might be more than there
     are actually damaged, because the algorithm needs to find <i>something</i>
     that looks good.</li>

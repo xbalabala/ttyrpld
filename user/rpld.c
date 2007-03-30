@@ -228,13 +228,10 @@ static void mainloop(int fd)
 static int packet_preprox(struct rpldev_packet *packet)
 {
 	static unsigned long *const tab[] = {
-		[EVT_INIT]   = &Stats.init,
 		[EVT_OPEN]   = &Stats.open,
 		[EVT_READ]   = &Stats.read,
 		[EVT_WRITE]  = &Stats.write,
-		[EVT_CLOSE]  = &Stats.close,
-		[EVT_DEINIT] = &Stats.deinit,
-		[EVT_IOCTL]  = &Stats.ioctl,
+		[EVT_LCLOSE] = &Stats.lclose,
 		[EVT_max]    = NULL,
 	};
 
@@ -243,18 +240,12 @@ static int packet_preprox(struct rpldev_packet *packet)
 
 	/* General packet classification (first stage drop) */
 	switch(packet->event) {
-	/* Not used in rpld at this time */
-	case EVT_INIT:
-	case EVT_CLOSE:
-	case EVT_IOCTL:
-		return 0;
-
 	/* These will be processed */
 	case EVT_OPEN:
-	case EVT_DEINIT:
+	case EVT_LCLOSE:
 		break;
 
-	/* The following roll their own + will be processed... */
+	/* The following roll their own and will also be processed... */
 	case EVT_READ:
 		Stats.in += packet->size;
 		break;
@@ -303,7 +294,7 @@ static int packet_process(struct rpldev_packet *packet,
 			tty->out += packet->size;
 			log_write(packet, tty, fd);
 			return 1;
-		case EVT_DEINIT:
+		case EVT_LCLOSE:
 			log_close(tty);
 			break;
 		default:
@@ -650,10 +641,8 @@ static void sighandler_int(int s)
 
 static void sighandler_alrm(int s)
 {
-	printf("\r\e[2K" "IOCD: %lu/%lu/%lu/%lu  RW: %lu/%lu (%llu/%llu)"
-	       " I: %lu  B: %lu", Stats.init, Stats.open, Stats.close,
-	       Stats.deinit, Stats.read, Stats.write, Stats.in, Stats.out,
-	       Stats.ioctl, Stats.badpack);
+	printf("\r\e[2K" "read %lluB/%luP, write %lluB/%luP",
+	       Stats.in, Stats.read, Stats.out, Stats.write);
 	fflush(stdout);
 	if(GOpt.verbose)
 		alarm(1);

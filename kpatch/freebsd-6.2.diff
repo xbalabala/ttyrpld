@@ -1,307 +1,83 @@
-diff --fast -Ndpru freebsd-sys~/dev/syscons/syscons.c freebsd-sys/dev/syscons/syscons.c
---- freebsd-sys~/dev/syscons/syscons.c	2006-03-04 01:41:28.000000000 +0100
-+++ freebsd-sys/dev/syscons/syscons.c	2006-06-19 17:46:39.000000000 +0200
-@@ -229,7 +229,7 @@ CONS_DRIVER(sc, sccnprobe, sccninit, scc
- 	    sccndbctl);
- 
- static	d_open_t	scopen;
--static	d_close_t	scclose;
-+static	d_close_t	scfdclose, scclose;
- static	d_read_t	scread;
- static	d_ioctl_t	scioctl;
- static	d_mmap_t	scmmap;
-@@ -237,6 +237,7 @@ static	d_mmap_t	scmmap;
- static struct cdevsw sc_cdevsw = {
- 	.d_version =	D_VERSION,
- 	.d_open =	scopen,
-+        .d_fdclose =    scfdclose,
- 	.d_close =	scclose,
- 	.d_read =	scread,
- 	.d_ioctl =	scioctl,
-@@ -538,6 +539,12 @@ scopen(struct cdev *dev, int flag, int m
-     return error;
- }
- 
-+static int scfdclose(struct cdev *dev, int flags, int mode,
-+ struct thread *th)
-+{
-+    return tty_fdclose(dev->si_tty);
-+}
-+
- static int
- scclose(struct cdev *dev, int flag, int mode, struct thread *td)
- {
-diff --fast -Ndpru freebsd-sys~/fs/devfs/devfs_vnops.c freebsd-sys/fs/devfs/devfs_vnops.c
---- freebsd-sys~/fs/devfs/devfs_vnops.c	2005-11-12 22:21:27.000000000 +0100
-+++ freebsd-sys/fs/devfs/devfs_vnops.c	2006-06-19 17:46:39.000000000 +0200
-@@ -266,6 +266,15 @@ devfs_close(struct vop_close_args *ap)
- 	dsw = dev_refthread(dev);
- 	if (dsw == NULL)
- 		return (ENXIO);
-+        if(dsw->d_fdclose != NULL) {
-+            if(dsw->d_flags & D_NEEDGIANT) {
-+                dsw->d_fdclose(dev, ap->a_fflag, S_IFCHR, td);
-+            } else {
-+                DROP_GIANT();
-+                dsw->d_fdclose(dev, ap->a_fflag, S_IFCHR, td);
-+                PICKUP_GIANT();
-+            }
-+        }
- 	VI_LOCK(vp);
- 	if (vp->v_iflag & VI_DOOMED) {
- 		/* Forced close. */
-diff --fast -Ndpru freebsd-sys~/i386/isa/pcvt/pcvt_drv.c freebsd-sys/i386/isa/pcvt/pcvt_drv.c
---- freebsd-sys~/i386/isa/pcvt/pcvt_drv.c	2005-01-06 23:18:17.000000000 +0100
-+++ freebsd-sys/i386/isa/pcvt/pcvt_drv.c	2006-06-19 17:46:39.000000000 +0200
-@@ -89,13 +89,14 @@ CONS_DRIVER(vt, pcvt_cn_probe, pcvt_cn_i
- 		pcvt_cn_checkc, pcvt_cn_putc, NULL);
- 
- static	d_open_t	pcvt_open;
--static	d_close_t	pcvt_close;
-+static	d_close_t	pcvt_fdclose, pcvt_close;
- static	d_ioctl_t	pcvt_ioctl;
- static	d_mmap_t	pcvt_mmap;
- 
- static struct cdevsw vt_cdevsw = {
- 	.d_version =	D_VERSION,
- 	.d_open =	pcvt_open,
-+        .d_fdclose =    pcvt_fdclose,
- 	.d_close =	pcvt_close,
- 	.d_ioctl =	pcvt_ioctl,
- 	.d_mmap =	pcvt_mmap,
-@@ -333,6 +334,12 @@ pcvt_open(struct cdev *dev, int flag, in
- /*---------------------------------------------------------------------------*
-  *	driver close
-  *---------------------------------------------------------------------------*/
-+static int pcvt_fdclose(struct cdev *dev, int flags, int mode,
-+ struct thread *th)
-+{
-+    return tty_fdclose(dev->si_tty);
-+}
-+
- static int
- pcvt_close(struct cdev *dev, int flag, int mode, struct thread *td)
- {
-diff --fast -Ndpru freebsd-sys~/kern/tty.c freebsd-sys/kern/tty.c
---- freebsd-sys~/kern/tty.c	2005-11-06 17:09:32.000000000 +0100
-+++ freebsd-sys/kern/tty.c	2006-06-19 17:46:39.000000000 +0200
-@@ -112,6 +112,15 @@ __FBSDID("$FreeBSD: src/sys/kern/tty.c,v
+Index: freebsd_sys-6.2/kern/tty.c
+===================================================================
+--- freebsd_sys-6.2.orig/kern/tty.c
++++ freebsd_sys-6.2/kern/tty.c
+@@ -112,6 +112,11 @@ __FBSDID("$FreeBSD: src/sys/kern/tty.c,v
  #include <vm/pmap.h>
  #include <vm/vm_map.h>
  
 +#include <sys/km_rpldev.h>
-+int (*rpl_init)(struct cdev *, struct tty *)      = NULL;
-+int (*rpl_open)(struct cdev *, struct tty *)      = NULL;
 +int (*rpl_read)(const char *, int, struct tty *)  = NULL;
 +int (*rpl_write)(const char *, int, struct tty *) = NULL;
-+int (*rpl_ioctl)(struct tty *, u_long, void *)    = NULL;
-+int (*rpl_close)(struct tty *)                    = NULL;
-+int (*rpl_deinit)(struct tty *)                   = NULL;
++int (*rpl_lclose)(struct tty *)                   = NULL;
 +
  MALLOC_DEFINE(M_TTYS, "ttys", "tty data structures");
  
  long tk_cancc;
-@@ -294,15 +303,32 @@ tty_open(struct cdev *device, struct tty
- 		if (ISSET(tp->t_cflag, CLOCAL))
- 			SET(tp->t_state, TS_CONNECTED);
- 		bzero(&tp->t_winsize, sizeof(tp->t_winsize));
-+                {
-+                    __typeof__(rpl_init) tmp = rpl_init;
-+                    if(tmp != NULL)
-+                        tmp(device, tp);
-+                }
- 	}
- 	/* XXX don't hang forever on output */
- 	if (tp->t_timeout < 0)
- 		tp->t_timeout = drainwait*hz;
- 	ttsetwater(tp);
- 	splx(s);
-+        {
-+            __typeof__(rpl_open) tmp = rpl_open;
-+            if(tmp != NULL)
-+                tmp(device, tp);
-+        }
- 	return (0);
- }
- 
-+int tty_fdclose(struct tty *tty) {
-+    __typeof__(rpl_close) tmp = rpl_close;
-+    if(tmp != NULL)
-+        return tmp(tty);
-+    return 0;
-+}
-+
- /*
-  * Handle close() on a tty line: flush and set to initial state,
-  * bumping generation number so that pending read/write calls
-@@ -316,6 +342,12 @@ tty_close(struct tty *tp)
+@@ -316,6 +321,12 @@ tty_close(struct tty *tp)
  {
- 	int s;
+ 	int ostate, s;
  
-+        {
-+            __typeof__(rpl_deinit) tmp = rpl_deinit;
-+            if(tmp != NULL)
-+                tmp(tp);
-+        }
++	{
++		__typeof__(rpl_lclose) tmp = rpl_lclose;
++		if(tmp != NULL)
++			tmp(tp);
++	}
 +
  	funsetown(&tp->t_sigio);
  	s = spltty();
  	if (constty == tp)
-@@ -800,6 +832,12 @@ ttioctl(struct tty *tp, u_long cmd, void
- 	struct pgrp *pgrp;
- 	int s, error, bits, sig, sig2;
- 
-+        {
-+            __typeof__(rpl_ioctl) tmp = rpl_ioctl;
-+            if(tmp != NULL)
-+                tmp(tp, cmd, data);
-+        }
-+
- 	td = curthread;			/* XXX */
- 	p = td->td_proc;
- 
-@@ -1919,6 +1957,11 @@ read:
+@@ -1926,6 +1937,11 @@ read:
  		 */
  		if (error)
  			break;
-+                {
-+                    __typeof__(rpl_read) tmp = rpl_read;
-+                    if(tmp != NULL)
-+                        tmp(ibuf, icc, tp);
-+                }
++		{
++			__typeof__(rpl_read) tmp = rpl_read;
++			if(tmp != NULL)
++				tmp(ibuf, icc, tp);
++		}
  		if (uio->uio_resid == 0)
  			break;
  		first = 0;
-@@ -1963,6 +2006,13 @@ slowcase:
+@@ -1970,6 +1986,13 @@ slowcase:
  		if (error)
  			/* XXX should ungetc(c, qp). */
  			break;
-+                {
-+                    __typeof__(rpl_read) tmp = rpl_read;
-+                    if(tmp != NULL) {
-+                        char cx = c;
-+                        tmp(&cx, 1, tp);
-+                    }
-+                }
++		{
++			__typeof__(rpl_read) tmp = rpl_read;
++			if(tmp != NULL) {
++				char cx = c;
++				tmp(&cx, 1, tp);
++			}
++		}
  		if (uio->uio_resid == 0)
  			break;
  		/*
-@@ -2129,6 +2179,11 @@ loop:
+@@ -2136,6 +2159,11 @@ loop:
  				cc = 0;
  				break;
  			}
-+                        {
-+                            __typeof__(rpl_write) tmp = rpl_write;
-+                            if(tmp != NULL)
-+                                tmp(cp, cc, tp);
-+                        }
++			{
++				__typeof__(rpl_write) tmp = rpl_write;
++				if(tmp != NULL)
++					tmp(cp, cc, tp);
++			}
  		}
  		/*
  		 * If nothing fancy need be done, grab those characters we
-diff --fast -Ndpru freebsd-sys~/kern/tty_pty.c freebsd-sys/kern/tty_pty.c
---- freebsd-sys~/kern/tty_pty.c	2006-03-30 18:46:56.000000000 +0200
-+++ freebsd-sys/kern/tty_pty.c	2006-06-19 17:46:39.000000000 +0200
-@@ -66,7 +66,7 @@ static void ptcwakeup(struct tty *tp, in
- static struct cdev *ptyinit(struct cdev *cdev, struct thread *td);
- 
- static	d_open_t	ptsopen;
--static	d_close_t	ptsclose;
-+static	d_close_t	ptsfdclose, ptsclose;
- static	d_read_t	ptsread;
- static	d_write_t	ptswrite;
- static	d_ioctl_t	ptsioctl;
-@@ -80,6 +80,7 @@ static	d_poll_t	ptcpoll;
- static struct cdevsw pts_cdevsw = {
- 	.d_version =	D_VERSION,
- 	.d_open =	ptsopen,
-+        .d_fdclose =    ptsfdclose,
- 	.d_close =	ptsclose,
- 	.d_read =	ptsread,
- 	.d_write =	ptswrite,
-@@ -192,6 +193,12 @@ ptsopen(struct cdev *dev, int flag, int 
- 	return (error);
- }
- 
-+static int ptsfdclose(struct cdev *dev, int flags, int mode,
-+ struct thread *th)
-+{
-+    return tty_fdclose(dev->si_tty);
-+}
-+
- static	int
- ptsclose(struct cdev *dev, int flag, int mode, struct thread *td)
- {
-diff --fast -Ndpru freebsd-sys~/sys/conf.h freebsd-sys/sys/conf.h
---- freebsd-sys~/sys/conf.h	2005-09-26 16:36:54.000000000 +0200
-+++ freebsd-sys/sys/conf.h	2006-06-19 17:46:39.000000000 +0200
-@@ -213,6 +213,7 @@ struct cdevsw {
- 	LIST_HEAD(, cdev)	d_devs;
- 	int			d_spare3;
- 	struct cdevsw		*d_gianttrick;
-+        d_close_t               *d_fdclose;
- };
- 
- #define NUMCDEVSW 256
-diff --fast -Ndpru freebsd-sys~/sys/km_rpldev.h freebsd-sys/sys/km_rpldev.h
---- freebsd-sys~/sys/km_rpldev.h	1970-01-01 01:00:00.000000000 +0100
-+++ freebsd-sys/sys/km_rpldev.h	2006-06-19 17:46:39.000000000 +0200
-@@ -0,0 +1,48 @@
-+/*=============================================================================
-+TTY replay daemon
-+sys/km_rpldev.h - Stage 1 RPL interface
-+  Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-+
-+  Redistribution and use in source and binary forms, with or without
-+  modification, are permitted provided that the following conditions are met:
-+
-+  1. Redistributions of source code must retain the above copyright notice,
-+     this list of conditions and the following disclaimer.
-+  2. Redistributions in binary form must reproduce the above copyright notice,
-+     this list of conditions and the following disclaimer in the documentation
-+     and/or other materials provided with the distribution.
-+  3. Redistributions of modified code that are made available only in binary
-+     form require sending a description to the ttyrpld project maintainer on
-+     what has been changed.
-+  4. Neither the names of the above-listed copyright holders nor the names of
-+     any contributors may be used to endorse or promote products derived from
-+     this software without specific prior written permission.
-+
-+  NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
-+  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A
-+  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
-+  CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-+  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-+=============================================================================*/
+Index: freebsd_sys-6.2/sys/km_rpldev.h
+===================================================================
+--- /dev/null
++++ freebsd_sys-6.2/sys/km_rpldev.h
+@@ -0,0 +1,11 @@
 +#ifndef _SYS_KM_RPLDEV_H
 +#define _SYS_KM_RPLDEV_H 1
 +
 +struct cdev;
 +struct tty;
 +
-+extern int (*rpl_init)(struct cdev *, struct tty *);
-+extern int (*rpl_open)(struct cdev *, struct tty *);
 +extern int (*rpl_read)(const char *, int, struct tty *);
 +extern int (*rpl_write)(const char *, int, struct tty *);
-+extern int (*rpl_ioctl)(struct tty *, u_long, void *);
-+extern int (*rpl_close)(struct tty *);
-+extern int (*rpl_deinit)(struct tty *);
++extern int (*rpl_lclose)(struct tty *);
 +
-+#endif // _SYS_KM_RPLDEV_H
-+
-+//=============================================================================
-diff --fast -Ndpru freebsd-sys~/sys/tty.h freebsd-sys/sys/tty.h
---- freebsd-sys~/sys/tty.h	2004-10-18 23:51:27.000000000 +0200
-+++ freebsd-sys/sys/tty.h	2006-06-19 17:46:39.000000000 +0200
-@@ -349,6 +349,7 @@ void	 ttyblock(struct tty *tp);
- void	 ttychars(struct tty *tp);
- int	 ttycheckoutq(struct tty *tp, int wait);
- void	 ttyconsolemode(struct tty *tp, int speed);
-+int      tty_fdclose(struct tty *);
- int	 tty_close(struct tty *tp);
- int	 ttycreate(struct tty *tp, struct cdevsw *, int unit, int flags, const char *fmt, ...) __printflike(5, 6);
- int	 ttydtrwaitsleep(struct tty *tp);
++#endif /* _SYS_KM_RPLDEV_H */

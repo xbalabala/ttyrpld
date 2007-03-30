@@ -21,7 +21,7 @@ struct GOptmap_t {
 };
 
 struct Statmap_t {
-	unsigned long init, open, read, write, ioctl, close, deinit, badpack;
+	unsigned long open, read, write, lclose, badpack;
 	unsigned long long in, out;
 };
 

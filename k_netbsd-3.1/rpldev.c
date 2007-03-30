@@ -59,13 +59,9 @@ extern int rpldev_mod_lkmentry(struct lkm_table *, int, int);
 static int kmd_event(struct lkm_table *, int);
 
 /* Stage 2 functions */
-static int rpldhc_init(dev_t, struct tty *);
-static int rpldhc_open(struct tty *);
 static int rpldhc_read(const char *, int, struct tty *);
 static int rpldhc_write(const char *, int, struct tty *);
-static int rpldhc_ioctl(struct tty *, u_long, caddr_t);
-static int rpldhc_close(struct tty *);
-static int rpldhc_deinit(struct tty *);
+static int rpldhc_lclose(struct tty *);
 
 /* Stage 3 functions */
 static int rpldev_open(dev_t, int, int, struct proc *);
@@ -136,30 +132,6 @@ static int kmd_event(struct lkm_table *table, int cmd)
 }
 
 //-----------------------------------------------------------------------------
-static int rpldhc_init(dev_t dev, struct tty *tty)
-{
-	struct rpldev_packet p;
-
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = 0;
-	p.event = EVT_INIT;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
-static int rpldhc_open(struct tty *tty)
-{
-	struct rpldev_packet p;
-
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = 0;
-	p.event = EVT_OPEN;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
 static int rpldhc_read(const char *buf, int count, struct tty *tty)
 {
 	struct rpldev_packet p;
@@ -190,39 +162,13 @@ static int rpldhc_write(const char *buf, int count, struct tty *tty)
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_ioctl(struct tty *tty, u_long cmd, void *arg)
-{
-	struct rpldev_packet p;
-	uint32_t cmd32;
-
-	cmd32   = cmd;
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = htole16(sizeof(cmd32));
-	p.event = EVT_IOCTL;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, &cmd32, sizeof(cmd32));
-}
-
-static int rpldhc_close(struct tty *tty)
+static int rpldhc_lclose(struct tty *tty)
 {
 	struct rpldev_packet p;
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = EVT_CLOSE;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
-static int rpldhc_deinit(struct tty *tty)
-{
-	struct rpldev_packet p;
-
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = 0;
-	p.event = EVT_DEINIT;
+	p.event = EVT_LCLOSE;
 	p.magic = MAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
@@ -247,14 +193,9 @@ static int rpldev_open(dev_t dev, int flag, int mode, struct proc *th)
 	}
 
 	BufRP = BufWP = Buffer;
-	rpl_init   = rpldhc_init;
-	rpl_open   = rpldhc_open;
 	rpl_read   = rpldhc_read;
 	rpl_write  = rpldhc_write;
-	/* BSD generates too many useless ioctls */
-//	rpl_ioctl  = rpldhc_ioctl;
-	rpl_close  = rpldhc_close;
-	rpl_deinit = rpldhc_deinit;
+	rpl_lclose = rpldhc_lclose;
 	return 0;
 }
 
@@ -343,13 +284,10 @@ static int rpldev_poll(dev_t dev, int events, struct proc *th)
 
 static int rpldev_close(dev_t dev, int flag, int mode, struct proc *th)
 {
-	rpl_init   = NULL;
-	rpl_open   = NULL;
 	rpl_read   = NULL;
 	rpl_write  = NULL;
-	rpl_ioctl  = NULL;
-	rpl_close  = NULL;
-	rpl_deinit = NULL;
+	rpl_lclose = NULL;
+
 	lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
 	free(Buffer, M_TTYS);
 	Buffer = NULL;

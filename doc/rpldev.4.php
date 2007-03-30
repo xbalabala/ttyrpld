@@ -94,32 +94,17 @@ devices is already more than a system could ever have in a meaningful way.</p>
 
 <p class="code"><code>
 <b>enum</b> {<br />
-&nbsp; &nbsp; EVT_INIT <b>=</b> 0x69,<br />
 &nbsp; &nbsp; EVT_OPEN <b>=</b> 0x01,<br />
 &nbsp; &nbsp; EVT_READ <b>=</b> 0x02,<br />
 &nbsp; &nbsp; EVT_WRITE <b>=</b> 0x03,<br />
-&nbsp; &nbsp; EVT_IOCTL <b>=</b> 0x04,<br />
-&nbsp; &nbsp; EVT_CLOSE <b>=</b> 0x05,<br />
-&nbsp; &nbsp; EVT_DEINIT <b>=</b> 0x64,<br />
+&nbsp; &nbsp; EVT_LCLOSE <b>=</b> 0x64,<br />
 };</code></p>
 
-<p class="block"><code>EVT_INIT</code> is generated is generated when the tty
-is initialized. This usually happens when you <code>open()</code> it the first
-time.</p>
-
-<p class="block"><code>EVT_OPEN</code>, <code>EVT_READ</code>,
-<code>EVT_WRITE</code> and <code>EVT_CLOSE</code> are generated whenever an
-<code>open()</code>, <code>read()</code>, <code>write()</code> or
-<code>close()</code>, respectively, is done.</p>
-
-<p class="block"><code>EVT_DEINIT</code> is generated when the tty is about to
-be deinitialized. In theory, you do not know when a device will do this (i.e.
-deferred deinit). However, you've got the Kernel sources, and as such know when
-it actually happens (e.g. when the last open filedescriptor is closed).</p>
-
-<p class="block"><code>EVT_IOCTL</code> is generated when <code>ioctl()</code>
-is called on a tty. The data will consist of one <code>uint32_t</code>
-describing the <code>cmd</code> parameter. (See <code>ioctl(2)</code>.)</p>
+<p class="block"><code>EVT_OPEN</code>, <code>EVT_READ</code> and
+<code>EVT_WRITE</code> are generated whenever an <code>open()</code>,
+<code>read()</code> or <code>write()</code> is done, respectively.
+<code>EVT_LCLOSE</code> is generated when the last file descriptor to the tty
+is closed.</p>
 
 <p class="block">During an <code>open()</code> on a tty line (Linux only), the
 filename of the accessed dentry is extracted and passed to <i>rpld</i> within

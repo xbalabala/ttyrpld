@@ -182,13 +182,11 @@ static void getinfo_text_all(int fd)
 	skprintf(fd,
 	"=========================================================="
 	"================\n"
-	"  *		   %9llu %9llu ttyrpld " TTYRPLD_VERSION "/" ARCH "\n"
-	"  IOCD: %lu/%lu/%lu/%lu  RW: %lu/%lu  I: %lu  B: %lu\n"
+	"  *           %9llu %9llu ttyrpld " TTYRPLD_VERSION "/" ARCH "\n"
+	"  (packets)   %9lu %9lu\n"
 	"----------------------------------------------------------"
 	"----------------\n",
-	Stats.in, Stats.out, Stats.init, Stats.open, Stats.close,
-	Stats.deinit, Stats.read, Stats.write, Stats.ioctl,
-	Stats.badpack);
+	Stats.in, Stats.out, Stats.read, Stats.out);
 
 	trav = HXbtrav_init(Ttys);
 	while((node = HXbtraverse(trav)) != NULL)
@@ -237,10 +235,10 @@ static void getinfo_bin_all(int fd)
 	const struct HXbtree_node *node;
 	struct HXbtrav *trav;
 
-	skprintf(fd, "ttyrpld " TTYRPLD_VERSION "\n" "format 3\n"
-	         "%lu %lu %lu %lu %lu %lu %llu %llu %lu %lu\n",
-	         Stats.init, Stats.open, Stats.close, Stats.deinit, Stats.read,
-	         Stats.write, Stats.in, Stats.out, Stats.ioctl, Stats.badpack);
+	skprintf(fd, "ttyrpld " TTYRPLD_VERSION "\n" "format 4\n"
+	         "%lu %lu %lu %lu %llu %llu %lu\n",
+	         Stats.open, Stats.lclose, Stats.read, Stats.write,
+	         Stats.in, Stats.out, Stats.badpack);
 
 	trav = HXbtrav_init(Ttys);
 	while((node = HXbtraverse(trav)) != NULL)
