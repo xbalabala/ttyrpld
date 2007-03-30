@@ -329,7 +329,7 @@ static int evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 		fill_it = 1;
 
 	if(tty->uid != -1 && tty->full_dev != NULL &&
-	  lstat(tty->full_dev, &sb) == 0 && sb.st_uid != tty->uid) {
+	  stat(tty->full_dev, &sb) == 0 && sb.st_uid != tty->uid) {
 		/* Create new logfile if owner changed */
 		tty->in	      = tty->out = 0;
 		owner_changed = 1;
@@ -488,7 +488,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	 * rpld is able to sort logs by user (by putting each user's logfiles
 	 * into a separate directory) -- for that, we need the username.
 	 */
-	if(lstat(full_dev, &sb) < 0) {
+	if(stat(full_dev, &sb) < 0) {
 		/* This will happen if we get a [MAJOR:MINOR] name... */
 		strcpy(user, _("NONE"));
 	} else {
@@ -688,7 +688,7 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 	 * good reason.
 	 */
 	char buf[MAXFNLEN];
-	struct stat sb;
+	struct stat sb_self, sb_deref;
 	const char *de;
 	int ret = 0;
 	void *dx;
@@ -704,20 +704,21 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 		if(*de == '.')
 			continue;
 		snprintf(buf, sizeof(buf), "%s/%s", dir, de);
-		if(lstat(buf, &sb) < 0 || S_ISLNK(sb.st_mode))
+		if(lstat(buf, &sb_self) < 0 || stat(buf, &sb_deref) < 0)
 			continue;
-		if(S_ISCHR(sb.st_mode) &&
-		  K26_MKDEV(COMPAT_MAJOR(sb.st_rdev), COMPAT_MINOR(sb.st_rdev)) == id) {
+		if(S_ISCHR(sb_deref.st_mode) &&
+		  K26_MKDEV(COMPAT_MAJOR(sb_deref.st_rdev),
+		  COMPAT_MINOR(sb_deref.st_rdev)) == id) {
 			HX_strlcpy(dest, buf, len);
 			ret = 1;
 			break;
-		}
-		if(S_ISDIR(sb.st_mode)) {
+		} else if(!S_ISLNK(sb_self.st_mode) &&
+		  S_ISDIR(sb_deref.st_mode)) {
 			snprintf(buf, sizeof(buf), "%s/%s", dir, de);
-			if(find_devnode_dive(id, dest, len, buf)) {
-				ret = 1;
-				break;
-			}
+			if(!find_devnode_dive(id, dest, len, buf))
+				continue;
+			ret = 1;
+			break;
 		}
 	}
 
