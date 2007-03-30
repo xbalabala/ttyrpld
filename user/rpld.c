@@ -694,7 +694,7 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 	void *dx;
 
 	if((dx = HXdir_open(dir)) == NULL) {
-		if(rate_limit(C_KERNEL, 10))
+		if(errno != ENOENT && rate_limit(C_KERNEL, 10))
 			notify(LOG_WARNING, _("Could not open %s: %s\n"),
 			       dir, strerror(errno));
 		return 0;
