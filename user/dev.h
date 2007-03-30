@@ -24,6 +24,20 @@
 		(unsigned long)((((major) & 0xFF) << 8) | ((minor) & 0xFF) | \
 		(((minor) & 0xFFFF00) << 8))
 
+/* Solaris
+ * Scheme is:
+ *   bits  0 - 17    (18 bits)    minor
+ *   bits 18 - 32    (14 bits)    major
+ */
+#elif defined(__sun__)
+#	define COMPAT_MAJOR(dev) \
+		(unsigned long)(((dev) & 0xFFFC0000) >> 18)
+#	define COMPAT_MINOR(dev) \
+		(unsigned long)((dev) & 0x3FFFF)
+#	define COMPAT_MKDEV(major, minor) \
+		(unsigned long)((((major) & 0x3FFF) << 18) | \
+		((minor) & 0x3FFFF))
+
 /* Glibc-Linux and NetBSD
  * Scheme is:
  *   bits  0 -  7     (8 bits)    minor, lower part
