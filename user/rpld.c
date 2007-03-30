@@ -689,9 +689,9 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 	 */
 	char buf[MAXFNLEN];
 	struct stat sb;
+	const char *de;
 	int ret = 0;
 	void *dx;
-	char *de;
 
 	if((dx = HXdir_open(dir)) == NULL) {
 		if(rate_limit(C_KERNEL, 10))
