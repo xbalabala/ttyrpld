@@ -8,6 +8,7 @@
 	Foundation; however ONLY version 2 of the License. For details,
 	see the file named "LICENSE.LGPL2".
 */
+#include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/types.h>

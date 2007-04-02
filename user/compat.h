@@ -23,8 +23,17 @@ static inline struct passwd *rpld_getpwuid(uid_t uid, struct passwd *resbuf,
 #	define rpld_getpwnam getpwnam_r
 #	define rpld_getpwuid getpwuid_r
 #else
-#	define rpld_getpwnam(user, rbuf, buffer, buflen) getpwnam(user)
-#	define rpld_getpwuid(uid, rbuf, buffer, buflen)  getpwuid(uid)
+static inline struct passwd *rpld_getpwnam(const char *user,
+    struct passwd *buffer, char *resbuf, size_t buflen)
+{
+	return getpwnam(user);
+}
+
+static inline struct passwd *rpld_getpwuid(uid_t uid, struct passwd *resbuf,
+    char *buffer, size_t buflen)
+{
+	return getpwuid(uid);
+}
 #endif
 
 #endif /* TTYRPLD_COMPAT_H */

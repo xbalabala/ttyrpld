@@ -10,7 +10,7 @@
 #	endif
 #elif defined(__OpenBSD__)
 #	include <machine/endian.h>
-#	if BYTE_ORDER == BIG_ENDIAN
+#	ifdef BYTE_ORDER
 #		define __BYTE_ORDER	BYTE_ORDER
 #		define __LITTLE_ENDIAN LITTLE_ENDIAN
 #		define __BIG_ENDIAN	BIG_ENDIAN

@@ -1,5 +1,6 @@
 
-AC_DEFUN([HAVE_GETPWUID], [
+AC_DEFUN([HAVE_GETPWUID], [AC_CHECK_FUNCS([getpwuid_r], [
+
 	AC_LANG_PUSH(C)
 	AC_MSG_CHECKING([getpwuid])
 	AC_COMPILE_IFELSE(
@@ -37,5 +38,8 @@ AC_DEFUN([HAVE_GETPWUID], [
 	fi;
 
 	AC_LANG_POP(C)
-])
+], [
+	AC_MSG_CHECKING([getpwuid])
+	AC_MSG_RESULT([getpwuid(uid_t)])
+])])
 HAVE_GETPWUID
