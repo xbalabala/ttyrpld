@@ -7,6 +7,7 @@ AC_PROG_CC
 AC_HAVE_HEADERS(alloca.h)
 AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_AC_LDLIBS="$ttyreplay_AC_LDLIBS -lrt"])
 AC_CHECK_LIB([socket], [accept], [rpld_AC_LDLIBS="$rpld_AC_LDLIBS -lsocket -lnsl"])
+AC_CHECK_LIB([intl], [gettext], [AC_LDLIBS="$AC_LDLIBS -lintl"])
 AC_CHECK_HEADER([libHX.h], [], AC_MSG_ERROR([Need at least libHX 1.10]), [
 #include <libHX.h>
 #if !defined(_LIBHX_H) || _LIBHX_H < 20070320
@@ -25,6 +26,7 @@ AC_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
 	-Winline -pipe"
 AC_SUBST(AC_CFLAGS)
+AC_SUBST(AC_LDLIBS)
 AC_SUBST(ttyreplay_AC_LDLIBS)
 AC_SUBST(rpld_AC_LDLIBS)
 AC_OUTPUT(Makefile doc/GNUmakefile user/Makefile)

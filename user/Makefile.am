@@ -1,6 +1,7 @@
 # -*- Makefile -*-
 
 AM_CFLAGS         = $(AC_CFLAGS) -I$(top_srcdir)/include
+AM_LDFLAGS        = $(AC_LDLIBS)
 
 bin_PROGRAMS      = ttyreplay
 sbin_PROGRAMS     = rplctl rpld
