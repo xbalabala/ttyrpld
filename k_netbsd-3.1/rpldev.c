@@ -47,7 +47,7 @@
 #include <sys/types.h>
 #include <sys/vnode.h>
 #include <sys/lkm.h>
-#include <sys/km_rpldev.h>
+#include <sys/rpldhk.h>
 #include "../include/rpl_ioctl.h"
 #include "../include/rpl_packet.h"
 
@@ -59,9 +59,9 @@ extern int rpldev_mod_lkmentry(struct lkm_table *, int, int);
 static int kmd_event(struct lkm_table *, int);
 
 /* Stage 2 functions */
-static int rpldhc_read(const char *, int, struct tty *);
-static int rpldhc_write(const char *, int, struct tty *);
-static int rpldhc_lclose(struct tty *);
+static int rpldhc_read(const char *, size_t, const struct tty *);
+static int rpldhc_write(const char *, size_t, const struct tty *);
+static int rpldhc_lclose(const struct tty *);
 
 /* Stage 3 functions */
 static int rpldev_open(dev_t, int, int, struct proc *);
@@ -132,7 +132,7 @@ static int kmd_event(struct lkm_table *table, int cmd)
 }
 
 //-----------------------------------------------------------------------------
-static int rpldhc_read(const char *buf, int count, struct tty *tty)
+static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
 
@@ -147,7 +147,7 @@ static int rpldhc_read(const char *buf, int count, struct tty *tty)
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_write(const char *buf, int count, struct tty *tty)
+static int rpldhc_write(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
 
@@ -162,7 +162,7 @@ static int rpldhc_write(const char *buf, int count, struct tty *tty)
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_lclose(struct tty *tty)
+static int rpldhc_lclose(const struct tty *tty)
 {
 	struct rpldev_packet p;
 

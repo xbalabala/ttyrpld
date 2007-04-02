@@ -47,7 +47,7 @@
 #include <sys/tty.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#include <sys/km_rpldev.h>
+#include <sys/rpldhk.h>
 #include "../include/rpl_ioctl.h"
 #include "../include/rpl_packet.h"
 
@@ -68,13 +68,9 @@ static int kmd_load(void);
 static int kmd_unload(void);
 
 /* Stage 2 functions */
-static int rpldhc_init(struct cdev *, struct tty *);
-static int rpldhc_open(struct cdev *, struct tty *);
-static int rpldhc_read(const char *, int, struct tty *);
-static int rpldhc_write(const char *, int, struct tty *);
-static int rpldhc_ioctl(struct tty *, u_long, void *);
-static int rpldhc_close(struct tty *);
-static int rpldhc_deinit(struct tty *);
+static int rpldhc_read(const char *, size_t, const struct tty *);
+static int rpldhc_write(const char *, size_t, const struct tty *);
+static int rpldhc_lclose(const struct tty *);
 
 /* Stage 3 functions */
 static int rpldev_open(struct cdev *, int, int, struct thread *);
@@ -159,37 +155,7 @@ static int kmd_unload(void)
 }
 
 //-----------------------------------------------------------------------------
-static int rpldhc_init(struct cdev *cd, struct tty *tty)
-{
-	struct rpldev_packet p;
-
-	if(tty == NULL)
-		return 0;
-
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = 0;
-	p.event = EVT_INIT;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
-static int rpldhc_open(struct cdev *cd, struct tty *tty)
-{
-	struct rpldev_packet p;
-
-	if(tty == NULL)
-		return 0;
-
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = 0;
-	p.event = EVT_OPEN;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
-static int rpldhc_read(const char *buf, int count, struct tty *tty)
+static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
 
@@ -204,7 +170,7 @@ static int rpldhc_read(const char *buf, int count, struct tty *tty)
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_write(const char *buf, int count, struct tty *tty)
+static int rpldhc_write(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
 
@@ -219,45 +185,13 @@ static int rpldhc_write(const char *buf, int count, struct tty *tty)
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_ioctl(struct tty *tty, u_long cmd, void *arg)
-{
-	struct rpldev_packet p;
-	uint32_t cmd32;
-
-	if(tty == NULL)
-		return 0;
-
-	cmd32   = cmd;
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = htole16(sizeof(cmd32));
-	p.event = EVT_IOCTL;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, &cmd32, sizeof(cmd32));
-}
-
-static int rpldhc_close(struct tty *tty)
-{
-	struct rpldev_packet p;
-
-	if(tty == NULL)
-		return 0;
-
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = 0;
-	p.event = EVT_CLOSE;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, NULL, 0);
-}
-
-static int rpldhc_deinit(struct tty *tty)
+static int rpldhc_lclose(const struct tty *tty)
 {
 	struct rpldev_packet p;
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = EVT_DEINIT;
+	p.event = EVT_LCLOSE;
 	p.magic = MAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
@@ -284,18 +218,9 @@ static int rpldev_open(struct cdev *cd, int flag, int mode,
 	}
 
 	BufRP = BufWP = Buffer;
-	rpl_init   = rpldhc_init;
-	rpl_open   = rpldhc_open;
 	rpl_read   = rpldhc_read;
 	rpl_write  = rpldhc_write;
-	/*
-	 * ioctl reporting is deactivated, because (1) a _lot_ more ioctls are
-	 * generated in *BSD compared to Linux, (2) ioctls are not yet
-	 * interpreted by userspace apps (ttyreplay).
-	 */
-//	rpl_ioctl  = rpldhc_ioctl;
-	rpl_close  = rpldhc_close;
-	rpl_deinit = rpldhc_deinit;
+	rpl_lclose = rpldhc_lclose;
 	return 0;
 }
 
@@ -386,13 +311,9 @@ static int rpldev_ioctl(struct cdev *cd, u_long cmd, caddr_t data, int flags,
 static int rpldev_close(struct cdev *cd, int flags, int fmt,
     struct thread *th)
 {
-	rpl_init   = NULL;
-	rpl_open   = NULL;
 	rpl_read   = NULL;
 	rpl_write  = NULL;
-	rpl_ioctl  = NULL;
-	rpl_close  = NULL;
-	rpl_deinit = NULL;
+	rpl_lclose = NULL;
 
 	mtx_lock(&Buffer_lock);
 	free(Buffer, Buffer_malloc);

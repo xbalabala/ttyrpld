@@ -2,75 +2,114 @@ Index: netbsd_sys-3.1/kern/tty.c
 ===================================================================
 --- netbsd_sys-3.1.orig/kern/tty.c
 +++ netbsd_sys-3.1/kern/tty.c
-@@ -61,6 +61,7 @@ __KERNEL_RCSID(0, "$NetBSD: tty.c,v 1.17
- #include <sys/kprintf.h>
- #include <sys/namei.h>
- #include <sys/sysctl.h>
-+#include <sys/km_rpldev.h>
+@@ -64,6 +64,10 @@ __KERNEL_RCSID(0, "$NetBSD: tty.c,v 1.17
  
  #include <machine/stdarg.h>
  
-@@ -72,6 +73,10 @@ static void	ttyprintf_nolock(struct tty 
++#include <sys/types.h>
++#define WANT_RPL_HOOKS 1
++#include <sys/rpldhk.h>
++
+ static int	ttnread(struct tty *);
+ static void	ttyblock(struct tty *);
+ static void	ttyecho(int, struct tty *);
+@@ -72,6 +76,10 @@ static void	ttyprintf_nolock(struct tty 
      __attribute__((__format__(__printf__,2,3)));
  static int	proc_compare(struct proc *, struct proc *);
  
-+int (*rpl_read)(const char *, int, struct tty *)  = NULL;
-+int (*rpl_write)(const char *, int, struct tty *) = NULL;
-+int (*rpl_lclose)(struct tty *)                   = NULL;
++int (*rpl_read)(const char *, size_t, const struct tty *)  = NULL;
++int (*rpl_write)(const char *, size_t, const struct tty *) = NULL;
++int (*rpl_lclose)(const struct tty *)                      = NULL;
 +
  /* Symbolic sleep message strings. */
  const char	ttclos[] = "ttycls";
  const char	ttopen[] = "ttyopn";
-@@ -318,6 +323,11 @@ ttyclose(struct tty *tp)
+@@ -318,6 +326,7 @@ ttyclose(struct tty *tp)
  
  	ttyflush(tp, FREAD | FWRITE);
  
-+	{
-+		typeof(rpl_lclose) tmp = rpl_lclose;
-+		if(tmp != NULL)
-+			tmp(tp);
-+	}
++	rpldhk_lclose(tp);
  	tp->t_gen++;
  	tp->t_pgrp = NULL;
  	if (tp->t_session != NULL) {
-@@ -1827,6 +1837,13 @@ ttread(struct tty *tp, struct uio *uio, 
+@@ -1827,6 +1836,7 @@ ttread(struct tty *tp, struct uio *uio, 
   		error = ureadc(c, uio);
  		if (error)
  			break;
-+		{
-+			typeof(rpl_read) tmp = rpl_read;
-+			if(tmp != NULL) {
-+				char cx = c;
-+				tmp(&cx, 1, tp);
-+			}
-+		}
++		rpldhk_read1(c, tp);
   		if (uio->uio_resid == 0)
  			break;
  		/*
-@@ -1994,6 +2011,11 @@ ttwrite(struct tty *tp, struct uio *uio,
+@@ -1994,6 +2004,7 @@ ttwrite(struct tty *tp, struct uio *uio,
  				cc = 0;
  				goto out;
  			}
-+			{
-+				typeof(rpl_write) tmp = rpl_write;
-+				if(tmp != NULL)
-+					tmp(cp, cc, tp);
-+			}
++			rpldhk_write(cp, cc, tp);
  		}
  		/*
  		 * If nothing fancy need be done, grab those characters we
-Index: netbsd_sys-3.1/sys/km_rpldev.h
+Index: netbsd_sys-3.1/sys/rpldhk.h
 ===================================================================
 --- /dev/null
-+++ netbsd_sys-3.1/sys/km_rpldev.h
-@@ -0,0 +1,10 @@
-+#ifndef _SYS_KM_RPLDEV_H
-+#define _SYS_KM_RPLDEV_H 1
++++ netbsd_sys-3.1/sys/rpldhk.h
+@@ -0,0 +1,60 @@
++#ifndef _SYS_RPLDHK_H
++#define _SYS_RPLDHK_H 1
++
++#ifdef _KERNEL
++
++#include <sys/types.h>
 +
 +struct tty;
 +
-+extern int (*rpl_read)(const char *, int, struct tty *);
-+extern int (*rpl_write)(const char *, int, struct tty *);
-+extern int (*rpl_lclose)(struct tty *);
++extern int (*rpl_read)(const char *, size_t, const struct tty *);
++extern int (*rpl_write)(const char *, size_t, const struct tty *);
++extern int (*rpl_lclose)(const struct tty *);
 +
-+#endif /* _SYS_KM_RPLDEV_H */
++#ifdef WANT_RPL_HOOKS
++
++static inline void rpldhk_read1(char c, const struct tty *tty)
++{
++	typeof(rpl_read) tmp = rpl_read;
++	if(tmp != NULL)
++		tmp(&c, 1, tty);
++	return;
++}
++
++static inline void rpldhk_write(const char *buf, size_t size,
++    const struct tty *tty)
++{
++	typeof(rpl_write) tmp = rpl_write;
++	if(tmp != NULL)
++		tmp(buf, size, tty);
++	return;
++}
++
++static inline void rpldhk_lclose(const struct tty *tty)
++{
++	typeof(rpl_lclose) tmp = rpl_lclose;
++	if(tmp != NULL)
++		tmp(tty);
++	return;
++}
++
++#else /* WANT_RPL_HOOKS */
++
++static inline void rpldhk_read1(char c, const struct tty *tty)
++{
++}
++
++static inline void rpldhk_write(const char *buf, size_t size,
++    const struct tty *tty)
++{
++}
++
++static inline void rpldhk_lclose(const struct tty *tty)
++{
++}
++
++#endif /* WANT_RPL_HOOKS */
++
++#endif /* _KERNEL */
++
++#endif /* _SYS_RPLDHK_H */

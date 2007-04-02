@@ -285,7 +285,7 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 ===================================================================
 --- /dev/null
 +++ openbsd_sys-4.0/kern/rpldev.c
-@@ -0,0 +1,348 @@
+@@ -0,0 +1,347 @@
 +/*
 +	ttyrpld/k_openbsd-4.0/rpldev.c
 +	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
@@ -335,8 +335,8 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +#include <sys/tty.h>
 +#include <sys/types.h>
 +#include <sys/vnode.h>
-+#include <sys/lkm.h>
-+#include <sys/km_rpldev.h>
++#include <sys/rpldev.h>
++#include <sys/rpldhk.h>
 +#include "rpl_ioctl.h"
 +#include "rpl_packet.h"
 +
@@ -349,7 +349,6 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +static int rpldhc_lclose(struct tty *);
 +
 +/* Stage 3 functions */
-+#include <sys/km_rpldev.h>
 +
 +/* Local functions */
 +static inline size_t avail_R(void);
@@ -369,7 +368,7 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +static int kmi_usecount = 0;
 +
 +//-----------------------------------------------------------------------------
-+static int rpldhc_read(const char *buf, int count, struct tty *tty)
++static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 +{
 +	struct rpldev_packet p;
 +
@@ -384,7 +383,7 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +	return circular_put_packet(&p, buf, count);
 +}
 +
-+static int rpldhc_write(const char *buf, int count, struct tty *tty)
++static int rpldhc_write(const char *buf, size_t count, const struct tty *tty)
 +{
 +	struct rpldev_packet p;
 +
@@ -399,7 +398,7 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +	return circular_put_packet(&p, buf, count);
 +}
 +
-+static int rpldhc_lclose(struct tty *tty)
++static int rpldhc_lclose(const struct tty *tty)
 +{
 +	struct rpldev_packet p;
 +
@@ -638,60 +637,48 @@ Index: openbsd_sys-4.0/kern/tty.c
 ===================================================================
 --- openbsd_sys-4.0.orig/kern/tty.c
 +++ openbsd_sys-4.0/kern/tty.c
-@@ -62,6 +62,7 @@
- 
+@@ -63,6 +63,9 @@
  #include <uvm/uvm_extern.h>
  #include <dev/rndvar.h>
-+#include <sys/km_rpldev.h>
  
++#define WANT_RPL_HOOKS 1
++#include <sys/rpldhk.h>
++
  #include "pty.h"
  
-@@ -77,6 +78,10 @@ int	filt_ttywrite(struct knote *kn, long
+ static int ttnread(struct tty *);
+@@ -77,6 +80,10 @@ int	filt_ttywrite(struct knote *kn, long
  void 	filt_ttywdetach(struct knote *kn);
  int	ttystats_init(void);
  
-+int (*rpl_read)(const char *, int, struct tty *)  = NULL;
-+int (*rpl_write)(const char *, int, struct tty *) = NULL;
-+int (*rpl_lclose)(struct tty *)                   = NULL;
++int (*rpl_read)(const char *, size_t, const struct tty *)  = NULL;
++int (*rpl_write)(const char *, size_t, const struct tty *) = NULL;
++int (*rpl_lclose)(const struct tty *)                      = NULL;
 +
  /* Symbolic sleep message strings. */
  char ttclos[]	= "ttycls";
  char ttopen[]	= "ttyopn";
-@@ -205,6 +210,11 @@ ttyclose(struct tty *tp)
+@@ -205,6 +212,7 @@ ttyclose(struct tty *tp)
  
  	ttyflush(tp, FREAD | FWRITE);
  
-+	{
-+		typeof(rpl_lclose) tmp = rpl_lclose;
-+		if(tmp != NULL)
-+			tmp(tp);
-+	}
++	rpldhk_lclose(tp);
  	tp->t_gen++;
  	tp->t_pgrp = NULL;
  	if (tp->t_session)
-@@ -1580,6 +1590,13 @@ read:
+@@ -1580,6 +1588,7 @@ read:
   		error = ureadc(c, uio);
  		if (error)
  			break;
-+		{
-+			typeof(rpl_read) tmp = rpl_read;
-+			if(tmp != NULL) {
-+				char cx = c;
-+				rpl_read(&cx, 1, tp);
-+			}
-+                }
++		rpldhk_read1(c, tp);
   		if (uio->uio_resid == 0)
  			break;
  		/*
-@@ -1738,6 +1755,11 @@ loop:
+@@ -1738,6 +1747,7 @@ loop:
  				cc = 0;
  				break;
  			}
-+			{
-+				typeof(rpl_write) tmp = rpl_write;
-+				if(tmp != NULL)
-+					rpl_write(cp, cc, tp);
-+			}
++			rpldhk_write(cp, cc, tp);
  		}
  		/*
  		 * If nothing fancy need be done, grab those characters we
@@ -735,7 +722,7 @@ Index: openbsd_sys-4.0/rpl_packet.h
 ===================================================================
 --- /dev/null
 +++ openbsd_sys-4.0/rpl_packet.h
-@@ -0,0 +1,49 @@
+@@ -0,0 +1,46 @@
 +#ifndef TTYRPLD_PACKET_H
 +#define TTYRPLD_PACKET_H 1
 +
@@ -755,13 +742,10 @@ Index: openbsd_sys-4.0/rpl_packet.h
 +
 +enum {
 +	EVT_NONE       = 0x00,
-+	EVT_OPEN       = 0x01, /* deprecated */
++	EVT_OPEN       = 0x01,
 +	EVT_READ       = 0x02,
 +	EVT_WRITE      = 0x03,
-+	EVT_IOCTL      = 0x04, /* deprecated */
-+	EVT_CLOSE      = 0x05, /* deprecated */
 +	EVT_MAGIC      = 0x4A,
-+	EVT_INIT       = 0x69, /* deprecated */
 +	EVT_LCLOSE     = 0x64,
 +	EVT_ID_PROG    = 0xF0,
 +	EVT_ID_DEVPATH = 0xF1,
@@ -812,17 +796,20 @@ Index: openbsd_sys-4.0/sys/conf.h
  /* open, close, read, ioctl, poll, kqfilter XXX should be a generic device */
  #define cdev_log_init(c,n) { \
  	dev_init(c,n,open), dev_init(c,n,close), dev_init(c,n,read), \
-Index: openbsd_sys-4.0/sys/km_rpldev.h
+Index: openbsd_sys-4.0/sys/rpldev.h
 ===================================================================
 --- /dev/null
-+++ openbsd_sys-4.0/sys/km_rpldev.h
-@@ -0,0 +1,18 @@
-+#ifndef _SYS_KM_RPLDEV_H
-+#define _SYS_KM_RPLDEV_H 1
++++ openbsd_sys-4.0/sys/rpldev.h
+@@ -0,0 +1,19 @@
++#ifndef _SYS_RPLDEV_H
++#define _SYS_RPLDEV_H
++
++#ifdef _KERNEL
 +
 +#include <sys/types.h>
++
 +struct proc;
-+struct tty;
++struct uio;
 +
 +extern int rpldev_open(dev_t, int, int, struct proc *);
 +extern int rpldev_read(dev_t, struct uio *, int);
@@ -830,8 +817,71 @@ Index: openbsd_sys-4.0/sys/km_rpldev.h
 +extern int rpldev_poll(dev_t, int, struct proc *);
 +extern int rpldev_close(dev_t, int, int, struct proc *);
 +
-+extern int (*rpl_read)(const char *, int, struct tty *);
-+extern int (*rpl_write)(const char *, int, struct tty *);
-+extern int (*rpl_lclose)(struct tty *);
++#endif /* _KERNEL */
 +
-+#endif /* _SYS_KM_RPLDEV_H */
++#endif /* _SYS_RPLDEV_H */
+Index: openbsd_sys-4.0/sys/rpldhk.h
+===================================================================
+--- /dev/null
++++ openbsd_sys-4.0/sys/rpldhk.h
+@@ -0,0 +1,60 @@
++#ifndef _SYS_RPLDHK_H
++#define _SYS_RPLDHK_H 1
++
++#ifdef _KERNEL
++
++#include <sys/types.h>
++
++struct tty;
++
++extern int (*rpl_read)(const char *, size_t, const struct tty *);
++extern int (*rpl_write)(const char *, size_t, const struct tty *);
++extern int (*rpl_lclose)(const struct tty *);
++
++#ifdef WANT_RPL_HOOKS
++
++static inline void rpldhk_read1(char c, const struct tty *tty)
++{
++	typeof(rpl_read) tmp = rpl_read;
++	if(tmp != NULL)
++		tmp(&c, 1, tty);
++	return;
++}
++
++static inline void rpldhk_write(const char *buf, size_t size,
++    const struct tty *tty)
++{
++	typeof(rpl_write) tmp = rpl_write;
++	if(tmp != NULL)
++		tmp(buf, size, tty);
++	return;
++}
++
++static inline void rpldhk_lclose(const struct tty *tty)
++{
++	typeof(rpl_lclose) tmp = rpl_lclose;
++	if(tmp != NULL)
++		tmp(tty);
++	return;
++}
++
++#else /* WANT_RPL_HOOKS */
++
++static inline void rpldhk_read1(char c, const struct tty *tty)
++{
++}
++
++static inline void rpldhk_write(const char *buf, size_t size,
++    const struct tty *tty)
++{
++}
++
++static inline void rpldhk_lclose(const struct tty *tty)
++{
++}
++
++#endif /* WANT_RPL_HOOKS */
++
++#endif /* _KERNEL */
++
++#endif /* _SYS_RPLDHK_H */

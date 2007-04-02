@@ -2,82 +2,125 @@ Index: freebsd_sys-6.2/kern/tty.c
 ===================================================================
 --- freebsd_sys-6.2.orig/kern/tty.c
 +++ freebsd_sys-6.2/kern/tty.c
-@@ -112,6 +112,11 @@ __FBSDID("$FreeBSD: src/sys/kern/tty.c,v
+@@ -112,6 +112,12 @@ __FBSDID("$FreeBSD: src/sys/kern/tty.c,v
  #include <vm/pmap.h>
  #include <vm/vm_map.h>
  
-+#include <sys/km_rpldev.h>
-+int (*rpl_read)(const char *, int, struct tty *)  = NULL;
-+int (*rpl_write)(const char *, int, struct tty *) = NULL;
-+int (*rpl_lclose)(struct tty *)                   = NULL;
++#define WANT_RPL_HOOKS 1
++#include <sys/rpldhk.h>
++int (*rpl_read)(const char *, size_t, const struct tty *)  = NULL;
++int (*rpl_write)(const char *, size_t, const struct tty *) = NULL;
++int (*rpl_lclose)(const struct tty *)                      = NULL;
 +
  MALLOC_DEFINE(M_TTYS, "ttys", "tty data structures");
  
  long tk_cancc;
-@@ -316,6 +321,12 @@ tty_close(struct tty *tp)
+@@ -316,6 +322,7 @@ tty_close(struct tty *tp)
  {
  	int ostate, s;
  
-+	{
-+		__typeof__(rpl_lclose) tmp = rpl_lclose;
-+		if(tmp != NULL)
-+			tmp(tp);
-+	}
-+
++	rpldhk_lclose(tp);
  	funsetown(&tp->t_sigio);
  	s = spltty();
  	if (constty == tp)
-@@ -1926,6 +1937,11 @@ read:
+@@ -1926,6 +1933,7 @@ read:
  		 */
  		if (error)
  			break;
-+		{
-+			__typeof__(rpl_read) tmp = rpl_read;
-+			if(tmp != NULL)
-+				tmp(ibuf, icc, tp);
-+		}
++		rpldhk_read(ibuf, icc, tp);
  		if (uio->uio_resid == 0)
  			break;
  		first = 0;
-@@ -1970,6 +1986,13 @@ slowcase:
+@@ -1970,6 +1978,7 @@ slowcase:
  		if (error)
  			/* XXX should ungetc(c, qp). */
  			break;
-+		{
-+			__typeof__(rpl_read) tmp = rpl_read;
-+			if(tmp != NULL) {
-+				char cx = c;
-+				tmp(&cx, 1, tp);
-+			}
-+		}
++		rpldhk_read1(c, tp);
  		if (uio->uio_resid == 0)
  			break;
  		/*
-@@ -2136,6 +2159,11 @@ loop:
+@@ -2136,6 +2145,7 @@ loop:
  				cc = 0;
  				break;
  			}
-+			{
-+				__typeof__(rpl_write) tmp = rpl_write;
-+				if(tmp != NULL)
-+					tmp(cp, cc, tp);
-+			}
++			rpldhk_write(cp, cc, tp);
  		}
  		/*
  		 * If nothing fancy need be done, grab those characters we
-Index: freebsd_sys-6.2/sys/km_rpldev.h
+Index: freebsd_sys-6.2/sys/rpldhk.h
 ===================================================================
 --- /dev/null
-+++ freebsd_sys-6.2/sys/km_rpldev.h
-@@ -0,0 +1,11 @@
-+#ifndef _SYS_KM_RPLDEV_H
-+#define _SYS_KM_RPLDEV_H 1
++++ freebsd_sys-6.2/sys/rpldhk.h
+@@ -0,0 +1,72 @@
++#ifndef _SYS_RPLDHK_H
++#define _SYS_RPLDHK_H 1
++
++#ifdef _KERNEL
++
++#include <sys/types.h>
 +
 +struct cdev;
 +struct tty;
 +
-+extern int (*rpl_read)(const char *, int, struct tty *);
-+extern int (*rpl_write)(const char *, int, struct tty *);
-+extern int (*rpl_lclose)(struct tty *);
++extern int (*rpl_read)(const char *, size_t, const struct tty *);
++extern int (*rpl_write)(const char *, size_t, const struct tty *);
++extern int (*rpl_lclose)(const struct tty *);
 +
-+#endif /* _SYS_KM_RPLDEV_H */
++#ifdef WANT_RPL_HOOKS
++
++static inline void rpldhk_read(const char *buf, size_t size,
++    const struct tty *tty)
++{
++	__typeof__(rpl_read) tmp = rpl_read;
++	if(tmp != NULL)
++		tmp(buf, size, tty);
++	return;
++}
++
++static inline void rpldhk_read1(char c, const struct tty *tty)
++{
++	__typeof__(rpl_read) tmp = rpl_read;
++	if(tmp != NULL)
++		tmp(&c, sizeof(c), tty);
++	return;
++}
++
++static inline void rpldhk_write(const char *buf, size_t size,
++    const struct tty *tty)
++{
++	__typeof__(rpl_write) tmp = rpl_write;
++	if(tmp != NULL)
++		tmp(buf, size, tty);
++	return;
++}
++
++static inline void rpldhk_lclose(const struct tty *tty)
++{
++	__typeof__(rpl_lclose) tmp = rpl_lclose;
++	if(tmp != NULL)
++		tmp(tty);
++	return;
++}
++
++#else /* WANT_RPL_HOOKS */
++
++static inline void rpldhk_read(const char *buf, size_t size,
++    const struct tty *tty)
++{
++}
++
++static inline void rpldhk_read1(char c, const struct tty *tty)
++{
++}
++
++#define rpldhk_write rpldhk_read /* same signature */
++
++static inline void rpldhk_lclose(const struct tty *tty)
++{
++}
++
++#endif /* WANT_RPL_HOOKS */
++
++#endif /* _KERNEL */
++
++#endif /* _SYS_RPLDHK_H */

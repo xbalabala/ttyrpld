@@ -14,7 +14,6 @@
 #include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
-#include <linux/km_rpldev.h>
 #include <linux/major.h>
 #include <linux/miscdevice.h>
 #include <linux/module.h>
@@ -26,6 +25,7 @@
 #include <linux/wait.h>
 #include <linux/version.h>
 #include <linux/vmalloc.h>
+#include <linux/rpldhk.h>
 #include "../include/rpl_ioctl.h"
 #include "../include/rpl_packet.h"
 
@@ -58,10 +58,10 @@
 #define SKIP_PTM(tty)   if(IS_PTY_MASTER(tty)) return 0;
 
 /* Stage 2 functions */
-static int rpldhc_open(struct tty_struct *, struct tty_struct *, struct file *);
-static int rpldhc_read(const char __user *, size_t, struct tty_struct *);
-static int rpldhc_write(const char __user *, size_t, struct tty_struct *);
-static int rpldhc_lclose(struct tty_struct *, struct tty_struct *);
+static int rpldhc_open(const struct tty_struct *, const struct file *);
+static int rpldhc_read(const char __user *, size_t, const struct tty_struct *);
+static int rpldhc_write(const char __user *, size_t, const struct tty_struct *);
+static int rpldhc_lclose(const struct tty_struct *, const struct tty_struct *);
 
 /* Stage 3 functions */
 static int     rpldev_open(struct inode *, struct file *);
@@ -140,8 +140,7 @@ module_init(rpldev_init);
 module_exit(rpldev_exit);
 
 //-----------------------------------------------------------------------------
-static int rpldhc_open(struct tty_struct *tty, struct tty_struct *ctl,
-    struct file *filp)
+static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
 {
 	struct rpldev_packet p;
 	char dev[MAXFNLEN], *full_dev;
@@ -170,7 +169,7 @@ static int rpldhc_open(struct tty_struct *tty, struct tty_struct *ctl,
 }
 
 static int rpldhc_read(const char __user *buf, size_t count,
-    struct tty_struct *tty)
+    const struct tty_struct *tty)
 {
 	/*
 	 * The data flow is a bit weird at first. rpldhc_read() gets the data
@@ -193,7 +192,7 @@ static int rpldhc_read(const char __user *buf, size_t count,
 }
 
 static int rpldhc_write(const char __user *buf, size_t count,
-    struct tty_struct *tty)
+    const struct tty_struct *tty)
 {
 	/*
 	 * Data flow: /dev/stdout(slave) -> tty driver(master).
@@ -222,7 +221,8 @@ static int rpldhc_write(const char __user *buf, size_t count,
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_lclose(struct tty_struct *tty, struct tty_struct *other)
+static int rpldhc_lclose(const struct tty_struct *tty,
+    const struct tty_struct *other)
 {
 	struct rpldev_packet p;
 
