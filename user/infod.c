@@ -182,11 +182,11 @@ static void getinfo_text_all(int fd)
 	skprintf(fd,
 	"=========================================================="
 	"================\n"
-	"  *           %9llu %9llu ttyrpld " TTYRPLD_VERSION "/" ARCH "\n"
+	"  (bytes)     %9llu %9llu ttyrpld " TTYRPLD_VERSION "/" ARCH "\n"
 	"  (packets)   %9lu %9lu\n"
 	"----------------------------------------------------------"
 	"----------------\n",
-	Stats.in, Stats.out, Stats.read, Stats.out);
+	Stats.in, Stats.out, Stats.read, Stats.write);
 
 	trav = HXbtrav_init(Ttys);
 	while((node = HXbtraverse(trav)) != NULL)
