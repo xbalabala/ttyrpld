@@ -113,15 +113,12 @@ off_t G_skip(int fd, off_t offset, int do_wait)
 	char buf[4096];
 
 #if (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__))
-	if(d_ioctl(fd, RPL_IOC_IDENTIFY) == 0xC0FFEE) {
+	if(d_ioctl(fd, RPL_IOC_IDENTIFY) == 0xC0FFEE)
 		/*
 		 * BSD does not have lseek() for device files. And its return
 		 * value scheme is also limited.
 		 */
-		ret = offset;
-		d_ioctl(fd, RPL_IOC_SEEK, &ret);
-		return ret;
-	}
+		return d_ioctl(fd, RPL_IOC_SEEK, &ret);
 #endif
 	if(seekable)
 		return lseek(fd, offset, SEEK_CUR);
