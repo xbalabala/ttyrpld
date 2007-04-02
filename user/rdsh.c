@@ -37,7 +37,7 @@ struct GOptmap_t GOpt = {
 	.user_id    = -1,
 	.syslog     = 0,
 	.verbose    = 0,
-	.infod_port = "/var/run/.rplinfod_socket",
+	.infod_port = "/var/run/.rpld_socket",
 	.ofmt       = "%(USER)/%(DATE).%(TIME).%(TTY)",
 };
 
