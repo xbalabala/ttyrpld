@@ -118,7 +118,7 @@ off_t G_skip(int fd, off_t offset, int do_wait)
 		 * BSD does not have lseek() for device files. And its return
 		 * value scheme is also limited.
 		 */
-		return d_ioctl(fd, RPL_IOC_SEEK, &ret);
+		return d_ioctl(fd, RPL_IOC_SEEK);
 #endif
 	if(seekable)
 		return lseek(fd, offset, SEEK_CUR);
