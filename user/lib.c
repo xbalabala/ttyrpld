@@ -23,7 +23,21 @@
 #include "pctrl.h"
 #include "rpl_ioctl.h"
 
-//-----------------------------------------------------------------------------
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+static inline int d_ioctl(int fd, unsigned int request)
+{
+	int err, ret;
+	if((err = ioctl(fd, request, &ret)) == 0)
+		return ret;
+	return -1;
+}
+#else
+static inline int d_ioctl(int fd, unsigned int request)
+{
+	return ioctl(fd, request);
+}
+#endif
+
 void load_locale(const char *exe)
 {
 	struct stat sb;
@@ -93,23 +107,23 @@ off_t G_skip(int fd, off_t offset, int do_wait)
 	 * method to get to the wanted position. This only works for forward
 	 * offsets.
 	 */
-	off_t seekable = lseek(fd, 0, SEEK_CUR);
-	ssize_t ret    = 0;
-	size_t rem     = offset;
+	int seekable = lseek(fd, 0, SEEK_CUR) >= 0;
+	ssize_t ret  = 0;
+	size_t rem   = offset;
 	char buf[4096];
 
 #if (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__))
-	if(D_IOCTL(fd, RPL_IOC_IDENTIFY, &ret) && ret == 0xC0FFEE) {
+	if(d_ioctl(fd, RPL_IOC_IDENTIFY) == 0xC0FFEE) {
 		/*
-		 * BSD does not have lseek() for device files.  And its return
+		 * BSD does not have lseek() for device files. And its return
 		 * value scheme is also limited.
 		 */
 		ret = offset;
-		D_IOCTL(fd, RPL_IOC_SEEK, &ret);
+		d_ioctl(fd, RPL_IOC_SEEK, &ret);
 		return ret;
 	}
 #endif
-	if(seekable != -1)
+	if(seekable)
 		return lseek(fd, offset, SEEK_CUR);
 
 	if(do_wait) {

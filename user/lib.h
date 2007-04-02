@@ -14,11 +14,6 @@
 
 #define MAXFNLEN 256
 #define TTYRPLD_VERSION "2.18"
-#if defined(__FreeBSD__) || defined(__OpenBSD__)
-#	define D_IOCTL(fd, cmd, ret) (ioctl((fd), (cmd), *(ret)) == 0)
-#else
-#	define D_IOCTL(fd, cmd, ret) ((*(ret) = ioctl((fd), (cmd))) >= 0)
-#endif
 
 struct pctrl_info;
 
