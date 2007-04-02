@@ -186,8 +186,8 @@ static int replay_file(int fd, const char *name)
 		}
 
 		SWAB1(&packet.size);
-		SWAB1(&packet.tv.tv_sec);
-		SWAB1(&packet.tv.tv_usec);
+		SWAB1(&packet.time.tv_sec);
+		SWAB1(&packet.time.tv_usec);
 
 		switch(packet.event) {
 		case EVT_WRITE:
