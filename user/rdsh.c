@@ -88,7 +88,7 @@ void log_close(struct tty *tty)
 	close(tty->fd);
 	tty->fd = -1;
 	if(tty->log != NULL) {
-		free(tty->log);
+		hmc_free(tty->log);
 		tty->log = NULL; /* for infod */
 	}
 
