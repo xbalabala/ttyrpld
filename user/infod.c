@@ -151,6 +151,8 @@ static void *client_thread(void *arg)
 #	define ARCH "OpenBSD"
 #elif defined(__NetBSD__)
 #	define ARCH "NetBSD"
+#elif defined(__sun__)
+#	define ARCH "SunOS"
 #else
 #	define ARCH "Other"
 #endif
