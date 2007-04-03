@@ -44,9 +44,9 @@ static int rpldev_detach(dev_info_t *, ddi_detach_cmd_t);
 static int rpldev_getinfo(dev_info_t *, ddi_info_cmd_t, void *, void **);
 
 /* Stage 2 functions */
-static int rpldhc_read(const char *, size_t, struct queue *);
-static int rpldhc_write(const char *, size_t, struct queue *);
-static int rpldhc_lclose(struct queue *);
+static int rpldhc_read(const char *, size_t, const struct queue *);
+static int rpldhc_write(const char *, size_t, const struct queue *);
+static int rpldhc_lclose(const struct queue *);
 
 /* Stage 3 functions */
 static int rpldev_open(dev_t *, int, int, struct cred *);
@@ -196,7 +196,7 @@ static int rpldev_getinfo(dev_info_t *dip, ddi_info_cmd_t cmd, void *arg,
 }
 
 //-----------------------------------------------------------------------------
-static int rpldhc_read(const char *buf, size_t count, struct queue *q)
+static int rpldhc_read(const char *buf, size_t count, const struct queue *q)
 {
 	struct rpldev_packet p;
 
@@ -211,7 +211,7 @@ static int rpldhc_read(const char *buf, size_t count, struct queue *q)
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_write(const char *buf, size_t count, struct queue *q)
+static int rpldhc_write(const char *buf, size_t count, const struct queue *q)
 {
 	struct rpldev_packet p;
 
@@ -226,7 +226,7 @@ static int rpldhc_write(const char *buf, size_t count, struct queue *q)
 	return circular_put_packet(&p, buf, count);
 }
 
-static int rpldhc_lclose(struct queue *q)
+static int rpldhc_lclose(const struct queue *q)
 {
 	struct rpldev_packet p;
 

@@ -38,9 +38,9 @@ static int rpldhk_trap(void);
 static void rpldhk_packet(struct queue *, struct msgb *, int);
 
 /* Variables */
-int (*rpl_read)(const char *, size_t, struct queue *);
-int (*rpl_write)(const char *, size_t, struct queue *);
-int (*rpl_lclose)(struct queue *);
+int (*rpl_read)(const char *, size_t, const struct queue *);
+int (*rpl_write)(const char *, size_t, const struct queue *);
+int (*rpl_lclose)(const struct queue *);
 
 /* Module info */
 static struct module_info rpldhk_minfo = {
