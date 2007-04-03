@@ -20,6 +20,14 @@
     <td class="t1">4.x</li>
   </tr>
   <tr>
+    <td class="t2">iconv/libiconv</td>
+    <td colspan="2" class="t2">any</td>
+  </tr>
+  <tr>
+    <td class="t1">gettext/libintl</td>
+    <td colspan="2" class="t1">any</td>
+  </tr>
+  <tr>
     <td colspan="3" class="t2"><i>If you want to recreate the
       documentation:</i></td>
   </tr>
