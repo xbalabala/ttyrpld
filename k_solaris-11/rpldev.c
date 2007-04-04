@@ -44,6 +44,7 @@ static int rpldev_detach(dev_info_t *, ddi_detach_cmd_t);
 static int rpldev_getinfo(dev_info_t *, ddi_info_cmd_t, void *, void **);
 
 /* Stage 2 functions */
+static int rpldhc_open(const struct queue *);
 static int rpldhc_read(const char *, size_t, const struct queue *);
 static int rpldhc_write(const char *, size_t, const struct queue *);
 static int rpldhc_lclose(const struct queue *);
@@ -196,6 +197,18 @@ static int rpldev_getinfo(dev_info_t *dip, ddi_info_cmd_t cmd, void *arg,
 }
 
 //-----------------------------------------------------------------------------
+static int rpldhc_open(const struct queue *q)
+{
+	struct rpldev_packet p;
+
+	p.dev   = TTY_DEVNR(q);
+	p.size  = 0;
+	p.event = EVT_OPEN;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, NULL, 0);
+}
+
 static int rpldhc_read(const char *buf, size_t count, const struct queue *q)
 {
 	struct rpldev_packet p;
@@ -255,6 +268,7 @@ static int rpldev_open(dev_t *devp, int flag, int otyp, struct cred *credp)
 	}
 
 	BufRP = BufWP = Buffer;
+	rpl_open   = rpldhc_open;
 	rpl_read   = rpldhc_read;
 	rpl_write  = rpldhc_write;
 	rpl_lclose = rpldhc_lclose;
@@ -362,6 +376,7 @@ static int rpldev_chpoll(dev_t dev, short requested_events, int any_yet,
 
 static int rpldev_close(dev_t dev, int flag, int otyp, struct cred *credp)
 {
+	rpl_open   = NULL;
 	rpl_read   = NULL;
 	rpl_write  = NULL;
 	rpl_lclose = NULL;

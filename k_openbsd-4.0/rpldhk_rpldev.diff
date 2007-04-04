@@ -1,7 +1,7 @@
-Index: openbsd_sys-4.0/arch/alpha/alpha/conf.c
+Index: openbsd-sys-4.0/arch/alpha/alpha/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/alpha/alpha/conf.c
-+++ openbsd_sys-4.0/arch/alpha/alpha/conf.c
+--- openbsd-sys-4.0.orig/arch/alpha/alpha/conf.c
++++ openbsd-sys-4.0/arch/alpha/alpha/conf.c
 @@ -202,6 +202,11 @@ struct cdevsw	cdevsw[] =
  	cdev_crypto_init(NCRYPTO,crypto), /* 57: /dev/crypto */
  	cdev_bktr_init(NBKTR,bktr),	/* 58: Bt848 video capture device */
@@ -14,10 +14,10 @@ Index: openbsd_sys-4.0/arch/alpha/alpha/conf.c
  };
  int	nchrdev = sizeof (cdevsw) / sizeof (cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/amd64/amd64/conf.c
+Index: openbsd-sys-4.0/arch/amd64/amd64/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/amd64/amd64/conf.c
-+++ openbsd_sys-4.0/arch/amd64/amd64/conf.c
+--- openbsd-sys-4.0.orig/arch/amd64/amd64/conf.c
++++ openbsd-sys-4.0/arch/amd64/amd64/conf.c
 @@ -290,6 +290,11 @@ struct cdevsw	cdevsw[] =
  	cdev_ptm_init(NPTY,ptm),	/* 81: pseudo-tty ptm device */
  	cdev_hotplug_init(NHOTPLUG,hotplug), /* 82: devices hot plugging */
@@ -30,10 +30,10 @@ Index: openbsd_sys-4.0/arch/amd64/amd64/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/arm/arm/conf.c
+Index: openbsd-sys-4.0/arch/arm/arm/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/arm/arm/conf.c
-+++ openbsd_sys-4.0/arch/arm/arm/conf.c
+--- openbsd-sys-4.0.orig/arch/arm/arm/conf.c
++++ openbsd-sys-4.0/arch/arm/arm/conf.c
 @@ -394,6 +394,10 @@ struct cdevsw cdevsw[] = {
  	cdev_radio_init(NRADIO,radio),		/* 97: generic radio I/O */
  	cdev_ptm_init(NPTY,ptm),		/* 98: pseudo-tty ptm device */
@@ -45,10 +45,10 @@ Index: openbsd_sys-4.0/arch/arm/arm/conf.c
  };
  
  int nblkdev = sizeof(bdevsw) / sizeof(bdevsw[0]);
-Index: openbsd_sys-4.0/arch/hp300/hp300/conf.c
+Index: openbsd-sys-4.0/arch/hp300/hp300/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/hp300/hp300/conf.c
-+++ openbsd_sys-4.0/arch/hp300/hp300/conf.c
+--- openbsd-sys-4.0.orig/arch/hp300/hp300/conf.c
++++ openbsd-sys-4.0/arch/hp300/hp300/conf.c
 @@ -172,7 +172,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 51 */
  #endif
@@ -62,10 +62,10 @@ Index: openbsd_sys-4.0/arch/hp300/hp300/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/hppa/hppa/conf.c
+Index: openbsd-sys-4.0/arch/hppa/hppa/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/hppa/hppa/conf.c
-+++ openbsd_sys-4.0/arch/hppa/hppa/conf.c
+--- openbsd-sys-4.0.orig/arch/hppa/hppa/conf.c
++++ openbsd-sys-4.0/arch/hppa/hppa/conf.c
 @@ -187,6 +187,11 @@ struct cdevsw   cdevsw[] =
  	cdev_lkm_dummy(),
  	cdev_lkm_dummy(),
@@ -78,10 +78,10 @@ Index: openbsd_sys-4.0/arch/hppa/hppa/conf.c
  };
  int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/hppa64/hppa64/conf.c
+Index: openbsd-sys-4.0/arch/hppa64/hppa64/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/hppa64/hppa64/conf.c
-+++ openbsd_sys-4.0/arch/hppa64/hppa64/conf.c
+--- openbsd-sys-4.0.orig/arch/hppa64/hppa64/conf.c
++++ openbsd-sys-4.0/arch/hppa64/hppa64/conf.c
 @@ -170,6 +170,12 @@ struct cdevsw   cdevsw[] =
  	cdev_lkm_dummy(),
  	cdev_lkm_dummy(),
@@ -95,10 +95,10 @@ Index: openbsd_sys-4.0/arch/hppa64/hppa64/conf.c
  };
  int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/i386/i386/conf.c
+Index: openbsd-sys-4.0/arch/i386/i386/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/i386/i386/conf.c
-+++ openbsd_sys-4.0/arch/i386/i386/conf.c
+--- openbsd-sys-4.0.orig/arch/i386/i386/conf.c
++++ openbsd-sys-4.0/arch/i386/i386/conf.c
 @@ -317,6 +317,11 @@ struct cdevsw	cdevsw[] =
  	cdev_gpio_init(NGPIO,gpio),	/* 83: GPIO interface */
  	cdev_nvram_init(NNVRAM,nvram),	/* 84: NVRAM interface */
@@ -111,10 +111,10 @@ Index: openbsd_sys-4.0/arch/i386/i386/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/luna88k/luna88k/conf.c
+Index: openbsd-sys-4.0/arch/luna88k/luna88k/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/luna88k/luna88k/conf.c
-+++ openbsd_sys-4.0/arch/luna88k/luna88k/conf.c
+--- openbsd-sys-4.0.orig/arch/luna88k/luna88k/conf.c
++++ openbsd-sys-4.0/arch/luna88k/luna88k/conf.c
 @@ -154,6 +154,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 51 */
  #endif
@@ -127,10 +127,10 @@ Index: openbsd_sys-4.0/arch/luna88k/luna88k/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/mac68k/mac68k/conf.c
+Index: openbsd-sys-4.0/arch/mac68k/mac68k/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/mac68k/mac68k/conf.c
-+++ openbsd_sys-4.0/arch/mac68k/mac68k/conf.c
+--- openbsd-sys-4.0.orig/arch/mac68k/mac68k/conf.c
++++ openbsd-sys-4.0/arch/mac68k/mac68k/conf.c
 @@ -164,6 +164,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 51 */
  #endif
@@ -143,10 +143,10 @@ Index: openbsd_sys-4.0/arch/mac68k/mac68k/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/macppc/macppc/conf.c
+Index: openbsd-sys-4.0/arch/macppc/macppc/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/macppc/macppc/conf.c
-+++ openbsd_sys-4.0/arch/macppc/macppc/conf.c
+--- openbsd-sys-4.0.orig/arch/macppc/macppc/conf.c
++++ openbsd-sys-4.0/arch/macppc/macppc/conf.c
 @@ -243,6 +243,11 @@ struct cdevsw cdevsw[] = {
  	cdev_ptm_init(NPTY,ptm),	/* 77: pseudo-tty ptm device */
  	cdev_hotplug_init(NHOTPLUG,hotplug), /* 78: devices hot plugging */
@@ -159,10 +159,10 @@ Index: openbsd_sys-4.0/arch/macppc/macppc/conf.c
  };
  int nchrdev = sizeof cdevsw / sizeof cdevsw[0];
  
-Index: openbsd_sys-4.0/arch/mvme68k/mvme68k/conf.c
+Index: openbsd-sys-4.0/arch/mvme68k/mvme68k/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/mvme68k/mvme68k/conf.c
-+++ openbsd_sys-4.0/arch/mvme68k/mvme68k/conf.c
+--- openbsd-sys-4.0.orig/arch/mvme68k/mvme68k/conf.c
++++ openbsd-sys-4.0/arch/mvme68k/mvme68k/conf.c
 @@ -214,6 +214,11 @@ struct cdevsw	cdevsw[] =
  	cdev_lkm_dummy(),		/* 51 */
  #endif
@@ -175,10 +175,10 @@ Index: openbsd_sys-4.0/arch/mvme68k/mvme68k/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/mvme88k/mvme88k/conf.c
+Index: openbsd-sys-4.0/arch/mvme88k/mvme88k/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/mvme88k/mvme88k/conf.c
-+++ openbsd_sys-4.0/arch/mvme88k/mvme88k/conf.c
+--- openbsd-sys-4.0.orig/arch/mvme88k/mvme88k/conf.c
++++ openbsd-sys-4.0/arch/mvme88k/mvme88k/conf.c
 @@ -200,6 +200,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 51 */
  #endif
@@ -191,10 +191,10 @@ Index: openbsd_sys-4.0/arch/mvme88k/mvme88k/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/mvmeppc/mvmeppc/conf.c
+Index: openbsd-sys-4.0/arch/mvmeppc/mvmeppc/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/mvmeppc/mvmeppc/conf.c
-+++ openbsd_sys-4.0/arch/mvmeppc/mvmeppc/conf.c
+--- openbsd-sys-4.0.orig/arch/mvmeppc/mvmeppc/conf.c
++++ openbsd-sys-4.0/arch/mvmeppc/mvmeppc/conf.c
 @@ -181,6 +181,11 @@ struct cdevsw cdevsw[] = {
          cdev_notdef(),                  /* 53 */ 
  	cdev_disk_init(NRAID,raid),	/* 54: RAIDframe disk driver */
@@ -207,10 +207,10 @@ Index: openbsd_sys-4.0/arch/mvmeppc/mvmeppc/conf.c
  };
  int nchrdev = sizeof cdevsw / sizeof cdevsw[0];
  
-Index: openbsd_sys-4.0/arch/sgi/sgi/conf.c
+Index: openbsd-sys-4.0/arch/sgi/sgi/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/sgi/sgi/conf.c
-+++ openbsd_sys-4.0/arch/sgi/sgi/conf.c
+--- openbsd-sys-4.0.orig/arch/sgi/sgi/conf.c
++++ openbsd-sys-4.0/arch/sgi/sgi/conf.c
 @@ -188,6 +188,11 @@ cdev_wsdisplay_init(NWSDISPLAY, wsdispla
  	cdev_notdef(),			/* 51: */
  #endif
@@ -223,10 +223,10 @@ Index: openbsd_sys-4.0/arch/sgi/sgi/conf.c
  };
  
  int	nchrdev = sizeof (cdevsw) / sizeof (cdevsw[0]);
-Index: openbsd_sys-4.0/arch/sparc/sparc/conf.c
+Index: openbsd-sys-4.0/arch/sparc/sparc/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/sparc/sparc/conf.c
-+++ openbsd_sys-4.0/arch/sparc/sparc/conf.c
+--- openbsd-sys-4.0.orig/arch/sparc/sparc/conf.c
++++ openbsd-sys-4.0/arch/sparc/sparc/conf.c
 @@ -265,6 +265,10 @@ struct cdevsw	cdevsw[] =
  	cdev_disk_init(NRAID,raid),     /* 123: RAIDframe disk driver */
  	cdev_notdef(),			/* 124 */
@@ -238,10 +238,10 @@ Index: openbsd_sys-4.0/arch/sparc/sparc/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/sparc64/sparc64/conf.c
+Index: openbsd-sys-4.0/arch/sparc64/sparc64/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/sparc64/sparc64/conf.c
-+++ openbsd_sys-4.0/arch/sparc64/sparc64/conf.c
+--- openbsd-sys-4.0.orig/arch/sparc64/sparc64/conf.c
++++ openbsd-sys-4.0/arch/sparc64/sparc64/conf.c
 @@ -289,6 +289,10 @@ struct cdevsw	cdevsw[] =
  	cdev_tty_init(NPCONS,pcons),	/* 122: PROM console */
  	cdev_ptm_init(NPTY,ptm),	/* 123: pseudo-tty ptm device */
@@ -253,10 +253,10 @@ Index: openbsd_sys-4.0/arch/sparc64/sparc64/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/arch/vax/vax/conf.c
+Index: openbsd-sys-4.0/arch/vax/vax/conf.c
 ===================================================================
---- openbsd_sys-4.0.orig/arch/vax/vax/conf.c
-+++ openbsd_sys-4.0/arch/vax/vax/conf.c
+--- openbsd-sys-4.0.orig/arch/vax/vax/conf.c
++++ openbsd-sys-4.0/arch/vax/vax/conf.c
 @@ -436,6 +436,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 74 */
  #endif
@@ -269,10 +269,10 @@ Index: openbsd_sys-4.0/arch/vax/vax/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd_sys-4.0/conf/files
+Index: openbsd-sys-4.0/conf/files
 ===================================================================
---- openbsd_sys-4.0.orig/conf/files
-+++ openbsd_sys-4.0/conf/files
+--- openbsd-sys-4.0.orig/conf/files
++++ openbsd-sys-4.0/conf/files
 @@ -661,6 +661,7 @@ file kern/tty_conf.c
  file kern/tty_pty.c			pty			needs-count
  file kern/tty_subr.c
@@ -281,11 +281,11 @@ Index: openbsd_sys-4.0/conf/files
  file kern/uipc_domain.c
  file kern/uipc_mbuf.c
  file kern/uipc_mbuf2.c
-Index: openbsd_sys-4.0/kern/rpldev.c
+Index: openbsd-sys-4.0/kern/rpldev.c
 ===================================================================
 --- /dev/null
-+++ openbsd_sys-4.0/kern/rpldev.c
-@@ -0,0 +1,347 @@
++++ openbsd-sys-4.0/kern/rpldev.c
+@@ -0,0 +1,363 @@
 +/*
 +	ttyrpld/k_openbsd-4.0/rpldev.c
 +	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
@@ -335,18 +335,20 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +#include <sys/tty.h>
 +#include <sys/types.h>
 +#include <sys/vnode.h>
++
 +#include <sys/rpldev.h>
 +#include <sys/rpldhk.h>
-+#include "rpl_ioctl.h"
-+#include "rpl_packet.h"
++#include <sys/rpl_ioctl.h>
++#include <sys/rpl_packet.h>
 +
 +#define TTY_DEVNR(tty) htole32(mkdev_26(major((tty)->t_dev), \
 +                       minor((tty)->t_dev)))
 +
 +/* Stage 2 functions */
-+static int rpldhc_read(const char *, int, struct tty *);
-+static int rpldhc_write(const char *, int, struct tty *);
-+static int rpldhc_lclose(struct tty *);
++static int rpldhc_open(const struct tty *);
++static int rpldhc_read(const char *, size_t, const struct tty *);
++static int rpldhc_write(const char *, size_t, const struct tty *);
++static int rpldhc_lclose(const struct tty *);
 +
 +/* Stage 3 functions */
 +
@@ -368,6 +370,18 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +static int kmi_usecount = 0;
 +
 +//-----------------------------------------------------------------------------
++static int rpldhc_open(const struct tty *tty)
++{
++	struct rpldev_packet p;
++
++	p.dev   = TTY_DEVNR(tty);
++	p.size  = 0;
++	p.event = EVT_OPEN;
++	p.magic = MAGIC_SIG;
++	fill_time(&p.time);
++	return circular_put_packet(&p, NULL, 0);
++}
++
 +static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 +{
 +	struct rpldev_packet p;
@@ -429,6 +443,7 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +	}
 +
 +	BufRP = BufWP = Buffer;
++	rpl_open   = rpldhc_open;
 +	rpl_read   = rpldhc_read;
 +	rpl_write  = rpldhc_write;
 +	rpl_lclose = rpldhc_lclose;
@@ -520,6 +535,7 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +
 +int rpldev_close(dev_t dev, int flag, int mode, struct proc *th)
 +{
++	rpl_open   = NULL;
 +	rpl_read   = NULL;
 +	rpl_write  = NULL;
 +	rpl_lclose = NULL;
@@ -633,32 +649,73 @@ Index: openbsd_sys-4.0/kern/rpldev.c
 +}
 +
 +//=============================================================================
-Index: openbsd_sys-4.0/kern/tty.c
+Index: openbsd-sys-4.0/kern/tty.c
 ===================================================================
---- openbsd_sys-4.0.orig/kern/tty.c
-+++ openbsd_sys-4.0/kern/tty.c
-@@ -63,6 +63,9 @@
- #include <uvm/uvm_extern.h>
- #include <dev/rndvar.h>
+--- openbsd-sys-4.0.orig/kern/tty.c
++++ openbsd-sys-4.0/kern/tty.c
+@@ -65,6 +65,13 @@
  
-+#define WANT_RPL_HOOKS 1
-+#include <sys/rpldhk.h>
-+
  #include "pty.h"
  
- static int ttnread(struct tty *);
-@@ -77,6 +80,10 @@ int	filt_ttywrite(struct knote *kn, long
- void 	filt_ttywdetach(struct knote *kn);
- int	ttystats_init(void);
- 
++#include <sys/rpldhk.h>
++#include <sys/types.h>
++int (*rpl_open)(const struct tty *)                        = NULL;
 +int (*rpl_read)(const char *, size_t, const struct tty *)  = NULL;
 +int (*rpl_write)(const char *, size_t, const struct tty *) = NULL;
 +int (*rpl_lclose)(const struct tty *)                      = NULL;
 +
- /* Symbolic sleep message strings. */
- char ttclos[]	= "ttycls";
- char ttopen[]	= "ttyopn";
-@@ -205,6 +212,7 @@ ttyclose(struct tty *tp)
+ static int ttnread(struct tty *);
+ static void ttyblock(struct tty *);
+ void ttyunblock(struct tty *);
+@@ -168,6 +175,39 @@ int tty_count;
+ 
+ int64_t tk_cancc, tk_nin, tk_nout, tk_rawcc;
+ 
++static inline void rpldhk_open(const struct tty *tty)
++{
++	typeof(rpl_open) tmp = rpl_open;
++	if(tmp != NULL)
++		tmp(tty);
++	return;
++}
++
++static inline void rpldhk_read1(char c, const struct tty *tty)
++{
++	typeof(rpl_read) tmp = rpl_read;
++	if(tmp != NULL)
++		tmp(&c, 1, tty);
++	return;
++}
++
++static inline void rpldhk_write(const char *buf, size_t size,
++    const struct tty *tty)
++{
++	typeof(rpl_write) tmp = rpl_write;
++	if(tmp != NULL)
++		tmp(buf, size, tty);
++	return;
++}
++
++static inline void rpldhk_lclose(const struct tty *tty)
++{
++	typeof(rpl_lclose) tmp = rpl_lclose;
++	if(tmp != NULL)
++		tmp(tty);
++	return;
++}
++
+ /*
+  * Initial open of tty, or (re)entry to standard tty line discipline.
+  */
+@@ -187,6 +227,7 @@ ttyopen(dev_t device, struct tty *tp)
+ 	}
+ 	CLR(tp->t_state, TS_WOPEN);
+ 	splx(s);
++	rpldhk_open(tp);
+ 	return (0);
+ }
+ 
+@@ -205,6 +246,7 @@ ttyclose(struct tty *tp)
  
  	ttyflush(tp, FREAD | FWRITE);
  
@@ -666,7 +723,7 @@ Index: openbsd_sys-4.0/kern/tty.c
  	tp->t_gen++;
  	tp->t_pgrp = NULL;
  	if (tp->t_session)
-@@ -1580,6 +1588,7 @@ read:
+@@ -1580,6 +1622,7 @@ read:
   		error = ureadc(c, uio);
  		if (error)
  			break;
@@ -674,7 +731,7 @@ Index: openbsd_sys-4.0/kern/tty.c
   		if (uio->uio_resid == 0)
  			break;
  		/*
-@@ -1738,6 +1747,7 @@ loop:
+@@ -1738,6 +1781,7 @@ loop:
  				cc = 0;
  				break;
  			}
@@ -682,10 +739,37 @@ Index: openbsd_sys-4.0/kern/tty.c
  		}
  		/*
  		 * If nothing fancy need be done, grab those characters we
-Index: openbsd_sys-4.0/rpl_ioctl.h
+Index: openbsd-sys-4.0/sys/conf.h
+===================================================================
+--- openbsd-sys-4.0.orig/sys/conf.h
++++ openbsd-sys-4.0/sys/conf.h
+@@ -284,6 +284,22 @@ extern struct cdevsw cdevsw[];
+ 	dev_init(c,n,write), dev_init(c,n,ioctl), (dev_type_stop((*))) enodev, \
+ 	0, (dev_type_poll((*))) enodev, (dev_type_mmap((*))) enodev }
+ 
++#include <sys/rpldev.h>
++#define cdev_rpldev_init() {  \
++	.d_open     = rpldev_open,    \
++	.d_close    = rpldev_close,   \
++	.d_read     = rpldev_read,    \
++	.d_write    = (void *)enodev, \
++	.d_ioctl    = rpldev_ioctl,   \
++	.d_stop     = (void *)enodev, \
++	.d_tty      = NULL,           \
++	.d_poll     = rpldev_poll,    \
++	.d_mmap     = (void *)enodev, \
++	.d_type     = 0,              \
++	.d_flags    = 0,              \
++	.d_kqfilter = NULL,           \
++}
++
+ /* open, close, read, ioctl, poll, kqfilter XXX should be a generic device */
+ #define cdev_log_init(c,n) { \
+ 	dev_init(c,n,open), dev_init(c,n,close), dev_init(c,n,read), \
+Index: openbsd-sys-4.0/sys/rpl_ioctl.h
 ===================================================================
 --- /dev/null
-+++ openbsd_sys-4.0/rpl_ioctl.h
++++ openbsd-sys-4.0/sys/rpl_ioctl.h
 @@ -0,0 +1,31 @@
 +#ifndef TTYRPLD_IOCTL_H
 +#define TTYRPLD_IOCTL_H 1
@@ -718,10 +802,10 @@ Index: openbsd_sys-4.0/rpl_ioctl.h
 +};
 +
 +#endif /* TTYRPLD_IOCTL_H */
-Index: openbsd_sys-4.0/rpl_packet.h
+Index: openbsd-sys-4.0/sys/rpl_packet.h
 ===================================================================
 --- /dev/null
-+++ openbsd_sys-4.0/rpl_packet.h
++++ openbsd-sys-4.0/sys/rpl_packet.h
 @@ -0,0 +1,46 @@
 +#ifndef TTYRPLD_PACKET_H
 +#define TTYRPLD_PACKET_H 1
@@ -769,37 +853,10 @@ Index: openbsd_sys-4.0/rpl_packet.h
 +} __PACKED;
 +
 +#endif /* TTYRPLD_PACKET_H */
-Index: openbsd_sys-4.0/sys/conf.h
-===================================================================
---- openbsd_sys-4.0.orig/sys/conf.h
-+++ openbsd_sys-4.0/sys/conf.h
-@@ -284,6 +284,22 @@ extern struct cdevsw cdevsw[];
- 	dev_init(c,n,write), dev_init(c,n,ioctl), (dev_type_stop((*))) enodev, \
- 	0, (dev_type_poll((*))) enodev, (dev_type_mmap((*))) enodev }
- 
-+#include <sys/km_rpldev.h>
-+#define cdev_rpldev_init() {  \
-+    .d_open     = rpldev_open,    \
-+    .d_close    = rpldev_close,   \
-+    .d_read     = rpldev_read,    \
-+    .d_write    = (void *)enodev, \
-+    .d_ioctl    = rpldev_ioctl,   \
-+    .d_stop     = (void *)enodev, \
-+    .d_tty      = NULL,           \
-+    .d_poll     = rpldev_poll,    \
-+    .d_mmap     = (void *)enodev, \
-+    .d_type     = 0,              \
-+    .d_flags    = 0,              \
-+    .d_kqfilter = NULL,           \
-+}
-+
- /* open, close, read, ioctl, poll, kqfilter XXX should be a generic device */
- #define cdev_log_init(c,n) { \
- 	dev_init(c,n,open), dev_init(c,n,close), dev_init(c,n,read), \
-Index: openbsd_sys-4.0/sys/rpldev.h
+Index: openbsd-sys-4.0/sys/rpldev.h
 ===================================================================
 --- /dev/null
-+++ openbsd_sys-4.0/sys/rpldev.h
++++ openbsd-sys-4.0/sys/rpldev.h
 @@ -0,0 +1,19 @@
 +#ifndef _SYS_RPLDEV_H
 +#define _SYS_RPLDEV_H
@@ -820,11 +877,11 @@ Index: openbsd_sys-4.0/sys/rpldev.h
 +#endif /* _KERNEL */
 +
 +#endif /* _SYS_RPLDEV_H */
-Index: openbsd_sys-4.0/sys/rpldhk.h
+Index: openbsd-sys-4.0/sys/rpldhk.h
 ===================================================================
 --- /dev/null
-+++ openbsd_sys-4.0/sys/rpldhk.h
-@@ -0,0 +1,60 @@
++++ openbsd-sys-4.0/sys/rpldhk.h
+@@ -0,0 +1,17 @@
 +#ifndef _SYS_RPLDHK_H
 +#define _SYS_RPLDHK_H 1
 +
@@ -834,53 +891,10 @@ Index: openbsd_sys-4.0/sys/rpldhk.h
 +
 +struct tty;
 +
++extern int (*rpl_open)(const struct tty *);
 +extern int (*rpl_read)(const char *, size_t, const struct tty *);
 +extern int (*rpl_write)(const char *, size_t, const struct tty *);
 +extern int (*rpl_lclose)(const struct tty *);
-+
-+#ifdef WANT_RPL_HOOKS
-+
-+static inline void rpldhk_read1(char c, const struct tty *tty)
-+{
-+	typeof(rpl_read) tmp = rpl_read;
-+	if(tmp != NULL)
-+		tmp(&c, 1, tty);
-+	return;
-+}
-+
-+static inline void rpldhk_write(const char *buf, size_t size,
-+    const struct tty *tty)
-+{
-+	typeof(rpl_write) tmp = rpl_write;
-+	if(tmp != NULL)
-+		tmp(buf, size, tty);
-+	return;
-+}
-+
-+static inline void rpldhk_lclose(const struct tty *tty)
-+{
-+	typeof(rpl_lclose) tmp = rpl_lclose;
-+	if(tmp != NULL)
-+		tmp(tty);
-+	return;
-+}
-+
-+#else /* WANT_RPL_HOOKS */
-+
-+static inline void rpldhk_read1(char c, const struct tty *tty)
-+{
-+}
-+
-+static inline void rpldhk_write(const char *buf, size_t size,
-+    const struct tty *tty)
-+{
-+}
-+
-+static inline void rpldhk_lclose(const struct tty *tty)
-+{
-+}
-+
-+#endif /* WANT_RPL_HOOKS */
 +
 +#endif /* _KERNEL */
 +

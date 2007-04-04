@@ -59,6 +59,7 @@ extern int rpldev_mod_lkmentry(struct lkm_table *, int, int);
 static int kmd_event(struct lkm_table *, int);
 
 /* Stage 2 functions */
+static int rpldhc_open(const struct tty *);
 static int rpldhc_read(const char *, size_t, const struct tty *);
 static int rpldhc_write(const char *, size_t, const struct tty *);
 static int rpldhc_lclose(const struct tty *);
@@ -132,6 +133,18 @@ static int kmd_event(struct lkm_table *table, int cmd)
 }
 
 //-----------------------------------------------------------------------------
+static int rpldhc_open(const struct tty *tty)
+{
+	struct rpldev_packet p;
+
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = 0;
+	p.event = EVT_OPEN;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, NULL, 0);
+}
+
 static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
@@ -193,6 +206,7 @@ static int rpldev_open(dev_t dev, int flag, int mode, struct proc *th)
 	}
 
 	BufRP = BufWP = Buffer;
+	rpl_open   = rpldhc_open;
 	rpl_read   = rpldhc_read;
 	rpl_write  = rpldhc_write;
 	rpl_lclose = rpldhc_lclose;
@@ -284,6 +298,7 @@ static int rpldev_poll(dev_t dev, int events, struct proc *th)
 
 static int rpldev_close(dev_t dev, int flag, int mode, struct proc *th)
 {
+	rpl_open   = NULL;
 	rpl_read   = NULL;
 	rpl_write  = NULL;
 	rpl_lclose = NULL;

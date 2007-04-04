@@ -38,6 +38,7 @@ static int rpldhk_trap(void);
 static void rpldhk_packet(struct queue *, struct msgb *, int);
 
 /* Variables */
+int (*rpl_open)(const struct queue *);
 int (*rpl_read)(const char *, size_t, const struct queue *);
 int (*rpl_write)(const char *, size_t, const struct queue *);
 int (*rpl_lclose)(const struct queue *);
@@ -114,7 +115,10 @@ int _fini(void)
 static int rpldhk_open(struct queue *q, dev_t *dev, int oflag, int sflag,
     struct cred *cred)
 {
+	typeof(rpl_open) tmp = rpl_open;
 	qprocson(q);
+	if(tmp != NULL)
+		tmp(q);
 	return 0;
 }
 

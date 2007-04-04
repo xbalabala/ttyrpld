@@ -68,6 +68,7 @@ static int kmd_load(void);
 static int kmd_unload(void);
 
 /* Stage 2 functions */
+static int rpldhc_open(const struct tty *);
 static int rpldhc_read(const char *, size_t, const struct tty *);
 static int rpldhc_write(const char *, size_t, const struct tty *);
 static int rpldhc_lclose(const struct tty *);
@@ -155,6 +156,18 @@ static int kmd_unload(void)
 }
 
 //-----------------------------------------------------------------------------
+static int rpldhc_open(const struct tty *tty)
+{
+	struct rpldev_packet p;
+
+	p.dev   = TTY_DEVNR(tty);
+	p.size  = 0;
+	p.event = EVT_OPEN;
+	p.magic = MAGIC_SIG;
+	fill_time(&p.time);
+	return circular_put_packet(&p, NULL, 0);
+}
+
 static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
@@ -218,6 +231,7 @@ static int rpldev_open(struct cdev *cd, int flag, int mode,
 	}
 
 	BufRP = BufWP = Buffer;
+	rpl_open   = rpldhc_open;
 	rpl_read   = rpldhc_read;
 	rpl_write  = rpldhc_write;
 	rpl_lclose = rpldhc_lclose;
@@ -311,6 +325,7 @@ static int rpldev_ioctl(struct cdev *cd, u_long cmd, caddr_t data, int flags,
 static int rpldev_close(struct cdev *cd, int flags, int fmt,
     struct thread *th)
 {
+	rpl_open   = NULL;
 	rpl_read   = NULL;
 	rpl_write  = NULL;
 	rpl_lclose = NULL;
