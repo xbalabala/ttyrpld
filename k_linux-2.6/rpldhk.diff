@@ -1,3 +1,71 @@
+Index: linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
+===================================================================
+--- /dev/null
++++ linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
+@@ -0,0 +1,63 @@
++#include <linux/types.h>
++
++struct file;
++struct tty_struct;
++
++#ifdef CONFIG_RPLDHK
++
++static inline void rpldhk_open(const struct tty_struct *tty,
++    const struct file *filp)
++{
++	typeof(rpl_open) tmp = rpl_open;
++	if(tmp != NULL)
++		tmp(tty, filp);
++	return;
++}
++
++static inline void rpldhk_read(const char *buf, size_t size,
++    const struct tty_struct *tty)
++{
++	typeof(rpl_read) tmp = rpl_read;
++	if(tmp != NULL)
++		tmp(buf, size, tty);
++	return;
++}
++
++static inline void rpldhk_write(const char *buf, size_t size,
++    const struct tty_struct *tty)
++{
++	typeof(rpl_write) tmp = rpl_write;
++	if(tmp != NULL)
++		tmp(buf, size, tty);
++	return;
++}
++
++static inline void rpldhk_lclose(const struct tty_struct *tty,
++    const struct tty_struct *o_tty)
++{
++	typeof(rpl_lclose) tmp = rpl_lclose;
++	if(tmp != NULL)
++		tmp(tty, o_tty);
++	return;
++}
++
++#else /* CONFIG_RPLDHK */
++
++static inline void rpldhk_open(const struct tty_struct *tty,
++    const struct file *filp)
++{
++}
++
++static inline void rpldhk_read(const char __user *buf, size_t size,
++    const struct tty_struct *tty)
++{
++}
++
++#define rpldhk_write rpldhk_read /* same signature */
++
++static inline void rpldhk_lclose(const struct tty_struct *tty,
++    const struct tty_struct *o_tty)
++{
++}
++
++#endif /* CONFIG_RPLDHK */
 Index: linux-2.6.21-rc5/drivers/char/tty_io.c
 ===================================================================
 --- linux-2.6.21-rc5.orig/drivers/char/tty_io.c
@@ -6,8 +74,8 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  
  #include <linux/kmod.h>
  
-+#define WANT_RPLDEV_HOOKS 1
 +#include <linux/rpldhk.h>
++#include "rpldhk_ttyio.h"
 +#ifdef CONFIG_RPLDHK
 +int (*rpl_open)(const struct tty_struct *, const struct file *)          = NULL;
 +int (*rpl_read)(const char __user *, size_t, const struct tty_struct *)  = NULL;
@@ -91,11 +159,19 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  	mutex_unlock(&tty_mutex);
  	
  	if (retval)
+@@ -3938,6 +3959,7 @@ static struct cdev vc0_cdev;
+  */
+ static int __init tty_init(void)
+ {
++	printk(KERN_INFO "rpldhk 2.40, (C) Jan Engelhardt, 2004 - 2007\n");
+ 	cdev_init(&tty_cdev, &tty_fops);
+ 	if (cdev_add(&tty_cdev, MKDEV(TTYAUX_MAJOR, 0), 1) ||
+ 	    register_chrdev_region(MKDEV(TTYAUX_MAJOR, 0), 1, "/dev/tty") < 0)
 Index: linux-2.6.21-rc5/include/linux/rpldhk.h
 ===================================================================
 --- /dev/null
 +++ linux-2.6.21-rc5/include/linux/rpldhk.h
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,18 @@
 +#ifndef _LINUX_RPLDHK_H
 +#define _LINUX_RPLDHK_H
 +
@@ -111,66 +187,8 @@ Index: linux-2.6.21-rc5/include/linux/rpldhk.h
 +extern int (*rpl_write)(const char __user *, size_t, const struct tty_struct *);
 +extern int (*rpl_lclose)(const struct tty_struct *, const struct tty_struct *);
 +
-+#ifdef WANT_RPLDHK_HOOKS
-+
-+static inline void rpldhk_open(const struct tty_struct *tty,
-+    const struct file *filp)
-+{
-+	typeof(rpl_open) tmp = rpl_open;
-+	if (tmp != NULL)
-+		tmp(tty, filp);
-+	return;
-+}
-+
-+static inline void rpldhk_read(const char *buf, size_t size,
-+    const struct tty_struct *tty)
-+{
-+	typeof(rpl_read) tmp = rpl_read;
-+	if (tmp != NULL)
-+		tmp(buf, size, tty);
-+	return;
-+}
-+
-+static inline void rpldhk_write(const char *buf, size_t size,
-+    const struct tty_struct *tty)
-+{
-+	typeof(rpl_write) tmp = rpl_write;
-+	if (tmp != NULL)
-+		tmp(buf, size, tty);
-+	return;
-+}
-+
-+static inline void rpldhk_lclose(const struct tty_struct *tty,
-+    const struct tty_struct *o_tty)
-+{
-+	typeof(rpl_lclose) tmp = rpl_lclose;
-+	if (tmp != NULL)
-+		tmp(tty, o_tty);
-+	return;
-+}
-+
-+#else /* WANT_RPLDHK_HOOKS */
-+
-+static inline void rpldhk_open(const struct tty_struct *tty,
-+    const struct file *filp)
-+{
-+}
-+
-+static inline void rpldhk_read(const char __user *buf, size_t size,
-+    const struct tty_struct *tty)
-+{
-+}
-+
-+#define rpldhk_write rpldhk_read /* same signature */
-+
-+static inline void rpldhk_lclose(const struct tty_struct *tty,
-+    const struct tty_struct *o_tty)
-+{
-+}
-+
-+#endif /* WANT_RPLDHK_HOOKS */
-+
 +#endif /* __KERNEL__ */
++
 +#endif /* _LINUX_RPLDHK_H */
 Index: linux-2.6.21-rc5/security/Kconfig
 ===================================================================
