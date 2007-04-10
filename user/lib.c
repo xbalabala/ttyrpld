@@ -112,7 +112,7 @@ off_t G_skip(int fd, off_t offset, int do_wait)
 	size_t rem   = offset;
 	char buf[4096];
 
-#if (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__))
+#ifndef __linux__
 	if(d_ioctl(fd, RPL_IOC_IDENTIFY) == 0xC0FFEE)
 		/*
 		 * BSD does not have lseek() for device files. And its return
