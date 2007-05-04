@@ -55,7 +55,7 @@ case "$1" in
 	# - modprobe returns !0 for some reason, then see if it is loaded
 	# - otherwise, some error
 	modprobe rpldev &>/dev/null || lsmod | grep ^rpldev &>/dev/null;
-	if [ "$?" -ne 0 ]; then
+	if [ "$?" -ne 0 -a ! -c /dev/rpl -a ! -c /dev/misc/rpl ]; then
 		[ -n "$verbose" ] && echo -n "... error inserting module";
 		rc_failed;
 	else
