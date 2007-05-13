@@ -783,14 +783,14 @@ static int get_options(int *argc, const char ***argv)
 
 static void getopt_config(const struct HXoptcb *cbi)
 {
-	read_config(cbi->s);
+	read_config(cbi->data);
 	return;
 }
 
 static void getopt_username(const struct HXoptcb *cbi)
 {
-	if((GOpt.user_id = getuidfromname(cbi->s)) < 0) {
-		fprintf(stderr, _("No such user: %s\n"), cbi->s);
+	if((GOpt.user_id = getuidfromname(cbi->data)) < 0) {
+		fprintf(stderr, _("No such user: %s\n"), cbi->data);
 		exit(EXIT_FAILURE);
 	}
 	return;

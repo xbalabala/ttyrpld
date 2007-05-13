@@ -220,27 +220,28 @@ static void getopt_proc(const struct HXoptcb *cbi)
 		['X'] = IFP_REMOVE,
 		['Z'] = IFP_ZERO,
 	};
-	switch(cbi->tsh) {
+	switch(cbi->match_sh) {
 	case 'A':
 	case 'D':
 	case 'S':
 	case 'X': {
 		uint32_t dev;
 		++Got_arg;
-		if((dev = getdev(cbi->s)) != 0)
-			send_int(Sockfd, mapping[static_cast(int, cbi->tsh)], dev);
+		if((dev = getdev(cbi->data)) != 0)
+			send_int(Sockfd, mapping[static_cast(int,
+			         cbi->match_sh)], dev);
 		break;
 	}
 	case 'L': {
-		uint32_t dev = (cbi->s != NULL) ? getdev(cbi->s) : 0;
+		uint32_t dev = (cbi->data != NULL) ? getdev(cbi->data) : 0;
 		++Got_arg;
 		send_int(Sockfd, IFP_GETINFO_A, dev);
 		break;
 	}
 	case 'Z': {
-		uint32_t dev = (cbi->s != NULL) ? getdev(cbi->s) : 0;
+		uint32_t dev = (cbi->data != NULL) ? getdev(cbi->data) : 0;
 		++Got_arg;
-		send_int(Sockfd, mapping[static_cast(int, cbi->tsh)], dev);
+		send_int(Sockfd, mapping[static_cast(int, cbi->match_sh)], dev);
 		break;
 	}
 	} /* switch */

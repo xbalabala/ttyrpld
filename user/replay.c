@@ -495,7 +495,7 @@ static int get_options(int *argc, const char ***argv)
 static void getopt_jump(const struct HXoptcb *cbi)
 {
 	char *sec = "", *min = "", *hr = "";
-	char *tmp = HX_strdup(cbi->s), *origtmp = tmp;
+	char *tmp = HX_strdup(cbi->data), *origtmp = tmp;
 
 	Opt.sktype = PCTRL_SKTIME;
 	Opt.skval  = 0;
@@ -520,7 +520,7 @@ static void getopt_jump(const struct HXoptcb *cbi)
 
 static void getopt_msec(const struct HXoptcb *cbi)
 {
-	Opt.maxdelay = cbi->l * 1000;
+	Opt.maxdelay = cbi->data_long * 1000;
 	return;
 }
 
