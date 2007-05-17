@@ -1,7 +1,14 @@
-Index: linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
+---
+ drivers/char/rpldhk_ttyio.h |   63 ++++++++++++++++++++++++++++++++++++++++++++
+ drivers/char/tty_io.c       |   31 ++++++++++++++++++---
+ include/linux/rpldhk.h      |   18 ++++++++++++
+ security/Kconfig            |    8 +++++
+ 4 files changed, 115 insertions(+), 5 deletions(-)
+
+Index: linux-2.6.22-rc1-git5/drivers/char/rpldhk_ttyio.h
 ===================================================================
 --- /dev/null
-+++ linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
++++ linux-2.6.22-rc1-git5/drivers/char/rpldhk_ttyio.h
 @@ -0,0 +1,63 @@
 +#include <linux/types.h>
 +
@@ -14,7 +21,7 @@ Index: linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
 +    const struct file *filp)
 +{
 +	typeof(rpl_open) tmp = rpl_open;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(tty, filp);
 +	return;
 +}
@@ -23,7 +30,7 @@ Index: linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
 +    const struct tty_struct *tty)
 +{
 +	typeof(rpl_read) tmp = rpl_read;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(buf, size, tty);
 +	return;
 +}
@@ -32,7 +39,7 @@ Index: linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
 +    const struct tty_struct *tty)
 +{
 +	typeof(rpl_write) tmp = rpl_write;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(buf, size, tty);
 +	return;
 +}
@@ -41,7 +48,7 @@ Index: linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
 +    const struct tty_struct *o_tty)
 +{
 +	typeof(rpl_lclose) tmp = rpl_lclose;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(tty, o_tty);
 +	return;
 +}
@@ -66,10 +73,10 @@ Index: linux-2.6.21-rc5/drivers/char/rpldhk_ttyio.h
 +}
 +
 +#endif /* CONFIG_RPLDHK */
-Index: linux-2.6.21-rc5/drivers/char/tty_io.c
+Index: linux-2.6.22-rc1-git5/drivers/char/tty_io.c
 ===================================================================
---- linux-2.6.21-rc5.orig/drivers/char/tty_io.c
-+++ linux-2.6.21-rc5/drivers/char/tty_io.c
+--- linux-2.6.22-rc1-git5.orig/drivers/char/tty_io.c
++++ linux-2.6.22-rc1-git5/drivers/char/tty_io.c
 @@ -104,6 +104,19 @@
  
  #include <linux/kmod.h>
@@ -90,7 +97,7 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  #undef TTY_DEBUG_HANGUP
  
  #define TTY_PARANOIA_CHECK 1
-@@ -1671,8 +1684,10 @@ static ssize_t tty_read(struct file * fi
+@@ -1714,8 +1727,10 @@ static ssize_t tty_read(struct file * fi
  		i = -EIO;
  	tty_ldisc_deref(ld);
  	unlock_kernel();
@@ -102,7 +109,7 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  	return i;
  }
  
-@@ -1802,8 +1817,10 @@ static ssize_t tty_write(struct file * f
+@@ -1845,8 +1860,10 @@ static ssize_t tty_write(struct file * f
  	ld = tty_ldisc_ref_wait(tty);		
  	if (!ld->write)
  		ret = -EIO;
@@ -114,7 +121,7 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  	tty_ldisc_deref(ld);
  	return ret;
  }
-@@ -1893,7 +1910,7 @@ static void tty_line_name(struct tty_dri
+@@ -1936,7 +1953,7 @@ static void tty_line_name(struct tty_dri
   */
  
  static int init_dev(struct tty_driver *driver, int idx,
@@ -123,7 +130,7 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  {
  	struct tty_struct *tty, *o_tty;
  	struct ktermios *tp, **tp_loc, *o_tp, **o_tp_loc;
-@@ -2419,6 +2436,8 @@ static void release_dev(struct file * fi
+@@ -2462,6 +2479,8 @@ static void release_dev(struct file * fi
  	clear_bit(TTY_LDISC, &tty->flags);
  	cancel_delayed_work(&tty->buf.work);
  
@@ -132,7 +139,7 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  	/*
  	 * Wait for ->hangup_work and ->buf.work handlers to terminate
  	 */
-@@ -2558,7 +2577,7 @@ retry_open:
+@@ -2600,7 +2619,7 @@ retry_open:
  		return -ENODEV;
  	}
  got_driver:
@@ -141,16 +148,15 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  	mutex_unlock(&tty_mutex);
  	if (retval)
  		return retval;
-@@ -2613,6 +2632,8 @@ got_driver:
+@@ -2653,6 +2672,7 @@ got_driver:
+ 		__proc_set_tty(current, tty);
  	spin_unlock_irq(&current->sighand->siglock);
  	mutex_unlock(&tty_mutex);
- 	put_pid(old_pgrp);
-+
 +	rpldhk_open(tty, filp);
  	return 0;
  }
  
-@@ -2659,7 +2680,7 @@ static int ptmx_open(struct inode * inod
+@@ -2699,7 +2719,7 @@ static int ptmx_open(struct inode * inod
  	up(&allocated_ptys_lock);
  
  	mutex_lock(&tty_mutex);
@@ -159,7 +165,7 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  	mutex_unlock(&tty_mutex);
  	
  	if (retval)
-@@ -3938,6 +3959,7 @@ static struct cdev vc0_cdev;
+@@ -4005,6 +4025,7 @@ static struct cdev vc0_cdev;
   */
  static int __init tty_init(void)
  {
@@ -167,10 +173,10 @@ Index: linux-2.6.21-rc5/drivers/char/tty_io.c
  	cdev_init(&tty_cdev, &tty_fops);
  	if (cdev_add(&tty_cdev, MKDEV(TTYAUX_MAJOR, 0), 1) ||
  	    register_chrdev_region(MKDEV(TTYAUX_MAJOR, 0), 1, "/dev/tty") < 0)
-Index: linux-2.6.21-rc5/include/linux/rpldhk.h
+Index: linux-2.6.22-rc1-git5/include/linux/rpldhk.h
 ===================================================================
 --- /dev/null
-+++ linux-2.6.21-rc5/include/linux/rpldhk.h
++++ linux-2.6.22-rc1-git5/include/linux/rpldhk.h
 @@ -0,0 +1,18 @@
 +#ifndef _LINUX_RPLDHK_H
 +#define _LINUX_RPLDHK_H
@@ -190,10 +196,10 @@ Index: linux-2.6.21-rc5/include/linux/rpldhk.h
 +#endif /* __KERNEL__ */
 +
 +#endif /* _LINUX_RPLDHK_H */
-Index: linux-2.6.21-rc5/security/Kconfig
+Index: linux-2.6.22-rc1-git5/security/Kconfig
 ===================================================================
---- linux-2.6.21-rc5.orig/security/Kconfig
-+++ linux-2.6.21-rc5/security/Kconfig
+--- linux-2.6.22-rc1-git5.orig/security/Kconfig
++++ linux-2.6.22-rc1-git5/security/Kconfig
 @@ -95,5 +95,13 @@ config SECURITY_ROOTPLUG
  
  source security/selinux/Kconfig
