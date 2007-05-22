@@ -1,2 +1,4 @@
 #!/bin/bash
-exec autoreconf -fi;
+
+autoreconf -fi;
+rm -Rf autom4te*.cache;
