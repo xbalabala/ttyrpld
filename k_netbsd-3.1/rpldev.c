@@ -1,5 +1,5 @@
 /*
-	ttyrpld/k_netbsd-3.0/rpldev.c
+	ttyrpld/k_netbsd-3.1/rpldev.c
 	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
 
 	Redistribution and use in source and binary forms, with or without
