@@ -8,14 +8,12 @@ AC_HAVE_HEADERS(alloca.h)
 AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_AC_LDLIBS="$ttyreplay_AC_LDLIBS -lrt"])
 AC_CHECK_LIB([socket], [accept], [rpld_AC_LDLIBS="$rpld_AC_LDLIBS -lsocket -lnsl"])
 AC_CHECK_LIB([intl], [gettext], [AC_LDLIBS="$AC_LDLIBS -lintl"])
-AC_CHECK_HEADER([libHX.h], [], AC_MSG_ERROR([Need at least libHX 1.10]), [
+AC_CHECK_HEADER([libHX.h], [],
+	AC_MSG_ERROR([Need at least libHX 1.10 (http://jengelh.hopto.org/p/libHX/)]),
+	[
 #include <libHX.h>
-#if !defined(_LIBHX_H) || _LIBHX_H < 20070320
-#	error ----------------------------------------
-#	error You need a newer version of libHX
-#	error (at least 1.10.0)
-#	error URL: jengelh.hopto.org/p/libHX/
-#	error ----------------------------------------
+#if !defined(_LIBHX_H) || _LIBHX_H < 20070701
+#	error You need a newer version of libHX (at least 1.10.0)
 #endif
 ])
 
