@@ -1,30 +1,32 @@
 # -*- Makefile -*-
 
-# PREFIX will be overriden by RPM SPECFILE
+# PREFIX will be overriden by RPM SPECFILE (or respective install)
 PREFIX      := /usr/local
 LOCALE_PATH := ${ROOT}${PREFIX}/share/locale
-ALL_MO      := $(patsubst %.po,%.mo,$(wildcard */LC_MESSAGES/*.po))
+
+input       := @top_srcdir@/locale
+LOCALES     := $(patsubst ${input}/%.po,%,$(wildcard ${input}/*.po))
+TARGETS     := $(addsuffix /LC_MESSAGES/ttyrpld.mo,${LOCALES})
 
 .PHONY: all install uninstall clean
 
-all: ${ALL_MO}
+all: ${TARGETS}
 
-%.mo: %.po
-	@echo -en "$@: ";
+%/LC_MESSAGES/ttyrpld.mo: ${input}/%.po
+	@x="$@"; mkdir -p "$${x%/*}";
+	@echo -en "$*: ";
 	@msgfmt --statistics -o $@ $<;
 
 install: all
 	@echo "Installing locale files to ${LOCALE_PATH}";
 	for i in *; do \
-            [ ! -d "$$i" ] && continue; \
-            install -dm0755 "${LOCALE_PATH}/$$i/LC_MESSAGES"; \
-            install -m0644 "$$i/LC_MESSAGES/ttyrpld.mo" "${LOCALE_PATH}/$$i/LC_MESSAGES/"; \
-        done;
+		[ ! -d "$$i" ] && continue; \
+		install -dm0755 "${LOCALE_PATH}/$$i/LC_MESSAGES"; \
+		install -m0644 "$$i/LC_MESSAGES/ttyrpld.mo" "${LOCALE_PATH}/$$i/LC_MESSAGES/"; \
+	done;
 
 uninstall:
 	rm -f ${LOCALE_PATH}/*/LC_MESSAGES/ttyrpld.mo;
 
 clean:
-	rm -f ${ALL_MO};
-
-#==============================================================================
+	rm -Rf ${LOCALES};
