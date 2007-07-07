@@ -1,3 +1,12 @@
+/*
+ *	ttyrpld/user/ptmx.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2007
+ *
+ *	This file is part of ttyrpld. ttyrpld is free software; you can
+ *	redistribute it and/or modify it under the terms of the GNU
+ *	Lesser General Public License as published by the Free Software
+ *	Foundation; either version 2 or 3 of the License.
+ */
 #define _GNU_SOURCE 1
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -23,7 +32,7 @@ static void spawn_ptmx(void)
 	int ptmx_fd, pts_fd;
 	ssize_t ret, ret2;
 
-	if((ptmx_fd = open("/dev/ptmx", O_RDWR)) < 0) {
+	if ((ptmx_fd = open("/dev/ptmx", O_RDWR)) < 0) {
 		fprintf(stderr, "[%d] Could not open /dev/ptmx: %s\n",
 		        (int)pthread_self(), strerror(errno));
 		return;
@@ -33,7 +42,7 @@ static void spawn_ptmx(void)
 	unlockpt(ptmx_fd);
 	ptsname_r(ptmx_fd, buffer, sizeof(buffer));
 
-	if((pts_fd = open(buffer, O_RDWR)) < 0) {
+	if ((pts_fd = open(buffer, O_RDWR)) < 0) {
 		fprintf(stderr, "[%08lX] Could not open %s: %s\n",
 		        static_cast(unsigned long, pthread_self()),
 		        buffer, strerror(errno));
@@ -46,12 +55,12 @@ static void spawn_ptmx(void)
 	pthread_mutex_unlock(&fd_count_lock);
 
 	ret = write(pts_fd, hw, hw_len);
-	if(ret != hw_len)
+	if (ret != hw_len)
 		fprintf(stderr, "[%08lX] Wrote %d bytes of %d (%s)\n",
 		        static_cast(unsigned long, pthread_self()),
 		        ret, hw_len, strerror(errno));
 	ret2 = read(ptmx_fd, buffer, sizeof(buffer));
-	if(ret2 != ret)
+	if (ret2 != ret)
 		fprintf(stderr, "[%08lX] Read %d bytes of %d (%s)\n",
 		        static_cast(unsigned long, pthread_self()),
 		        ret2, ret, strerror(errno));
@@ -73,14 +82,14 @@ int main(int argc, const char **argv)
 {
 	pthread_t id;
 
-	if(argc >= 2) {
+	if (argc >= 2) {
 		/* For debug - spawn only one instance */
 		ptmx_runner(NULL);
 		return EXIT_SUCCESS;
 	}
 
-	while(1) {
-		if(pthread_create(&id, NULL, ptmx_runner, NULL) != 0) {
+	while (1) {
+		if (pthread_create(&id, NULL, ptmx_runner, NULL) != 0) {
 			fprintf(stderr, "[0] Could not create thread: "
 			        "%s\n", strerror(errno));
 			sleep(1);
@@ -90,7 +99,7 @@ int main(int argc, const char **argv)
 		pthread_detach(id);
 		fprintf(stderr, "Active fds: %d\n", fd_count);
 		usleep(10000);
-	} while(1);
+	}
 
 	return EXIT_SUCCESS;
 }

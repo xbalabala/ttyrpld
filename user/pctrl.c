@@ -1,13 +1,12 @@
 /*
-	ttyrpld/user/pctrl.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-
-	This file is part of ttyrpld. ttyrpld is free software; you can
-	redistribute it and/or modify it under the terms of the GNU
-	Lesser General Public License as published by the Free Software
-	Foundation; however ONLY version 2 of the License. For details,
-	see the file named "LICENSE.LGPL2".
-*/
+ *	ttyrpld/user/pctrl.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *
+ *	This file is part of ttyrpld. ttyrpld is free software; you can
+ *	redistribute it and/or modify it under the terms of the GNU
+ *	Lesser General Public License as published by the Free Software
+ *	Foundation; either version 2 or 3 of the License.
+ */
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/stat.h>
@@ -38,10 +37,11 @@ static pthread_t worker;
 static int ctty = -1;
 
 //-----------------------------------------------------------------------------
-int pctrl_init(void) {
+int pctrl_init(void)
+{
 	struct sigaction sa;
 
-	if((ctty = open("/dev/tty", O_RDWR)) < 0)
+	if ((ctty = open("/dev/tty", O_RDWR)) < 0)
 		return -errno;
 
 	tcgetattr(ctty, &tio_default);
@@ -58,25 +58,26 @@ int pctrl_init(void) {
 	return 1;
 }
 
-static void *pctrl_thread(void *arg) {
-	while(1) {
+static void *pctrl_thread(void *arg)
+{
+	while (1) {
 		fd_set set;
 		char c = 0;
 
 		FD_ZERO(&set);
 		FD_SET(ctty, &set);
 
-		if(select(ctty + 1, &set, NULL, NULL, NULL) <= 0)
+		if (select(ctty + 1, &set, NULL, NULL, NULL) <= 0)
 			continue;
 
 		pthread_mutex_lock(&ps_lock);
-		if(pstatus == NULL) {
+		if (pstatus == NULL) {
 			usleep(10000);
 			continue;
 		}
 
 		read(ctty, &c, 1);
-		switch(tolower(c)) {
+		switch (tolower(c)) {
 		case ' ':
 			pstatus->paused ^= static_cast(unsigned long, -1);
 			break;
@@ -99,14 +100,14 @@ static void *pctrl_thread(void *arg) {
 			pstatus->echo ^= static_cast(unsigned long, -1);
 			break;
 		case '6':
-			if(pstatus->skval < 0)
+			if (pstatus->skval < 0)
 				pstatus->skval = 0;
 			pstatus->paused = 0;
 			pstatus->sktype = PCTRL_SKTIME;
 			pstatus->skval += 10 * 1000;
 			break;
 		case '9':
-			if(pstatus->skval < 0)
+			if (pstatus->skval < 0)
 				pstatus->skval = 0;
 			pstatus->paused = 0;
 			pstatus->sktype = PCTRL_SKTIME;
@@ -131,7 +132,7 @@ static void *pctrl_thread(void *arg) {
 
 void pctrl_exit(void)
 {
-	if(ctty < 0)
+	if (ctty < 0)
 		return;
 	pctrl_deactivate(0);
 	close(ctty);
@@ -140,7 +141,7 @@ void pctrl_exit(void)
 
 void pctrl_activate(struct pctrl_info *i)
 {
-	if(ctty < 0)
+	if (ctty < 0)
 		return;
 	pstatus = i;
 	memcpy(&tio_pad, &tio_default, sizeof(struct termios));
@@ -154,10 +155,10 @@ void pctrl_deactivate(int sig)
 	pthread_mutex_lock(&ps_lock);
 	pstatus = NULL;
 	pthread_mutex_unlock(&ps_lock);
-	if(ctty < 0)
+	if (ctty < 0)
 		return;
 	tcsetattr(ctty, TCSANOW, &tio_default);
-	if(sig > 0)
+	if (sig > 0)
 		raise(sig);
 	return;
 }

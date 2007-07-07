@@ -1,36 +1,36 @@
 /*
-	ttyrpld/k_netbsd-3.1/rpldev.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions
-	are met:
-
-	1. Redistributions of source code must retain the above copyright
-	   notice, this list of conditions and the following disclaimer.
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	3. Redistributions of modified code that are made available only
-	   in binary form require sending a description to the ttyrpld
-	   project maintainer on what has been changed.
-	4. Neither the names of the above-listed copyright holders nor the
-	   names of any contributors may be used to endorse or promote
-	   products derived from this software without specific prior
-	   written permission.
-
-	NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND
-	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-	BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-*/
+ *	ttyrpld/k_netbsd-3.1/rpldev.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *
+ *	Redistribution and use in source and binary forms, with or without
+ *	modification, are permitted provided that the following conditions
+ *	are met:
+ *
+ *	1. Redistributions of source code must retain the above copyright
+ *	   notice, this list of conditions and the following disclaimer.
+ *	2. Redistributions in binary form must reproduce the above copyright
+ *	   notice, this list of conditions and the following disclaimer in the
+ *	   documentation and/or other materials provided with the distribution.
+ *	3. Redistributions of modified code that are made available only
+ *	   in binary form require sending a description to the ttyrpld
+ *	   project maintainer on what has been changed.
+ *	4. Neither the names of the above-listed copyright holders nor the
+ *	   names of any contributors may be used to endorse or promote
+ *	   products derived from this software without specific prior
+ *	   written permission.
+ *
+ *	NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+ *	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ *	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND
+ *	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *	COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR
+ *	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ *	BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ *	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ *	ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ */
 #include <sys/param.h>
 #include <sys/conf.h>
 #include <sys/endian.h>
@@ -113,15 +113,15 @@ int rpldev_mod_lkmentry(struct lkm_table *table, int cmd, int ver)
 
 static int kmd_event(struct lkm_table *table, int cmd)
 {
-	switch(cmd) {
+	switch (cmd) {
 		case LKM_E_LOAD:
-			if(lkmexists(table))
+			if (lkmexists(table))
 				return EEXIST;
 			lockinit(&Buffer_lock, PLOCK, "rpldev", 0, 0);
 			lockinit(&Open_lock, PLOCK, "rpldev", 0, 0);
 			break;
 		case LKM_E_UNLOAD:
-			if(kmi_usecount || Open_count > 0)
+			if (kmi_usecount || Open_count > 0)
 				return EBUSY;
 			break;
 		case LKM_E_STAT:
@@ -149,7 +149,7 @@ static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
 
-	if(count == 0)
+	if (count == 0)
 		return 0;
 
 	p.dev   = TTY_DEVNR(tty);
@@ -164,7 +164,7 @@ static int rpldhc_write(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
 
-	if(count == 0)
+	if (count == 0)
 		return 0;
 
 	p.dev   = TTY_DEVNR(tty);
@@ -191,7 +191,7 @@ static int rpldhc_lclose(const struct tty *tty)
 static int rpldev_open(dev_t dev, int flag, int mode, struct proc *th)
 {
 	lockmgr(&Open_lock, LK_EXCLUSIVE, NULL);
-	if(Open_count) {
+	if (Open_count) {
 		lockmgr(&Open_lock, LK_RELEASE, NULL);
 		return EBUSY;
 	}
@@ -199,7 +199,7 @@ static int rpldev_open(dev_t dev, int flag, int mode, struct proc *th)
 	++Open_count;
 	lockmgr(&Open_lock, LK_RELEASE, NULL);
 
-	if((Buffer = malloc(Bufsize, M_TTYS, M_WAITOK | M_CANFAIL)) == NULL) {
+	if ((Buffer = malloc(Bufsize, M_TTYS, M_WAITOK | M_CANFAIL)) == NULL) {
 		--kmi_usecount;
 		--Open_count;
 		return ENOMEM;
@@ -219,18 +219,18 @@ static int rpldev_read(dev_t dev, struct uio *uio, int flags)
 	int ret = 0;
 
 	lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
-	if(Buffer == NULL)
+	if (Buffer == NULL)
 		goto out;
 
-	while(BufRP == BufWP) {
+	while (BufRP == BufWP) {
 		lockmgr(&Buffer_lock, LK_RELEASE, NULL);
-		if(flags & IO_NDELAY)
+		if (flags & IO_NDELAY)
 			return EWOULDBLOCK;
-		if((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
+		if ((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
 			return ret;
 		ret = 0;
 		lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
-		if(Buffer == NULL)
+		if (Buffer == NULL)
 			goto out;
 	}
 
@@ -247,25 +247,25 @@ static int rpldev_ioctl(dev_t dev, u_long cmd, caddr_t data, int flags,
 	size_t *ptr = (void *)data;
 	int ret = 0;
 
-	if(IOCGROUP(cmd) != RPL_IOC_MAGIC)
+	if (IOCGROUP(cmd) != RPL_IOC_MAGIC)
 		return ENOTTY;
-	if(ptr == NULL)
+	if (ptr == NULL)
 		return EFAULT;
 
-	switch(cmd) {
+	switch (cmd) {
 		case RPL_IOC_GETBUFSIZE:
 			*ptr = Bufsize;
 			return 0;
 		case RPL_IOC_GETRAVAIL:
 			lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
-			if(Buffer == NULL)
+			if (Buffer == NULL)
 				goto out;
 			*ptr = avail_R();
 			lockmgr(&Buffer_lock, LK_RELEASE, NULL);
 			return 0;
 		case RPL_IOC_GETWAVAIL:
 			lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
-			if(Buffer == NULL)
+			if (Buffer == NULL)
 				goto out;
 			*ptr = avail_W();
 			lockmgr(&Buffer_lock, LK_RELEASE, NULL);
@@ -315,14 +315,14 @@ static int rpldev_close(dev_t dev, int flag, int mode, struct proc *th)
 //-----------------------------------------------------------------------------
 static inline size_t avail_R(void)
 {
-	if(BufWP >= BufRP)
+	if (BufWP >= BufRP)
 		return BufWP - BufRP;
 	return BufWP + Bufsize - BufRP;
 }
 
 static inline size_t avail_W(void)
 {
-	if(BufWP >= BufRP)
+	if (BufWP >= BufRP)
 		return BufRP + Bufsize - BufWP - 1;
 	return BufRP - BufWP - 1;
 }
@@ -332,13 +332,13 @@ static inline int circular_get(struct uio *uio, size_t count)
 	size_t x = Buffer + Bufsize - BufRP;
 	int ret;
 
-	if(count < x) {
-		if((ret = uiomove(BufRP, count, uio)) != 0)
+	if (count < x) {
+		if ((ret = uiomove(BufRP, count, uio)) != 0)
 			return ret;
 		BufRP += count;
 	} else {
-		if((ret = uiomove(BufRP, x, uio)) != 0 ||
-		  (ret = uiomove(Buffer, count - x, uio)) != 0)
+		if ((ret = uiomove(BufRP, x, uio)) != 0 ||
+		    (ret = uiomove(Buffer, count - x, uio)) != 0)
 			return ret;
 		BufRP = Buffer + count - x;
 	}
@@ -350,7 +350,7 @@ static inline void circular_put(const void *src, size_t count)
 {
 	size_t x = Buffer + Bufsize - BufWP;
 
-	if(count < x) {
+	if (count < x) {
 		memcpy(BufWP, src, count);
 		BufWP += count;
 	} else {
@@ -365,20 +365,20 @@ static inline void circular_put(const void *src, size_t count)
 static int circular_put_packet(struct rpldev_packet *p, const void *buf,
     size_t count)
 {
-	if(count > (size_t)(-sizeof(struct rpldev_packet) - 1))
+	if (count > (size_t)(-sizeof(struct rpldev_packet) - 1))
 		return ENOSPC;
 	lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
-	if(Buffer == NULL) {
+	if (Buffer == NULL) {
 		lockmgr(&Buffer_lock, LK_RELEASE, NULL);
 		return 0;
 	}
-	if(avail_W() < sizeof(struct rpldev_packet) + count) {
+	if (avail_W() < sizeof(struct rpldev_packet) + count) {
 		lockmgr(&Buffer_lock, LK_RELEASE, NULL);
 		return ENOSPC;
 	}
 
 	circular_put(p, sizeof(struct rpldev_packet));
-	if(count > 0)
+	if (count > 0)
 		circular_put(buf, count);
 	lockmgr(&Buffer_lock, LK_RELEASE, NULL);
 	wakeup(&Buffer);
@@ -389,14 +389,14 @@ static inline void fill_time(struct timeval *tv)
 {
 	microtime(tv);
 
-	if(sizeof(tv->tv_sec) == sizeof(uint32_t))
+	if (sizeof(tv->tv_sec) == sizeof(uint32_t))
 		tv->tv_sec = htole32(tv->tv_sec);
-	else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
+	else if (sizeof(tv->tv_sec) == sizeof(uint64_t))
 		tv->tv_sec = htole64(tv->tv_sec);
 
-	if(sizeof(tv->tv_usec) == sizeof(uint32_t))
+	if (sizeof(tv->tv_usec) == sizeof(uint32_t))
 		tv->tv_usec = htole32(tv->tv_usec);
-	else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
+	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
 		tv->tv_usec = htole64(tv->tv_usec);
 
 	return;

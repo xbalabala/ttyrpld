@@ -1,13 +1,13 @@
 /*
-	ttyrpld/user/rdsh.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-
-	This file is part of ttyrpld. ttyrpld is free software; you can
-	redistribute it and/or modify it under the terms of the GNU
-	Lesser General Public License as published by the Free Software
-	Foundation; however ONLY version 2 of the License. For details,
-	see the file named "LICENSE.LGPL2".
-*/
+ *	ttyrpld/user/rdsh.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *
+ *	This file is part of ttyrpld. ttyrpld is free software; you can
+ *	redistribute it and/or modify it under the terms of the GNU
+ *	Lesser General Public License as published by the Free Software
+ *	Foundation; however ONLY version 2 of the License. For details,
+ *	Foundation; either version 2 or 3 of the License.
+ */
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <errno.h>
@@ -52,9 +52,9 @@ struct tty *get_tty(uint32_t dev, int create)
 	struct tty *ret = NULL, *tty;
 
 	ret = HXbtree_get(Ttys, reinterpret_cast(const void *, dev));
-	if(ret != NULL)
+	if (ret != NULL)
 		return ret;
-	if(!create || (tty = malloc(sizeof(struct tty))) == NULL)
+	if (!create || (tty = malloc(sizeof(struct tty))) == NULL)
 		return NULL;
 
 	tty->dev      = dev;
@@ -67,7 +67,7 @@ struct tty *get_tty(uint32_t dev, int create)
 	tty->full_dev = NULL;
 
 	ts = HXbtree_add(Ttys, reinterpret_cast(const void *, dev), tty);
-	if(ts == NULL) {
+	if (ts == NULL) {
 		free(tty);
 		notify(LOG_ERR, _("%s: Memory allocation failure\n"),
 		       __FUNCTION__);
@@ -87,12 +87,12 @@ void log_close(struct tty *tty)
 {
 	close(tty->fd);
 	tty->fd = -1;
-	if(tty->log != NULL) {
+	if (tty->log != NULL) {
 		hmc_free(tty->log);
 		tty->log = NULL; /* for infod */
 	}
 
-	if(tty->status != IFP_DEACTIVATE) {
+	if (tty->status != IFP_DEACTIVATE) {
 		/*
 		 * If the status is IFP_ACTIVATED, it is reinstantiated upon
 		 * next get_tty(). If it is IFP_DEACTIVSES, it will change to
@@ -107,7 +107,7 @@ void log_close(struct tty *tty)
 
 void notify(int lv, const char *fmt, ...)
 {
-	if(GOpt.verbose) {
+	if (GOpt.verbose) {
 		va_list argp;
 		va_start(argp, fmt);
 		fprintf(stderr, "\n");
@@ -116,7 +116,7 @@ void notify(int lv, const char *fmt, ...)
 		/* do not print to syslog if we do to stdout */
 		return;
 	}
-	if(GOpt.syslog) {
+	if (GOpt.syslog) {
 		va_list argp;
 		va_start(argp, fmt);
 		vsyslog(lv, fmt, argp);
@@ -129,11 +129,11 @@ void notify(int lv, const char *fmt, ...)
 ssize_t send_wait(int fd, const void *buf, size_t count, int flags)
 {
 	size_t rem = count;
-	while(rem > 0) {
+	while (rem > 0) {
 		ssize_t ret = send(fd, buf, rem, flags);
-		if(ret < 0)
+		if (ret < 0)
 			return -errno;
-		if(ret == rem)
+		if (ret == rem)
 			break;
 		buf += ret;
 		rem -= ret;
@@ -146,7 +146,7 @@ ssize_t send_wait(int fd, const void *buf, size_t count, int flags)
 static inline long K_VERSION(void)
 {
 	pthread_mutex_lock(&k_version_lock);
-	if(k_version_data == 0)
+	if (k_version_data == 0)
 		setup_kversion();
 	pthread_mutex_unlock(&k_version_lock);
 	return k_version_data;
@@ -156,9 +156,9 @@ static void setup_kversion(void)
 {
 	int x, y, z;
 	FILE *fp;
-	if((fp = fopen("/proc/version", "r")) == NULL)
+	if ((fp = fopen("/proc/version", "r")) == NULL)
 		return;
-	if(fscanf(fp, "%*s %*s %d.%d.%d", &x, &y, &z) != 3)
+	if (fscanf(fp, "%*s %*s %d.%d.%d", &x, &y, &z) != 3)
 		return;
 	fclose(fp);
 	k_version_data = KERNEL_VERSION(x, y, z);

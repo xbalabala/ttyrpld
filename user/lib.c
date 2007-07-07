@@ -1,13 +1,12 @@
 /*
-	ttyrpld/user/lib.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-
-	This file is part of ttyrpld. ttyrpld is free software; you can
-	redistribute it and/or modify it under the terms of the GNU
-	Lesser General Public License as published by the Free Software
-	Foundation; however ONLY version 2 of the License. For details,
-	see the file named "LICENSE.LGPL2".
-*/
+ *	ttyrpld/user/lib.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *
+ *	This file is part of ttyrpld. ttyrpld is free software; you can
+ *	redistribute it and/or modify it under the terms of the GNU
+ *	Lesser General Public License as published by the Free Software
+ *	Foundation; either version 2 or 3 of the License.
+ */
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -27,7 +26,7 @@
 static inline int d_ioctl(int fd, unsigned int request)
 {
 	int err, ret;
-	if((err = ioctl(fd, request, &ret)) == 0)
+	if ((err = ioctl(fd, request, &ret)) == 0)
 		return ret;
 	return -1;
 }
@@ -44,13 +43,13 @@ void load_locale(const char *exe)
 	int ok = 0;
 	setlocale(LC_ALL, "");
 
-	if(strchr(exe, '/') != NULL) {
+	if (strchr(exe, '/') != NULL) {
 		hmc_t *base = hmc_sinit(exe), *de;
 		hmc_trunc(&base, HX_strrcspn(base, "/"));
 		hmc_strcat(&base, "/locale");
 		de = hmc_dup(base);
 		hmc_strcat(&de, "/de/LC_MESSAGES/ttyrpld.mo");
-		if(stat(de, &sb) == 0) {
+		if (stat(de, &sb) == 0) {
 			bindtextdomain("ttyrpld", base);
 			++ok;
 		}
@@ -58,12 +57,12 @@ void load_locale(const char *exe)
 		hmc_free(de);
 	}
 
-	if(!ok) {
-		if(stat("locale/de/LC_MESSAGES/ttyrpld.mo", &sb) == 0)
+	if (!ok) {
+		if (stat("locale/de/LC_MESSAGES/ttyrpld.mo", &sb) == 0)
 			bindtextdomain("ttyrpld", ".");
-		else if(stat("/usr/local/share/locale/de/LC_MESSAGES/ttyrpld.mo", &sb) == 0)
+		else if (stat("/usr/local/share/locale/de/LC_MESSAGES/ttyrpld.mo", &sb) == 0)
 			bindtextdomain("ttyrpld", "/usr/local/share/locale");
-		else if(stat("/usr/share/locale/de/LC_MESSAGES/ttyrpld.mo", &sb) == 0)
+		else if (stat("/usr/share/locale/de/LC_MESSAGES/ttyrpld.mo", &sb) == 0)
 			bindtextdomain("ttyrpld", "/usr/share/locale");
 	}
 
@@ -85,15 +84,15 @@ ssize_t read_wait(int fd, void *buf, size_t count,
 	 */
 	size_t rem = count;
 
-	while(rem > 0) {
+	while (rem > 0) {
 		ssize_t ret = read(fd, buf, rem);
-		if(ret < 0)
+		if (ret < 0)
 			return -errno;
-		if(ret == rem)
+		if (ret == rem)
 			break;
 		buf += ret;
 		rem -= ret;
-		if(ps->brk)
+		if (ps->brk)
 			return count - rem;
 		usleep(10000);
 	}
@@ -113,22 +112,22 @@ off_t G_skip(int fd, off_t offset, int do_wait)
 	char buf[4096];
 
 #ifndef __linux__
-	if(d_ioctl(fd, RPL_IOC_IDENTIFY) == 0xC0FFEE)
+	if (d_ioctl(fd, RPL_IOC_IDENTIFY) == 0xC0FFEE)
 		/*
 		 * BSD does not have lseek() for device files. And its return
 		 * value scheme is also limited.
 		 */
 		return d_ioctl(fd, RPL_IOC_SEEK);
 #endif
-	if(seekable)
+	if (seekable)
 		return lseek(fd, offset, SEEK_CUR);
 
-	if(do_wait) {
-		while(rem > 0) {
+	if (do_wait) {
+		while (rem > 0) {
 			ret = read(fd, buf, min_uint(sizeof(buf), rem));
-			if(ret < 0)
+			if (ret < 0)
 				return -1;
-			if(ret == rem)
+			if (ret == rem)
 				return 0;
 			rem -= ret;
 			usleep(10000);
@@ -137,11 +136,11 @@ off_t G_skip(int fd, off_t offset, int do_wait)
 	}
 
 	/* no-wait method */
-	while(rem > 0) {
+	while (rem > 0) {
 		ret = read(fd, buf, min_uint(sizeof(buf), rem));
-		if(ret <= 0)
+		if (ret <= 0)
 			return -1;
-		if(ret == rem)
+		if (ret == rem)
 			return 0;
 		rem -= ret;
 		usleep(10000);
@@ -154,7 +153,7 @@ void swab_be(void *srcp, size_t count)
 {
 	char *movp = srcp, x;
 
-	while(count) {
+	while (count) {
 		x = *movp++;
 		movp[0] = movp[1];
 		*++movp = x;

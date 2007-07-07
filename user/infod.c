@@ -1,13 +1,12 @@
 /*
-	ttyrpld/user/infod.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-
-	This file is part of ttyrpld. ttyrpld is free software; you can
-	redistribute it and/or modify it under the terms of the GNU
-	Lesser General Public License as published by the Free Software
-	Foundation; however ONLY version 2 of the License. For details,
-	see the file named "LICENSE.LGPL2".
-*/
+ *	ttyrpld/user/infod.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *
+ *	This file is part of ttyrpld. ttyrpld is free software; you can
+ *	redistribute it and/or modify it under the terms of the GNU
+ *	Lesser General Public License as published by the Free Software
+ *	Foundation; either version 2 or 3 of the License.
+ */
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -71,14 +70,14 @@ void *infod_main(void *arg)
 	/* The INFOD mainloop which waits for incoming connections. */
 	block_signals();
 
-	while(1) {
+	while (1) {
 		socklen_t sz = sizeof(struct sockaddr_un);
 		struct sockaddr_un remote;
 		pthread_t id;
 		int clfd;
 
-		if((clfd = accept(Svfd, reinterpret_cast(void *,
-		  &remote), &sz)) < 0)
+		if ((clfd = accept(Svfd, reinterpret_cast(void *,
+		    &remote), &sz)) < 0)
 			continue;
 
 		pthread_create(&id, NULL, client_thread,
@@ -93,7 +92,7 @@ static void *client_thread(void *arg)
 {
 	int fd = reinterpret_cast(int, arg);
 
-	while(1) {
+	while (1) {
 		static const uint32_t zero = 0;
 		unsigned char req;
 		uint32_t gint;
@@ -102,17 +101,17 @@ static void *client_thread(void *arg)
 		ret |= !RECEIVE_FULL(fd, &req, sizeof(unsigned char));
 		ret |= !RECEIVE_FULL(fd, &gint, sizeof(gint));
 		SWAB1(&gint);
-		if(ret || req == IFP_NONE)
+		if (ret || req == IFP_NONE)
 			break;
 
-		switch(req) {
+		switch (req) {
 		case IFP_ACTIVATE ... IFP_DEACTIVSES:
 			set_session_status(gint, req);
 			break;
 		case IFP_REMOVE: {
 			struct tty *tty;
 			pthread_mutex_lock(&Ttys_lock);
-			if((tty = get_tty(gint, 0)) != NULL)
+			if ((tty = get_tty(gint, 0)) != NULL)
 				log_close(tty);
 			pthread_mutex_unlock(&Ttys_lock);
 			break;
@@ -160,11 +159,11 @@ static void *client_thread(void *arg)
 static void getinfo_text(uint32_t dev, int fd)
 {
 	pthread_mutex_lock(&Ttys_lock);
-	if(dev == 0) {
+	if (dev == 0) {
 		getinfo_text_all(fd);
 	} else {
 		struct tty *tty;
-		if((tty = get_tty(dev, 0)) == NULL) {
+		if ((tty = get_tty(dev, 0)) == NULL) {
 			pthread_mutex_unlock(&Ttys_lock);
 			return;
 		}
@@ -191,7 +190,7 @@ static void getinfo_text_all(int fd)
 	Stats.in, Stats.out, Stats.read, Stats.write);
 
 	trav = HXbtrav_init(Ttys);
-	while((node = HXbtraverse(trav)) != NULL)
+	while ((node = HXbtraverse(trav)) != NULL)
 		getinfo_text_one(fd, node->data);
 
 	skprintf(fd, "-----------------------------------------------"
@@ -203,7 +202,7 @@ static void getinfo_text_all(int fd)
 static void getinfo_text_one(int fd, struct tty *tty)
 {
 	char status = '?';
-	switch(tty->status) {
+	switch (tty->status) {
 		case IFP_ACTIVATE:   status = 'A'; break;
 		case IFP_DEACTIVATE: status = 'D'; break;
 		case IFP_DEACTIVSES: status = 'S'; break;
@@ -216,11 +215,11 @@ static void getinfo_text_one(int fd, struct tty *tty)
 static void getinfo_bin(uint32_t dev, int fd)
 {
 	pthread_mutex_lock(&Ttys_lock);
-	if(dev == 0) {
+	if (dev == 0) {
 		getinfo_bin_all(fd);
 	} else {
 		struct tty *tty;
-		if((tty = get_tty(dev, 0)) == NULL) {
+		if ((tty = get_tty(dev, 0)) == NULL) {
 			pthread_mutex_unlock(&Ttys_lock);
 			return;
 		}
@@ -243,7 +242,7 @@ static void getinfo_bin_all(int fd)
 	         Stats.in, Stats.out, Stats.badpack);
 
 	trav = HXbtrav_init(Ttys);
-	while((node = HXbtraverse(trav)) != NULL)
+	while ((node = HXbtraverse(trav)) != NULL)
 		getinfo_bin_one(fd, node->data);
 
 	HXbtrav_free(trav);
@@ -253,7 +252,7 @@ static void getinfo_bin_all(int fd)
 static void getinfo_bin_one(int fd, struct tty *tty)
 {
 	char status = '?';
-	switch(tty->status) {
+	switch (tty->status) {
 		case IFP_ACTIVATE:   status = 'A'; break;
 		case IFP_DEACTIVATE: status = 'D'; break;
 		case IFP_DEACTIVSES: status = 'S'; break;
@@ -268,7 +267,7 @@ static void set_session_status(uint32_t dev, int req)
 	struct tty *tty;
 
 	pthread_mutex_lock(&Ttys_lock);
-	if((tty = get_tty(dev, 1)) == NULL) {
+	if ((tty = get_tty(dev, 1)) == NULL) {
 		pthread_mutex_unlock(&Ttys_lock);
 		return;
 	}
@@ -281,11 +280,11 @@ static void set_session_status(uint32_t dev, int req)
 static void zero_counters(uint32_t dev)
 {
 	pthread_mutex_lock(&Ttys_lock);
-	if(dev == 0) {
+	if (dev == 0) {
 		struct HXbtrav *trav = HXbtrav_init(Ttys);
 		const struct HXbtree_node *node;
 
-		while((node = HXbtraverse(trav)) != NULL) {
+		while ((node = HXbtraverse(trav)) != NULL) {
 			struct tty *tty = node->data;
 			tty->in = tty->out = 0;
 		}
@@ -294,7 +293,7 @@ static void zero_counters(uint32_t dev)
 		HXbtrav_free(trav);
 	} else {
 		struct tty *tty;
-		if((tty = get_tty(dev, 0)) == NULL) {
+		if ((tty = get_tty(dev, 0)) == NULL) {
 			pthread_mutex_unlock(&Ttys_lock);
 			return;
 		}
@@ -308,11 +307,11 @@ static void zero_counters(uint32_t dev)
 static inline const char *basename_pp(const char *s, const char *t)
 {
 	const char *p;
-	if(s == NULL)
+	if (s == NULL)
 		return NULL;
 
-	if((p = strchr(t, '%')) != NULL) {
-		if((p = HX_strbchr(t, p, '/')) != NULL)
+	if ((p = strchr(t, '%')) != NULL) {
+		if ((p = HX_strbchr(t, p, '/')) != NULL)
 			return s + (p - t) + 1;
 		return s;
 	}
@@ -354,11 +353,13 @@ static int unix_server(const char *port)
 	sk.sun_path[sizeof(sk.sun_path) - 1] = '\0';
 	unlink(sk.sun_path);
 
-	if((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0 ||
-	  bind(fd, reinterpret_cast(struct sockaddr *, &sk),
-	  sizeof(struct sockaddr_un)) < 0 ||
-	  listen(fd, SOMAXCONN) < 0)
+	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0 ||
+	    bind(fd, reinterpret_cast(struct sockaddr *, &sk),
+	    sizeof(struct sockaddr_un)) < 0 ||
+	    listen(fd, SOMAXCONN) < 0) {
+		close(fd);
 		return -1;
+	}
 
 	return fd;
 }

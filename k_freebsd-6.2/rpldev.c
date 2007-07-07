@@ -1,36 +1,36 @@
 /*
-	ttyrpld/k_freebsd-6.2/rpldev.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions
-	are met:
-
-	1. Redistributions of source code must retain the above copyright
-	   notice, this list of conditions and the following disclaimer.
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	3. Redistributions of modified code that are made available only
-	   in binary form require sending a description to the ttyrpld
-	   project maintainer on what has been changed.
-	4. Neither the names of the above-listed copyright holders nor the
-	   names of any contributors may be used to endorse or promote
-	   products derived from this software without specific prior
-	   written permission.
-
-	NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND
-	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-	BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-*/
+ *	ttyrpld/k_freebsd-6.2/rpldev.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *
+ *	Redistribution and use in source and binary forms, with or without
+ *	modification, are permitted provided that the following conditions
+ *	are met:
+ *
+ *	1. Redistributions of source code must retain the above copyright
+ *	   notice, this list of conditions and the following disclaimer.
+ *	2. Redistributions in binary form must reproduce the above copyright
+ *	   notice, this list of conditions and the following disclaimer in the
+ *	   documentation and/or other materials provided with the distribution.
+ *	3. Redistributions of modified code that are made available only
+ *	   in binary form require sending a description to the ttyrpld
+ *	   project maintainer on what has been changed.
+ *	4. Neither the names of the above-listed copyright holders nor the
+ *	   names of any contributors may be used to endorse or promote
+ *	   products derived from this software without specific prior
+ *	   written permission.
+ *
+ *	NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+ *	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ *	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND
+ *	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *	COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR
+ *	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ *	BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ *	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ *	ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ */
 #include <sys/param.h>
 #include <sys/conf.h>
 #include <sys/endian.h>
@@ -123,9 +123,10 @@ DECLARE_MODULE(rpldev, kmi_rpldev, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
 static int kmd_event(module_t mp, int type, void *data)
 {
 	int ret;
-	switch(type) {
+
+	switch (type) {
 		case MOD_LOAD:
-			if((ret = kmd_load()) != 0)
+			if ((ret = kmd_load()) != 0)
 				kmd_unload();
 			return ret;
 		case MOD_UNLOAD:
@@ -139,16 +140,16 @@ static int kmd_load(void)
 	mtx_init(&Buffer_lock, "rpldev", NULL, MTX_DEF);
 	mtx_init(&Open_lock, "rpldev", NULL, MTX_DEF);
 	kmi_node = make_dev(&kmi_fops, 0, UID_ROOT, 0, 0600, "rpl");
-	if(kmi_node == NULL)
+	if (kmi_node == NULL)
 		return ENOMEM;
 	return 0;
 }
 
 static int kmd_unload(void)
 {
-	if(kmi_usecount || Open_count > 0)
+	if (kmi_usecount || Open_count > 0)
 		return EBUSY;
-	if(kmi_node != NULL)
+	if (kmi_node != NULL)
 		destroy_dev(kmi_node);
 	mtx_destroy(&Buffer_lock);
 	mtx_destroy(&Open_lock);
@@ -172,7 +173,7 @@ static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
 
-	if(tty == NULL || count == 0)
+	if (tty == NULL || count == 0)
 		return 0;
 
 	p.dev   = TTY_DEVNR(tty);
@@ -187,7 +188,7 @@ static int rpldhc_write(const char *buf, size_t count, const struct tty *tty)
 {
 	struct rpldev_packet p;
 
-	if(tty == NULL || count == 0)
+	if (tty == NULL || count == 0)
 		return 0;
 
 	p.dev   = TTY_DEVNR(tty);
@@ -215,7 +216,7 @@ static int rpldev_open(struct cdev *cd, int flag, int mode,
     struct thread *th)
 {
 	mtx_lock(&Open_lock);
-	if(Open_count) {
+	if (Open_count) {
 		mtx_unlock(&Open_lock);
 		return EBUSY;
 	}
@@ -223,7 +224,7 @@ static int rpldev_open(struct cdev *cd, int flag, int mode,
 	++Open_count;
 	mtx_unlock(&Open_lock);
 
-	if((Buffer = malloc(Bufsize, Buffer_malloc, M_WAITOK)) == NULL) {
+	if ((Buffer = malloc(Bufsize, Buffer_malloc, M_WAITOK)) == NULL) {
 		mtx_unlock(&Buffer_lock);
 		--kmi_usecount;
 		--Open_count;
@@ -244,18 +245,18 @@ static int rpldev_read(struct cdev *cd, struct uio *uio, int flags)
 	int ret = 0;
 
 	mtx_lock(&Buffer_lock);
-	if(Buffer == NULL)
+	if (Buffer == NULL)
 		goto out;
 
-	while(BufRP == BufWP) {
+	while (BufRP == BufWP) {
 		mtx_unlock(&Buffer_lock);
-		if(flags & IO_NDELAY)
+		if (flags & IO_NDELAY)
 			return EWOULDBLOCK;
-		if((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
+		if ((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
 			return ret;
 		ret = 0;
 		mtx_lock(&Buffer_lock);
-		if(Buffer == NULL)
+		if (Buffer == NULL)
 			goto out;
 	}
 
@@ -277,26 +278,26 @@ static int rpldev_ioctl(struct cdev *cd, u_long cmd, caddr_t data, int flags,
 	size_t *ptr = (void *)data;
 	int ret = 0;
 
-	if(IOCGROUP(cmd) != RPL_IOC_MAGIC)
+	if (IOCGROUP(cmd) != RPL_IOC_MAGIC)
 		return ENOTTY;
-	if(ptr == NULL)
+	if (ptr == NULL)
 		return EFAULT;
 
-	switch(cmd) {
+	switch (cmd) {
 		case RPL_IOC_GETBUFSIZE:
 			/* This is BSD. No put_user() like in Linux. */
 			*ptr = Bufsize;
 			return 0;
 		case RPL_IOC_GETRAVAIL:
 			mtx_lock(&Buffer_lock);
-			if(Buffer == NULL)
+			if (Buffer == NULL)
 				goto out;
 			*ptr = avail_R();
 			mtx_unlock(&Buffer_lock);
 			return 0;
 		case RPL_IOC_GETWAVAIL:
 			mtx_lock(&Buffer_lock);
-			if(Buffer == NULL)
+			if (Buffer == NULL)
 				goto out;
 			*ptr = avail_W();
 			mtx_unlock(&Buffer_lock);
@@ -342,14 +343,14 @@ static int rpldev_close(struct cdev *cd, int flags, int fmt,
 //-----------------------------------------------------------------------------
 static inline size_t avail_R(void)
 {
-	if(BufWP >= BufRP)
+	if (BufWP >= BufRP)
 		return BufWP - BufRP;
 	return BufWP + Bufsize - BufRP;
 }
 
 static inline size_t avail_W(void)
 {
-	if(BufWP >= BufRP)
+	if (BufWP >= BufRP)
 		return BufRP + Bufsize - BufWP - 1;
 	return BufRP - BufWP - 1;
 }
@@ -359,13 +360,13 @@ static inline int circular_get(struct uio *uio, size_t count)
 	size_t x = Buffer + Bufsize - BufRP;
 	int ret;
 
-	if(count < x) {
-		if((ret = uiomove(BufRP, count, uio)) != 0)
+	if (count < x) {
+		if ((ret = uiomove(BufRP, count, uio)) != 0)
 			return ret;
 		BufRP += count;
 	} else {
-		if((ret = uiomove(BufRP, x, uio)) != 0 ||
-		  (ret = uiomove(Buffer, count - x, uio)) != 0)
+		if ((ret = uiomove(BufRP, x, uio)) != 0 ||
+		    (ret = uiomove(Buffer, count - x, uio)) != 0)
 			return ret;
 		BufRP = Buffer + count - x;
 	}
@@ -377,7 +378,7 @@ static inline void circular_put(const void *src, size_t count)
 {
 	size_t x = Buffer + Bufsize - BufWP;
 
-	if(count < x) {
+	if (count < x) {
 		memcpy(BufWP, src, count);
 		BufWP += count;
 	} else {
@@ -392,20 +393,20 @@ static inline void circular_put(const void *src, size_t count)
 static int circular_put_packet(struct rpldev_packet *p, const void *buf,
     size_t count)
 {
-	if(count > (size_t)(-sizeof(struct rpldev_packet) - 1))
+	if (count > (size_t)(-sizeof(struct rpldev_packet) - 1))
 		return ENOSPC;
 	mtx_lock(&Buffer_lock);
-	if(Buffer == NULL) {
+	if (Buffer == NULL) {
 		mtx_unlock(&Buffer_lock);
 		return 0;
 	}
-	if(avail_W() < sizeof(struct rpldev_packet) + count) {
+	if (avail_W() < sizeof(struct rpldev_packet) + count) {
 		mtx_unlock(&Buffer_lock);
 		return ENOSPC;
 	}
 
 	circular_put(p, sizeof(struct rpldev_packet));
-	if(count > 0)
+	if (count > 0)
 		circular_put(buf, count);
 	mtx_unlock(&Buffer_lock);
 	wakeup_one(&Buffer);
@@ -416,14 +417,14 @@ static inline void fill_time(struct timeval *tv)
 {
 	microtime(tv);
 
-	if(sizeof(tv->tv_sec) == sizeof(uint32_t))
+	if (sizeof(tv->tv_sec) == sizeof(uint32_t))
 		tv->tv_sec = htole32(tv->tv_sec);
-	else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
+	else if (sizeof(tv->tv_sec) == sizeof(uint64_t))
 		tv->tv_sec = htole64(tv->tv_sec);
 
-	if(sizeof(tv->tv_usec) == sizeof(uint32_t))
+	if (sizeof(tv->tv_usec) == sizeof(uint32_t))
 		tv->tv_usec = htole32(tv->tv_usec);
-	else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
+	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
 		tv->tv_usec = htole64(tv->tv_usec);
 	return;
 }

@@ -287,38 +287,38 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +++ openbsd-sys-4.0/kern/rpldev.c
 @@ -0,0 +1,363 @@
 +/*
-+	ttyrpld/k_openbsd-4.0/rpldev.c
-+	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-+
-+	Redistribution and use in source and binary forms, with or without
-+	modification, are permitted provided that the following conditions
-+	are met:
-+
-+	1. Redistributions of source code must retain the above copyright
-+	   notice, this list of conditions and the following disclaimer.
-+	2. Redistributions in binary form must reproduce the above copyright
-+	   notice, this list of conditions and the following disclaimer in the
-+	   documentation and/or other materials provided with the distribution.
-+	3. Redistributions of modified code that are made available only
-+	   in binary form require sending a description to the ttyrpld
-+	   project maintainer on what has been changed.
-+	4. Neither the names of the above-listed copyright holders nor the
-+	   names of any contributors may be used to endorse or promote
-+	   products derived from this software without specific prior
-+	   written permission.
-+
-+	NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-+	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-+	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND
-+	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+	COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR
-+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+	BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-+	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-+	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-+*/
++ *	ttyrpld/k_openbsd-4.0/rpldev.c
++ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
++ *
++ *	Redistribution and use in source and binary forms, with or without
++ *	modification, are permitted provided that the following conditions
++ *	are met:
++ *
++ *	1. Redistributions of source code must retain the above copyright
++ *	   notice, this list of conditions and the following disclaimer.
++ *	2. Redistributions in binary form must reproduce the above copyright
++ *	   notice, this list of conditions and the following disclaimer in the
++ *	   documentation and/or other materials provided with the distribution.
++ *	3. Redistributions of modified code that are made available only
++ *	   in binary form require sending a description to the ttyrpld
++ *	   project maintainer on what has been changed.
++ *	4. Neither the names of the above-listed copyright holders nor the
++ *	   names of any contributors may be used to endorse or promote
++ *	   products derived from this software without specific prior
++ *	   written permission.
++ *
++ *	NO WARRANTY. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
++ *	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
++ *	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND
++ *	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
++ *	COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR
++ *	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ *	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++ *	BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++ *	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
++ *	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
++ *	ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
++ */
 +#include <sys/param.h>
 +#include <sys/conf.h>
 +#include <sys/endian.h>
@@ -386,7 +386,7 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +{
 +	struct rpldev_packet p;
 +
-+	if(count == 0)
++	if (count == 0)
 +		return 0;
 +
 +	p.dev   = TTY_DEVNR(tty);
@@ -401,7 +401,7 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +{
 +	struct rpldev_packet p;
 +
-+	if(count == 0)
++	if (count == 0)
 +		return 0;
 +
 +	p.dev   = TTY_DEVNR(tty);
@@ -428,7 +428,7 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +int rpldev_open(dev_t dev, int flag, int mode, struct proc *th)
 +{
 +	mtx_enter(&Open_lock);
-+	if(Open_count) {
++	if (Open_count) {
 +		mtx_leave(&Open_lock);
 +		return EBUSY;
 +	}
@@ -436,7 +436,7 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +	++Open_count;
 +	mtx_leave(&Open_lock);
 +
-+	if((Buffer = malloc(Bufsize, M_TTYS, M_WAITOK)) == NULL) {
++	if ((Buffer = malloc(Bufsize, M_TTYS, M_WAITOK)) == NULL) {
 +		--kmi_usecount;
 +		--Open_count;
 +		return ENOMEM;
@@ -456,18 +456,18 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +	int ret;
 +
 +	mtx_enter(&Buffer_lock);
-+	if(Buffer == NULL)
++	if (Buffer == NULL)
 +		goto out;
 +
-+	while(BufRP == BufWP) {
++	while (BufRP == BufWP) {
 +		mtx_leave(&Buffer_lock);
-+		if(flags & IO_NDELAY)
++		if (flags & IO_NDELAY)
 +			return EWOULDBLOCK;
-+		if((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
++		if ((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
 +			return ret;
 +		ret = 0;
 +		mtx_enter(&Buffer_lock);
-+		if(Buffer == NULL)
++		if (Buffer == NULL)
 +			goto out;
 +	}
 +
@@ -484,25 +484,25 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +	size_t *ptr = (void *)data;
 +	int ret = 0;
 +
-+	if(IOCGROUP(cmd) != RPL_IOC_MAGIC)
++	if (IOCGROUP(cmd) != RPL_IOC_MAGIC)
 +		return ENOTTY;
-+	if(ptr == NULL)
++	if (ptr == NULL)
 +		return EFAULT;
 +
-+	switch(cmd) {
++	switch (cmd) {
 +		case RPL_IOC_GETBUFSIZE:
 +			*ptr = Bufsize;
 +			return 0;
 +		case RPL_IOC_GETRAVAIL:
 +			mtx_enter(&Buffer_lock);
-+			if(Buffer == NULL)
++			if (Buffer == NULL)
 +				goto out;
 +			*ptr = avail_R();
 +			mtx_leave(&Buffer_lock);
 +			return 0;
 +		case RPL_IOC_GETWAVAIL:
 +			mtx_enter(&Buffer_lock);
-+			if(Buffer == NULL)
++			if (Buffer == NULL)
 +				goto out;
 +			*ptr = avail_W();
 +			mtx_leave(&Buffer_lock);
@@ -551,14 +551,14 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +//-----------------------------------------------------------------------------
 +static inline size_t avail_R(void)
 +{
-+	if(BufWP >= BufRP)
++	if (BufWP >= BufRP)
 +		return BufWP - BufRP;
 +	return BufWP + Bufsize - BufRP;
 +}
 +
 +static inline size_t avail_W(void)
 +{
-+	if(BufWP >= BufRP)
++	if (BufWP >= BufRP)
 +		return BufRP + Bufsize - BufWP - 1;
 +	return BufRP - BufWP - 1;
 +}
@@ -567,14 +567,14 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +{
 +	microtime(tv);
 +
-+	if(sizeof(tv->tv_sec) == sizeof(uint32_t))
++	if (sizeof(tv->tv_sec) == sizeof(uint32_t))
 +		tv->tv_sec = htole32(tv->tv_sec);
-+	else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
++	else if (sizeof(tv->tv_sec) == sizeof(uint64_t))
 +		tv->tv_sec = htole64(tv->tv_sec);
 +
-+	if(sizeof(tv->tv_usec) == sizeof(uint32_t))
++	if (sizeof(tv->tv_usec) == sizeof(uint32_t))
 +		tv->tv_usec = htole32(tv->tv_usec);
-+	else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
++	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
 +		tv->tv_usec = htole64(tv->tv_usec);
 +
 +	return;
@@ -582,7 +582,7 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +
 +static inline unsigned int min_uint(unsigned int a, unsigned int b)
 +{
-+	return a < b ? a : b;
++	return (a < b) ? a : b;
 +}
 +
 +static inline uint32_t mkdev_26(unsigned long maj, unsigned long min)
@@ -595,13 +595,13 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +	size_t x = Buffer + Bufsize - BufRP;
 +	int ret;
 +
-+	if(count < x) {
-+		if((ret = uiomove(BufRP, count, uio)) != 0)
++	if (count < x) {
++		if ((ret = uiomove(BufRP, count, uio)) != 0)
 +			return ret;
 +		BufRP += count;
 +	} else {
-+		if((ret = uiomove(BufRP, x, uio)) != 0 ||
-+		  (ret = uiomove(Buffer, count - x, uio)) != 0)
++		if ((ret = uiomove(BufRP, x, uio)) != 0 ||
++		    (ret = uiomove(Buffer, count - x, uio)) != 0)
 +			return ret;
 +		BufRP = Buffer + count - x;
 +	}
@@ -613,7 +613,7 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +{
 +	size_t x = Buffer + Bufsize - BufWP;
 +
-+	if(count < x) {
++	if (count < x) {
 +		memcpy(BufWP, src, count);
 +		BufWP += count;
 +	} else {
@@ -628,20 +628,20 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +static int circular_put_packet(struct rpldev_packet *p, const void *buf,
 +    size_t count)
 +{
-+	if(count > (size_t)(-sizeof(struct rpldev_packet) - 1))
++	if (count > (size_t)(-sizeof(struct rpldev_packet) - 1))
 +		return ENOSPC;
 +	mtx_enter(&Buffer_lock);
-+	if(Buffer == NULL) {
++	if (Buffer == NULL) {
 +		mtx_leave(&Buffer_lock);
 +		return 0;
 +	}
-+	if(avail_W() < sizeof(struct rpldev_packet) + count) {
++	if (avail_W() < sizeof(struct rpldev_packet) + count) {
 +		mtx_leave(&Buffer_lock);
 +		return ENOSPC;
 +	}
 +
 +	circular_put(p, sizeof(struct rpldev_packet));
-+	if(count > 0)
++	if (count > 0)
 +		circular_put(buf, count);
 +	mtx_leave(&Buffer_lock);
 +	wakeup_n(&Buffer, 1);
@@ -674,7 +674,7 @@ Index: openbsd-sys-4.0/kern/tty.c
 +static inline void rpldhk_open(const struct tty *tty)
 +{
 +	typeof(rpl_open) tmp = rpl_open;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(tty);
 +	return;
 +}
@@ -682,7 +682,7 @@ Index: openbsd-sys-4.0/kern/tty.c
 +static inline void rpldhk_read1(char c, const struct tty *tty)
 +{
 +	typeof(rpl_read) tmp = rpl_read;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(&c, 1, tty);
 +	return;
 +}
@@ -691,7 +691,7 @@ Index: openbsd-sys-4.0/kern/tty.c
 +    const struct tty *tty)
 +{
 +	typeof(rpl_write) tmp = rpl_write;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(buf, size, tty);
 +	return;
 +}
@@ -699,7 +699,7 @@ Index: openbsd-sys-4.0/kern/tty.c
 +static inline void rpldhk_lclose(const struct tty *tty)
 +{
 +	typeof(rpl_lclose) tmp = rpl_lclose;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(tty);
 +	return;
 +}

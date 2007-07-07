@@ -1,13 +1,12 @@
 /*
-	ttyrpld/user/replay.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-
-	This file is part of ttyrpld. ttyrpld is free software; you can
-	redistribute it and/or modify it under the terms of the GNU
-	Lesser General Public License as published by the Free Software
-	Foundation; however ONLY version 2 of the License. For details,
-	see the file named "LICENSE.LGPL2".
-*/
+ *	ttyrpld/user/replay.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *
+ *	This file is part of ttyrpld. ttyrpld is free software; you can
+ *	redistribute it and/or modify it under the terms of the GNU
+ *	Lesser General Public License as published by the Free Software
+ *	Foundation; either version 2 or 3 of the License.
+ */
 #include <sys/stat.h>
 #include <sys/time.h> /* µsec def, gettimeofday() */
 #include <sys/types.h>
@@ -61,10 +60,10 @@ struct {
 	.no_pctrl = 0,
 };
 
-// Functions
+/* Functions */
 static int replay_file(int, const char *);
 static void e_proc(int, struct rpldsk_packet *, struct pctrl_info *, char *,
-  struct timeval *, long *);
+	struct timeval *, long *);
 
 static unsigned long calc_ovcorr(unsigned long, int);
 static int find_next_packet(int, const struct pctrl_info *);
@@ -89,7 +88,7 @@ int main(int argc, const char **argv)
 	int i;
 
 	load_locale(*argv);
-	if(get_options(&argc, &argv) <= 0)
+	if (get_options(&argc, &argv) <= 0)
 		return EXIT_FAILURE;
 
 	fprintf(stderr, "> ttyreplay " TTYRPLD_VERSION "\n");
@@ -101,8 +100,8 @@ int main(int argc, const char **argv)
 
 	++argv;
 	--argc;
-	if(argc == 0) {
-		if(!isatty(STDIN_FILENO)) {
+	if (argc == 0) {
+		if (!isatty(STDIN_FILENO)) {
 			fprintf(stderr, _("No arguments given but STDIN seems "
 			        "to be a pipe/file -- replaying from STDIN\n"));
 			argv = auto_stdin;
@@ -114,14 +113,15 @@ int main(int argc, const char **argv)
 
 	setvbuf(stdout, NULL, _IONBF, 0);
 	Opt.ovcorr = calc_ovcorr(0, 100);
-	if(!Opt.no_pctrl)
+	if (!Opt.no_pctrl)
 		pctrl_init();
 
-	for(i = 0; i < argc; /* see switch() */) {
+	for (i = 0; i < argc; /* see switch() */) {
 		const char *file = (argv[i][0] == '-' && argv[i][1] == '\0') ?
 		                   "/dev/stdin" : argv[i];
 		int fd, rv;
-		if((fd = open(file, O_RDONLY)) < 0) {
+
+		if ((fd = open(file, O_RDONLY)) < 0) {
 			fprintf(stderr, _("Could not open %s: %s\n"),
 			        argv[i++], strerror(errno));
 			continue;
@@ -130,12 +130,14 @@ int main(int argc, const char **argv)
 		rv = replay_file(fd, file);
 		close(fd);
 
-		switch(rv) {
+		switch (rv) {
 		case PCTRL_PREV:
-			if(i > 0) --i;
+			if (i > 0)
+				--i;
 			break;
 		case PCTRL_NEXT:
-			if(i < argc - 1) ++i;
+			if (i < argc - 1)
+				++i;
 			break;
 		case PCTRL_EXIT:
 			i = argc;
@@ -159,7 +161,7 @@ static int replay_file(int fd, const char *name)
 	long skew = 0;
 	char tick = 0;
 
-	if(Opt.follow == FM_LIVE && !seek_to_end(fd, &ps))
+	if (Opt.follow == FM_LIVE && !seek_to_end(fd, &ps))
 		return 0;
 
 	memset(&ps, 0, sizeof(struct pctrl_info));
@@ -169,10 +171,10 @@ static int replay_file(int fd, const char *name)
 	ps.skval  = Opt.skval;
 	pctrl_activate(&ps);
 
-	while((ret = read_waitfm(fd, &packet,
-	  sizeof(struct rpldsk_packet), &ps)) == sizeof(struct rpldsk_packet))
+	while ((ret = read_waitfm(fd, &packet,
+	    sizeof(struct rpldsk_packet), &ps)) == sizeof(struct rpldsk_packet))
 	{
-		if(packet.magic != MAGIC_SIG) {
+		if (packet.magic != MAGIC_SIG) {
 			fprintf(stderr, _("\n" "<Packet inconsistency! "
 			        "Trying to find next valid packet.>\n"));
 			tick = 0;
@@ -189,40 +191,40 @@ static int replay_file(int fd, const char *name)
 		SWAB1(&packet.time.tv_sec);
 		SWAB1(&packet.time.tv_usec);
 
-		switch(packet.event) {
+		switch (packet.event) {
 		case EVT_WRITE:
 			e_proc(fd, &packet, &ps, &tick, &stamp, &skew);
 			break;
 		case EVT_ID_PROG:
-			fprintf(stderr, "\e[1;37;41m%s ", _("Created using")); // ]
+			fprintf(stderr, "\e[1;37;41m%s ", _("Created using")); /* ] */
 			read_through(fd, STDERR_FILENO, packet.size);
-			fprintf(stderr, "\e[0m\n"); // ]
+			fprintf(stderr, "\e[0m\n"); /* ] */
 			break;
 		case EVT_ID_DEVPATH:
-			fprintf(stderr, "\e[1;37;41m%s: ", _("Device path")); // ]
+			fprintf(stderr, "\e[1;37;41m%s: ", _("Device path")); /* ] */
 			read_through(fd, STDERR_FILENO, packet.size);
-			fprintf(stderr, "\e[0m\n"); // ]
+			fprintf(stderr, "\e[0m\n"); /* ] */
 			break;
 		case EVT_ID_TIME:
-			fprintf(stderr, "\e[1;37;41m%s ", _("Recorded on")); // ]
+			fprintf(stderr, "\e[1;37;41m%s ", _("Recorded on")); /* ] */
 			read_through(fd, STDERR_FILENO, packet.size);
-			fprintf(stderr, "\e[0m\n"); // ]
+			fprintf(stderr, "\e[0m\n"); /* ] */
 			break;
 		case EVT_ID_USER:
-			fprintf(stderr, "\e[1;37;41m%s: ", _("User")); // ]
+			fprintf(stderr, "\e[1;37;41m%s: ", _("User")); /* ] */
 			read_through(fd, STDERR_FILENO, packet.size);
-			fprintf(stderr, "\e[0m\n"); // ]
+			fprintf(stderr, "\e[0m\n"); /* ] */
 			break;
 		case EVT_LCLOSE:
-			fprintf(stderr, "\n\e[1;37;42m%s\e[0m\n", // ]]
+			fprintf(stderr, "\n\e[1;37;42m%s\e[0m\n", /* ]] */
 			        _("<tty device has been closed>"));
 			read_nullfm(fd, packet.size);
 			break;
 		case EVT_READ:
-			if(ps.echo) {
-				printf("\e[1;37;45m"); // ]
+			if (ps.echo) {
+				printf("\e[1;37;45m"); /* ] */
 				e_proc(fd, &packet, &ps, &tick, &stamp, &skew);
-				printf("\e[0m"); // ]
+				printf("\e[0m"); /* ] */
 				break;
 			}
 			/* fallthrough */
@@ -233,41 +235,41 @@ static int replay_file(int fd, const char *name)
 			break;
 		} /* switch */
 
-		if(ps.brk)
+		if (ps.brk)
 			break;
 	}
 
 	pctrl_deactivate(0);
 
-	if(ret < 0)
-		fprintf(stderr, "\n\e[1;37;41m%s\e[0m\nread(): %s\n", // ]]
+	if (ret < 0)
+		fprintf(stderr, "\n\e[1;37;41m%s\e[0m\nread(): %s\n", /* ]] */
 		        _("<Error while reading from stream>"),
 		        strerror(errno));
 
-	printf("\n\e[1;37;41m"); // ]
+	printf("\n\e[1;37;41m"); /* ] */
 	printf(_("<Log replaying of %s finished>"), name);
-	printf("\e[0m\n"); // ]
+	printf("\e[0m\n"); /* ] */
 	return ps.brk;
 }
 
 static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
     char *tick, struct timeval *stamp, long *skew)
 {
-	if(i->sktype == PCTRL_SKPACK && i->skval-- > 0) {
+	if (i->sktype == PCTRL_SKPACK && i->skval-- > 0) {
 		/* Just skip, do not update tick/stamp/skew/delta */
 		read_through(fd, STDOUT_FILENO, p->size);
 		return;
 	}
 
-	if(!*tick) {
+	if (!*tick) {
 		/* No delay after the first packet has been read... */
 		++*tick;
-		if(i->skval > 0) {
+		if (i->skval > 0) {
 			memcpy(stamp, &p->time, sizeof(struct timeval));
 			read_through(fd, STDOUT_FILENO, p->size);
 			return;
 		}
-	} else if(Opt.follow != FM_LIVE && Opt.follow != FM_NODELAY) {
+	} else if (Opt.follow != FM_LIVE && Opt.follow != FM_NODELAY) {
 		/*
 		 * ... only when we know the next packet (which is already read by now)
 		 * the time difference can be calculated. This code is not
@@ -277,42 +279,46 @@ static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
 		struct timeval delta;
 		tv_delta(stamp, &p->time, &delta);
 
-		if(i->sktype == PCTRL_SKTIME &&
-		 (i->skval -= tv2usec(&delta) / 1000) > 0) {
+		if (i->sktype == PCTRL_SKTIME &&
+		    (i->skval -= tv2usec(&delta) / 1000) > 0) {
 			memcpy(stamp, &p->time, sizeof(struct timeval));
 			read_through(fd, STDOUT_FILENO, p->size);
 			return;
 		}
 
-		if(i->factor != 1.0)
-			// -S switch for the fast
-			usec2tv(static_cast(double, tv2usec(&delta)) / i->factor, &delta);
+		if (i->factor != 1.0)
+			/* -S switch for the fast */
+			usec2tv(static_cast(double, tv2usec(&delta)) /
+			        i->factor, &delta);
 
-		if(Opt.maxdelay > 0 && tv2usec(&delta) > Opt.maxdelay)
-			// -m switch for those who do not want to wait their lifetime.
+		if (Opt.maxdelay > 0 && tv2usec(&delta) > Opt.maxdelay)
+			/* -m switch for those who do not want to wait */
 			usec2tv(Opt.maxdelay, &delta);
 
 		usleep_ovcorr(&delta, skew);
 	}
 
-	while(i->paused)
+	while (i->paused)
 		usleep(100000);
 
 	memcpy(stamp, &p->time, sizeof(struct timeval));
 	read_through(fd, STDOUT_FILENO, p->size);
 
-	if(Opt.showtime) {
+	if (Opt.showtime) {
 		struct tm tm;
 		char buf[80];
 		time_t now = p->time.tv_sec;
+
 		localtime_r(&now, &tm);
 
-		if(Opt.showtime == 1)
-			strftime(buf, sizeof(buf), "\e7\e[1;300H\e[10D" // ]]
-			 "\e[0;7m[\e[0;1;37;41m" "%H:%M:%S" "\e[0;7m]\e8\e[0m", &tm); // ]]]]
+		if (Opt.showtime == 1)
+			strftime(buf, sizeof(buf), "\e7\e[1;300H\e[10D" /* ]] */
+			         "\e[0;7m[\e[0;1;37;41m" "%H:%M:%S"
+			         "\e[0;7m]\e8\e[0m", &tm); /* ]]]] */
 		else
-			strftime(buf, sizeof(buf), "\e7\e[1;300H\e[13D" // ]]
-			 "\e[0;7m[\e[0;1;37;41m" "%d.%m %H:%M" "\e[0;7m]\e8\e[0m", &tm); // ]]]]
+			strftime(buf, sizeof(buf), "\e7\e[1;300H\e[13D" /* ]] */
+			         "\e[0;7m[\e[0;1;37;41m" "%d.%m %H:%M"
+			         "\e[0;7m]\e8\e[0m", &tm); /* ]]]] */
 
 		write(STDOUT_FILENO, buf, strlen(buf));
 	}
@@ -320,7 +326,8 @@ static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
 }
 
 //-----------------------------------------------------------------------------
-static unsigned long calc_ovcorr(unsigned long ad, int rd) {
+static unsigned long calc_ovcorr(unsigned long ad, int rd)
+{
 	struct timespec s = {.tv_sec = 0, .tv_nsec = ad};
 	struct timeval start, stop;
 	unsigned long av = 0;
@@ -328,12 +335,12 @@ static unsigned long calc_ovcorr(unsigned long ad, int rd) {
 
 	fprintf(stderr, _("Calculating average overhead..."));
 
-	while(count--) {
+	while (count--) {
 		gettimeofday(&start, NULL);
 		nanosleep(&s, NULL);
 		gettimeofday(&stop, NULL);
 		av += MICROSECOND * (stop.tv_sec - start.tv_sec) +
-			  stop.tv_usec - start.tv_usec;
+		      stop.tv_usec - start.tv_usec;
 	}
 
 	av /= rd;
@@ -341,7 +348,8 @@ static unsigned long calc_ovcorr(unsigned long ad, int rd) {
 	return av;
 }
 
-static int find_next_packet(int fd, const struct pctrl_info *ps) {
+static int find_next_packet(int fd, const struct pctrl_info *ps)
+{
 	/* Interesting, there is more algorithmic code than simple
 	code in ttyreplay. Outstanding. */
 #define LZ           sizeof(struct rpldsk_packet)
@@ -352,10 +360,10 @@ static int find_next_packet(int fd, const struct pctrl_info *ps) {
 	size_t s;
 	int ok = 0;
 
-	if(read_waitfm(fd, buf, BZ, ps) < BZ)
+	if (read_waitfm(fd, buf, BZ, ps) < BZ)
 		return 0;
 
-	while(1) {
+	while (1) {
 		char *ptr;
 
 		/*
@@ -364,27 +372,27 @@ static int find_next_packet(int fd, const struct pctrl_info *ps) {
 		 * into this function, there is a reason to it.
 		 */
 
-		if((ptr = memchr(buf, MAGIC_SIG, BZ)) != NULL &&
-		  ptr - buf >= MAGIC_OFFSET) {
+		if ((ptr = memchr(buf, MAGIC_SIG, BZ)) != NULL &&
+		    ptr - buf >= MAGIC_OFFSET) {
 			/*
 			 * A magic byte has been found and the packet start is
 			 * complete
 			 */
 			char *ctx = containerof(ptr, struct rpldsk_packet, magic);
-			if(ctx != buf) {
+			if (ctx != buf) {
 				size_t cnt = buf + BZ - ctx;
 				ctx = memmove(buf, ctx, cnt);
-				if(read_waitfm(fd, buf + cnt, BZ - cnt, ps) < BZ - cnt)
+				if (read_waitfm(fd, buf + cnt, BZ - cnt, ps) < BZ - cnt)
 					return 0;
 			}
-		} else if(ptr != NULL) {
+		} else if (ptr != NULL) {
 			/*
 			 * Magic byte, but of no use. Discard it, and fill up
 			 * with new data from the descriptor.
 			 */
 			size_t cnt = buf + BZ - ptr - 1;
 			memmove(buf, ptr + 1, cnt);
-			if(read_waitfm(fd, buf + cnt, BZ - cnt, ps) < BZ - cnt)
+			if (read_waitfm(fd, buf + cnt, BZ - cnt, ps) < BZ - cnt)
 				return 0;
 			continue;
 		} else {
@@ -393,13 +401,13 @@ static int find_next_packet(int fd, const struct pctrl_info *ps) {
 			 * byte in the stream, only read LZ bytes.
 			 */
 			memmove(buf, buf + BZ - LZ, BZ - LZ);
-			if(read_waitfm(fd, buf + LZ, BZ - LZ, ps) < BZ - LZ)
+			if (read_waitfm(fd, buf + LZ, BZ - LZ, ps) < BZ - LZ)
 				return 0;
 			continue;
 		}
 
 		s = packet->size;
-		if(s > 4096) {
+		if (s > 4096) {
 			/*
 			 * The default tty buffer size is 4096, and any size
 			 * above this is questionable at all. Start with a new
@@ -407,25 +415,25 @@ static int find_next_packet(int fd, const struct pctrl_info *ps) {
 			 */
 			ok = 0;
 			memmove(buf, buf + LZ, BZ - LZ);
-			if(read_waitfm(fd, buf, BZ, ps) < BZ)
+			if (read_waitfm(fd, buf, BZ, ps) < BZ)
 				return 0;
 			continue;
 		}
 
-		if(s < LZ) {
+		if (s < LZ) {
 			memmove(buf, buf + LZ + s, BZ - LZ - s);
-			if(read_waitfm(fd, buf + BZ - LZ - s, LZ + s, ps) < LZ + s)
+			if (read_waitfm(fd, buf + BZ - LZ - s, LZ + s, ps) < LZ + s)
 				return 0;
 		} else {
 			/*
 			 * There is no header (according to .size) in our buffer, so we
 			 * can blindly munge lots of data.
 			 */
-			if(!read_nullfm(fd, s - LZ) || read_waitfm(fd, buf, BZ, ps) < BZ)
+			if (!read_nullfm(fd, s - LZ) || read_waitfm(fd, buf, BZ, ps) < BZ)
 				return 0;
 		}
 
-		if((ptr = memchr(buf, MAGIC_SIG, MAGIC_OFFSET + 1)) == NULL ||
+		if ((ptr = memchr(buf, MAGIC_SIG, MAGIC_OFFSET + 1)) == NULL ||
 		  ptr - buf != MAGIC_OFFSET) {
 			/*
 			 * If the size field does not match up with the next
@@ -435,25 +443,25 @@ static int find_next_packet(int fd, const struct pctrl_info *ps) {
 			continue;
 		}
 
-		if(++ok >= 2)
+		if (++ok >= 2)
 			break;
 	}
 
 	fprintf(stderr, _("\n" "<Found packet boundary>\n"));
 
 	/* Finally adjust the read pointer to a packet boundary */
-	if((s = packet->size) < 16) {
+	if ((s = packet->size) < 16) {
 		/*
 		 * Mmhkay, there is another header other than the current
 		 * (packet) in the buffer. Crap, another one gone.
 		 */
 		memmove(buf, buf + LZ + s, BZ - LZ - s);
-		if(read_waitfm(fd, buf + BZ - LZ - s, s, ps) < s ||
-		  !read_nullfm(fd, packet->size))
+		if (read_waitfm(fd, buf + BZ - LZ - s, s, ps) < s ||
+		    !read_nullfm(fd, packet->size))
 			return 0;
 	} else {
 		/* Just subtract what we have already read into the buffer */
-		if(!read_nullfm(fd, s - LZ))
+		if (!read_nullfm(fd, s - LZ))
 			return 0;
 	}
 
@@ -500,11 +508,11 @@ static void getopt_jump(const struct HXoptcb *cbi)
 	Opt.sktype = PCTRL_SKTIME;
 	Opt.skval  = 0;
 
-	if((sec = strrchr(tmp, ':')) == NULL) {
+	if ((sec = strrchr(tmp, ':')) == NULL) {
 		sec = tmp;
 	} else {
 		*sec++ = '\0';
-		if((min = strrchr(tmp, ':')) == NULL) {
+		if ((min = strrchr(tmp, ':')) == NULL) {
 			min = tmp;
 		} else {
 			*min++ = '\0';
@@ -538,12 +546,12 @@ static ssize_t read_through(int in, int out, size_t count)
 	char buf[BUFSIZE];
 	size_t rem = count;
 
-	while(rem > 0) {
+	while (rem > 0) {
 		ssize_t ret = read(in, buf, min_uint(BUFSIZE, rem));
-		if(ret < 0)
+		if (ret < 0)
 			return 0;
 		write(out, buf, ret);
-		if(ret == rem)
+		if (ret == rem)
 			break;
 		rem -= ret;
 		usleep(10000);
@@ -569,7 +577,7 @@ static ssize_t read_waitfm(int fd, void *buf, size_t count,
 	struct stat sb;
 	off_t pos;
 
-	if(Opt.follow == FM_NONE || Opt.follow == FM_NODELAY)
+	if (Opt.follow == FM_NONE || Opt.follow == FM_NODELAY)
 		/*
 		 * If no follow mode is selected, the while() loop in
 		 * replay_file() shall terminate as soon as we encounter EOF or
@@ -582,7 +590,7 @@ static ssize_t read_waitfm(int fd, void *buf, size_t count,
 	 * requested bytes. fstat() must come after lseek() -- in the very case
 	 * that the file size increases inbetween.
 	 */
-	if(Opt.follow == FM_CATCHUP && (pos = lseek(fd, 0, SEEK_CUR)) != 0 &&
+	if (Opt.follow == FM_CATCHUP && (pos = lseek(fd, 0, SEEK_CUR)) != 0 &&
 	  fstat(fd, &sb) == 0 && pos == sb.st_size) {
 		fprintf(stderr, "\n\e[1;37;41m%s\e[0m\n",
 		        _("<Switching to live feed follow mode>"));
@@ -594,21 +602,22 @@ static ssize_t read_waitfm(int fd, void *buf, size_t count,
 
 static int seek_to_end(int fd, const struct pctrl_info *ps)
 {
-	if(lseek(fd, 0, SEEK_END) == -1 && errno == ESPIPE) {
+	if (lseek(fd, 0, SEEK_END) == -1 && errno == ESPIPE) {
 		/*
 		 * Some workaround for non-seekable descriptors. G_skip() is
 		 * not suitable, since ... it's just not designed to do what is
 		 * below, i.e.  non-blocking-until-EOF-call-it-something.
 		 */
 		char buf[BUFSIZE];
-		fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
+		fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 		fprintf(stderr, _("Reading from something that does not "
 		        "support seeking (a pipe?),\n"
 		        "skipping to a position where reading would block\n"));
 
-		while(read(fd, buf, BUFSIZE) > 0);
-		if(errno != EAGAIN) {
+		while (read(fd, buf, BUFSIZE) > 0)
+			;
+		if (errno != EAGAIN) {
 			perror("read()");
 			return 0;
 		}
@@ -668,8 +677,8 @@ static int usleep_ovcorr(struct timeval *req, long *skew)
 	gettimeofday(&start, NULL);
 	req_usec = tv2usec(req);
 
-	if(req_usec > Opt.ovcorr) {
-		if(*skew + Opt.ovcorr <= req_usec) {
+	if (req_usec > Opt.ovcorr) {
+		if (*skew + Opt.ovcorr <= req_usec) {
 			/*
 			 * If the accumulated skew time plus the minimal delay
 			 * fits into the request, the request is reduced and
@@ -688,7 +697,7 @@ static int usleep_ovcorr(struct timeval *req, long *skew)
 			*skew -= req_usec;
 			return 0;
 		}
-	} else if(*skew >= -Opt.ovcorr) {
+	} else if (*skew >= -Opt.ovcorr) {
 		/*
 		 * Specialty case: Allow the skew to become negative up to
 		 * -1/HZ s (= having paused too few).
@@ -733,7 +742,7 @@ static void tv_delta(const struct timeval *past, const struct timeval *now,
 	unsigned long sec = now->tv_sec - past->tv_sec;
 	long acc = now->tv_usec - past->tv_usec;
 
-	if(acc < 0) {
+	if (acc < 0) {
 		dest->tv_sec  = sec - 1;
 		dest->tv_usec = MICROSECOND + acc;
 	} else {

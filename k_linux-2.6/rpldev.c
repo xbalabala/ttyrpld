@@ -1,12 +1,12 @@
 /*
-	ttyrpld/k_linux-2.6/rpldev.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-
-	This program is free software; you can redistribute it and/or modify it
-	under the terms of the GNU General Public License as published by the
-	Free Software Foundation; however ONLY version 2 of the License. For
-	details, see the file named "LICENSE.GPL2".
-*/
+ *	ttyrpld/k_linux-2.6/rpldev.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *
+ *	This file is part of ttyrpld. ttyrpld is free software; you can
+ *	redistribute it and/or modify it under the terms of the GNU
+ *	Lesser General Public License as published by the Free Software
+ *	Foundation; either version 2 or 3 of the License.
+ */
 #include <asm/byteorder.h>
 #include <asm/semaphore.h>
 #include <asm/uaccess.h>
@@ -121,8 +121,9 @@ module_param_named(minor, Minor_nr, uint, S_IRUGO);
 static __init int rpldev_init(void)
 {
 	int ret;
+
 	kmi_miscinfo.minor = Minor_nr;
-	if((ret = misc_register(&kmi_miscinfo)) != 0)
+	if ((ret = misc_register(&kmi_miscinfo)) != 0)
 		return ret;
 	/* Give minor number back to sysfs */
 	Minor_nr = kmi_miscinfo.minor;
@@ -157,9 +158,9 @@ static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
 	 * "/dev/tty" is an evil case, because its ownership is not the same as
 	 * that of a better node, e.g. /dev/tty1. Do not pass it to userspace.
 	 */
-	if(filp->f_dentry->d_inode->i_rdev == MKDEV(TTYAUX_MAJOR, 0) ||
-	  IS_ERR(full_dev = d_path(filp->f_dentry, filp->f_vfsmnt,
-	  dev, sizeof(dev)))) {
+	if (filp->f_dentry->d_inode->i_rdev == MKDEV(TTYAUX_MAJOR, 0) ||
+	    IS_ERR(full_dev = d_path(filp->f_dentry, filp->f_vfsmnt,
+	    dev, sizeof(dev)))) {
 		p.size = 0;
 		return circular_put_packet(&p, NULL, 0);
 	}
@@ -180,7 +181,7 @@ static int rpldhc_read(const char __user *buf, size_t count,
 	struct rpldev_packet p;
 
 	SKIP_PTM(tty);
-	if(count == 0)
+	if (count == 0)
 		return 0;
 
 	p.dev   = TTY_DEVNR(tty);
@@ -210,7 +211,7 @@ static int rpldhc_write(const char __user *buf, size_t count,
 	struct rpldev_packet p;
 
 	SKIP_PTM(tty);
-	if(count == 0)
+	if (count == 0)
 		return 0;
 
 	p.dev   = TTY_DEVNR(tty);
@@ -226,7 +227,7 @@ static int rpldhc_lclose(const struct tty_struct *tty,
 {
 	struct rpldev_packet p;
 
-	if(IS_PTY_MASTER(tty))
+	if (IS_PTY_MASTER(tty))
 		tty = other;
 
 	p.dev   = TTY_DEVNR(tty);
@@ -240,7 +241,7 @@ static int rpldhc_lclose(const struct tty_struct *tty,
 //-----------------------------------------------------------------------------
 static int rpldev_open(struct inode *inode, struct file *filp)
 {
-	if(inode != NULL) {
+	if (inode != NULL) {
 		inode->i_mtime = CURRENT_TIME;
 		inode->i_mode &= ~(S_IWUGO | S_IXUGO);
 	}
@@ -250,14 +251,14 @@ static int rpldev_open(struct inode *inode, struct file *filp)
 	 * different packets could go to different readers.
 	 */
 	down(&Open_lock);
-	if(Open_count) {
+	if (Open_count) {
 		up(&Open_lock);
 		return -EBUSY;
 	}
 	++Open_count;
 	up(&Open_lock);
 
-	if((Buffer = vmalloc(Bufsize)) == NULL) {
+	if ((Buffer = vmalloc(Bufsize)) == NULL) {
 		--Open_count;
 		return -ENOMEM;
 	}
@@ -279,7 +280,7 @@ static int rpldev_open(struct inode *inode, struct file *filp)
 	 * Inode Change Time: when the device is successfully opened
 	 * Modification Time: whenever the device is opened
 	 */
-	if(inode != NULL)
+	if (inode != NULL)
 		inode->i_ctime = CURRENT_TIME;
 	return 0;
 }
@@ -288,24 +289,25 @@ static ssize_t rpldev_read(struct file *filp, char __user *buf, size_t count,
     loff_t *ppos)
 {
 	int ret = 0;
-	if(count == 0)
+
+	if (count == 0)
 		return 0;
 
 	/* Must sleep as long as there is no data */
-	if(down_interruptible(&Buffer_lock))
+	if (down_interruptible(&Buffer_lock))
 		return -ERESTARTSYS;
-	if(Buffer == NULL)
+	if (Buffer == NULL)
 		goto out;
 
-	while(BufRP == BufWP) {
+	while (BufRP == BufWP) {
 		up(&Buffer_lock);
-		if(filp->f_flags & O_NONBLOCK)
+		if (filp->f_flags & O_NONBLOCK)
 			return -EAGAIN;
-		if(wait_event_interruptible(Pull_queue, (BufRP != BufWP)))
+		if (wait_event_interruptible(Pull_queue, (BufRP != BufWP)))
 			return -ERESTARTSYS;
-		if(down_interruptible(&Buffer_lock))
+		if (down_interruptible(&Buffer_lock))
 			return -ERESTARTSYS;
-		if(Buffer == NULL)
+		if (Buffer == NULL)
 			goto out;
 	}
 
@@ -328,10 +330,10 @@ static loff_t rpldev_seek(struct file *filp, loff_t offset, int origin) {
 	 */
 	int ret = -ESPIPE;
 
-	if(origin == SEEK_END && offset == 0) {
-		if(down_interruptible(&Buffer_lock))
+	if (origin == SEEK_END && offset == 0) {
+		if (down_interruptible(&Buffer_lock))
 			return -ERESTARTSYS;
-		if(Buffer == NULL)
+		if (Buffer == NULL)
 			goto out;
 		BufRP = BufWP;
 		up(&Buffer_lock);
@@ -339,11 +341,11 @@ static loff_t rpldev_seek(struct file *filp, loff_t offset, int origin) {
 		return 0;
 	}
 
-	if(origin != SEEK_CUR)
+	if (origin != SEEK_CUR)
 		return -ESPIPE;
-	if(offset == 0)
+	if (offset == 0)
 		return 0;
-	if(down_interruptible(&Buffer_lock))
+	if (down_interruptible(&Buffer_lock))
 		return -ERESTARTSYS;
 	BufRP = Buffer + (BufRP - Buffer +
 	        min_uint(offset, avail_R())) % Bufsize;
@@ -359,20 +361,20 @@ static int rpldev_ioctl(struct inode *inode, struct file *filp,
 {
 	int ret = 0;
 
-	if(_IOC_TYPE(cmd) != RPL_IOC_MAGIC)
+	if (_IOC_TYPE(cmd) != RPL_IOC_MAGIC)
 		return -ENOTTY;
 
-	switch(cmd) {
+	switch (cmd) {
 		case RPL_IOC_GETBUFSIZE:
 			return Bufsize;
 		case RPL_IOC_GETRAVAIL:
-			if(down_interruptible(&Buffer_lock))
+			if (down_interruptible(&Buffer_lock))
 				return -ERESTARTSYS;
 			ret = avail_R();
 			up(&Buffer_lock);
 			return ret;
 		case RPL_IOC_GETWAVAIL:
-			if(down_interruptible(&Buffer_lock))
+			if (down_interruptible(&Buffer_lock))
 				return -ERESTARTSYS;
 			ret = avail_W();
 			up(&Buffer_lock);
@@ -427,7 +429,7 @@ assuming Buffer=(void*)20, Bufsize=8 for simplicity
 /* Return the number of available bytes to read */
 static inline size_t avail_R(void)
 {
-	if(BufWP >= BufRP)
+	if (BufWP >= BufRP)
 		return BufWP - BufRP;
 	return BufWP + Bufsize - BufRP;
 }
@@ -435,7 +437,7 @@ static inline size_t avail_R(void)
 /* Return the number of available bytes to write */
 static inline size_t avail_W(void)
 {
-	if(BufWP >= BufRP)
+	if (BufWP >= BufRP)
 		return BufRP + Bufsize - BufWP - 1;
 	return BufRP - BufWP - 1;
 }
@@ -455,12 +457,12 @@ static inline int circular_get(char __user *dest, size_t count)
 	 * It is advised that the userspace daemon has @dest memory-locked to
 	 * minimize blocking operation due to swapped-out page faults.
 	 */
-	if(count < x) {
-		if((ret = copy_to_user(dest, BufRP, count)) == 0)
+	if (count < x) {
+		if ((ret = copy_to_user(dest, BufRP, count)) == 0)
 			BufRP += count;
 	} else {
-		if((ret = copy_to_user(dest, BufRP, x)) == 0 &&
-		  (ret = copy_to_user(dest + x, Buffer, count - x)) == 0)
+		if ((ret = copy_to_user(dest, BufRP, x)) == 0 &&
+		    (ret = copy_to_user(dest + x, Buffer, count - x)) == 0)
 			BufRP = Buffer + count - x;
 	}
 
@@ -477,7 +479,7 @@ static inline void circular_put(const void __kernel *src, size_t count)
 {
 	size_t x = Buffer + Bufsize - BufWP;
 
-	if(count < x) {
+	if (count < x) {
 		memcpy(BufWP, src, count);
 		BufWP += count;
 	} else {
@@ -493,12 +495,12 @@ static inline void circular_putU(const void __user *src, size_t count)
 {
 	size_t x = Buffer + Bufsize - BufWP;
 
-	if(count < x) {
-		if(copy_from_user(BufWP, src, count) == 0)
+	if (count < x) {
+		if (copy_from_user(BufWP, src, count) == 0)
 			BufWP += count;
 	} else {
-		if(copy_from_user(BufWP, src, x) == 0 &&
-		 copy_from_user(Buffer, src + x, count - x) == 0)
+		if (copy_from_user(BufWP, src, x) == 0 &&
+		    copy_from_user(Buffer, src + x, count - x) == 0)
 			BufWP = Buffer + count - x;
 	}
 
@@ -518,22 +520,22 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
 	 * the greatest value @count can have without overflowing is (~0 -
 	 * sizeof(struct rpldev_packet)).
 	 */
-	if(count > (size_t)(-sizeof(struct rpldev_packet) - 1))
+	if (count > (size_t)(-sizeof(struct rpldev_packet) - 1))
 		return -ENOSPC;
-	if(down_interruptible(&Buffer_lock))
+	if (down_interruptible(&Buffer_lock))
 		return -ERESTARTSYS;
-	if(Buffer == NULL) {
+	if (Buffer == NULL) {
 		up(&Buffer_lock);
 		return 0;
 	}
-	if(avail_W() < sizeof(struct rpldev_packet) + count) {
+	if (avail_W() < sizeof(struct rpldev_packet) + count) {
 		up(&Buffer_lock);
 		return -ENOSPC;
 	}
 
 	circular_put(p, sizeof(struct rpldev_packet));
-	if(count > 0) {
-		if(__addr_ok(buf))
+	if (count > 0) {
+		if (__addr_ok(buf))
 			circular_putU(buf, count);
 		else
 			circular_put(buf, count);
@@ -552,14 +554,14 @@ static inline void fill_time(struct timeval *tv)
 	 * This function all gets optimized away on little-endian. On
 	 * big-endian, it is reduced by 50%.
 	 */
-	if(sizeof(tv->tv_sec) == sizeof(uint32_t))
+	if (sizeof(tv->tv_sec) == sizeof(uint32_t))
 		tv->tv_sec = cpu_to_le32(tv->tv_sec);
-	else if(sizeof(tv->tv_sec) == sizeof(uint64_t))
+	else if (sizeof(tv->tv_sec) == sizeof(uint64_t))
 		tv->tv_sec = cpu_to_le64(tv->tv_sec);
 
-	if(sizeof(tv->tv_usec) == sizeof(uint32_t))
+	if (sizeof(tv->tv_usec) == sizeof(uint32_t))
 		tv->tv_usec = cpu_to_le32(tv->tv_usec);
-	else if(sizeof(tv->tv_usec) == sizeof(uint64_t))
+	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
 		tv->tv_usec = cpu_to_le64(tv->tv_usec);
 
 	return;
