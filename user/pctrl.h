@@ -23,7 +23,8 @@ struct pctrl_info {
 	double factor;
 	int sktype;
 	long skval;
-	unsigned char paused, brk, echo;
+	unsigned int break_command;
+	unsigned char paused, echo;
 };
 
 extern int pctrl_init(void);

@@ -82,10 +82,10 @@ static void *pctrl_thread(void *arg)
 			pstatus->paused ^= static_cast(unsigned long, -1);
 			break;
 		case '<':
-			pstatus->brk = PCTRL_PREV;
+			pstatus->break_command = PCTRL_PREV;
 			break;
 		case '>':
-			pstatus->brk = PCTRL_NEXT;
+			pstatus->break_command = PCTRL_NEXT;
 			break;
 		case '[':
 			pstatus->factor -= 1.10;
@@ -114,7 +114,7 @@ static void *pctrl_thread(void *arg)
 			pstatus->skval += 60 * 1000;
 			break;
 		case 'q':
-			pstatus->brk = PCTRL_EXIT;
+			pstatus->break_command = PCTRL_EXIT;
 			break;
 		case 'x':
 			pstatus->factor = 1;

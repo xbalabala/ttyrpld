@@ -92,7 +92,7 @@ ssize_t read_wait(int fd, void *buf, size_t count,
 			break;
 		buf += ret;
 		rem -= ret;
-		if (ps->brk)
+		if (ps->break_command != PCTRL_NONE)
 			return count - rem;
 		usleep(10000);
 	}

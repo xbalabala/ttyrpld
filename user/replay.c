@@ -235,7 +235,7 @@ static int replay_file(int fd, const char *name)
 			break;
 		} /* switch */
 
-		if (ps.brk)
+		if (ps.break_command != PCTRL_NONE)
 			break;
 	}
 
@@ -249,7 +249,7 @@ static int replay_file(int fd, const char *name)
 	printf("\n\e[1;37;41m"); /* ] */
 	printf(_("<Log replaying of %s finished>"), name);
 	printf("\e[0m\n"); /* ] */
-	return ps.brk;
+	return ps.break_command;
 }
 
 static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
