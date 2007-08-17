@@ -21,6 +21,7 @@
 #include <pthread.h>
 #include <pwd.h>
 #include <signal.h>
+#include <stdbool.h>
 #include "rpl_stdint.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,16 +68,16 @@ static void sighandler_int(int);
 static void sighandler_alrm(int);
 static void sighandler_pipe(int);
 
-static int find_devnode(uint32_t, char *, size_t, const char **);
-static int find_devnode_dive(uint32_t, char *, size_t, const char *);
+static bool find_devnode(uint32_t, char *, size_t, const char **);
+static bool find_devnode_dive(uint32_t, char *, size_t, const char *);
 static char *getnamefromuid(uid_t, char *, size_t);
 static uid_t getuidfromname(const char *);
 static int get_options(int *, const char ***);
 static void getopt_config(const struct HXoptcb *);
 static void getopt_username(const struct HXoptcb *);
-static int rate_limit(int, time_t);
-static int read_config(const char *);
-static int read_config_bp(const char *, const char *);
+static bool rate_limit(int, time_t);
+static bool read_config(const char *);
+static bool read_config_bp(const char *, const char *);
 
 /* Variables */
 static struct {
@@ -658,7 +659,7 @@ static void sighandler_pipe(int s)
 }
 
 //-----------------------------------------------------------------------------
-static int find_devnode(uint32_t id, char *dest, size_t len,
+static bool find_devnode(uint32_t id, char *dest, size_t len,
     const char **loc_pbase)
 {
 	/*
@@ -671,15 +672,15 @@ static int find_devnode(uint32_t id, char *dest, size_t len,
 		if(find_devnode_dive(id, dest, len, *dirp)) {
 			if(loc_pbase != NULL)
 				*loc_pbase = *dirp;
-			return 1;
+			return true;
 		}
 		++dirp;
 	}
-	return 0;
+	return false;
 }
 
-static int find_devnode_dive(uint32_t id, char *dest, size_t len,
-     const char *dir)
+static bool find_devnode_dive(uint32_t id, char *dest, size_t len,
+    const char *dir)
 {
 	/*
 	 * Scan a directory for node. During directory traversal, everything
@@ -691,14 +692,14 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 	char buf[MAXFNLEN];
 	struct stat sb_self, sb_deref;
 	const char *de;
-	int ret = 0;
+	bool ret = false;
 	void *dx;
 
 	if((dx = HXdir_open(dir)) == NULL) {
 		if(errno != ENOENT && rate_limit(C_KERNEL, 10))
 			notify(LOG_WARNING, _("Could not open %s: %s\n"),
 			       dir, strerror(errno));
-		return 0;
+		return false;
 	}
 
 	while((de = HXdir_read(dx)) != NULL) {
@@ -711,14 +712,14 @@ static int find_devnode_dive(uint32_t id, char *dest, size_t len,
 		  K26_MKDEV(COMPAT_MAJOR(sb_deref.st_rdev),
 		  COMPAT_MINOR(sb_deref.st_rdev)) == id) {
 			HX_strlcpy(dest, buf, len);
-			ret = 1;
+			ret = true;
 			break;
 		} else if(!S_ISLNK(sb_self.st_mode) &&
 		  S_ISDIR(sb_deref.st_mode)) {
 			snprintf(buf, sizeof(buf), "%s/%s", dir, de);
 			if(!find_devnode_dive(id, dest, len, buf))
 				continue;
-			ret = 1;
+			ret = true;
 			break;
 		}
 	}
@@ -795,20 +796,20 @@ static void getopt_username(const struct HXoptcb *cbi)
 	return;
 }
 	
-static int rate_limit(int counter, time_t delta)
+static bool rate_limit(int counter, time_t delta)
 {
 	static time_t last_time[C_MAX] = {};
 	time_t now = time(NULL);
 
 	if(now > last_time[counter] + delta) {
 		last_time[counter] = now;
-		return 1;
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
-static int read_config(const char *file)
+static bool read_config(const char *file)
 {
     static struct HXoption config_table[] = {
         {.ln = "DEVICE",      .type = HXTYPE_STRING, .ptr = &Opt.device},
@@ -824,7 +825,7 @@ static int read_config(const char *file)
 	return HX_shconfig(file, config_table) <= 0;
 }
 
-static int read_config_bp(const char *app_path, const char *file)
+static bool read_config_bp(const char *app_path, const char *file)
 {
 	char *fpath = HX_strdup(app_path), *ptr, construct[MAXFNLEN];
 	if((ptr = strrchr(fpath, '/')) == NULL) {
