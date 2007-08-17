@@ -69,8 +69,7 @@ struct tty *get_tty(uint32_t dev, int create)
 	ts = HXbtree_add(Ttys, reinterpret_cast(const void *, dev), tty);
 	if (ts == NULL) {
 		free(tty);
-		notify(LOG_ERR, _("%s: Memory allocation failure\n"),
-		       __FUNCTION__);
+		notify(LOG_ERR, _("%s: Memory allocation failure\n"), __func__);
 		return NULL;
 	}
 
