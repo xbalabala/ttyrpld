@@ -821,7 +821,7 @@ static int read_config(const char *file)
          .cb = getopt_username},
         {NULL},
     };
-    return HX_shconfig(file, config_table);
+	return HX_shconfig(file, config_table) <= 0;
 }
 
 static int read_config_bp(const char *app_path, const char *file)
