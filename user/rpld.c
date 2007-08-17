@@ -81,15 +81,17 @@ static bool read_config_bp(const char *, const char *);
 
 /* Variables */
 static struct {
-	int _running, dolog, infod_start, max_fd;
 	char *device;
 	long bsize;
+	int max_fd;
+	unsigned int dolog, infod_start;
+	bool _running;
 } Opt = {
-	._running    = 1,
+	._running    = true,
 	.bsize       = 32 * 1024,
 	.device      = "/dev/misc/rpl /dev/rpl /devices/pseudo/rpldev@0:0",
-	.dolog       = 1,
-	.infod_start = 0,
+	.dolog       = true,
+	.infod_start = false,
 	.max_fd      = -1, /* use system default */
 };
 

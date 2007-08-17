@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,17 +48,17 @@ enum {
 
 struct {
 	double factor;
-	int follow, nodelay, sktype, no_pctrl, showtime;
 	long ovcorr, maxdelay, skval;
+	unsigned int follow, nodelay, sktype, no_pctrl, showtime;
 } Opt = {
 	.factor   = 1.0,
-	.follow   = 0,
+	.follow   = false,
 	.maxdelay = -1,
-	.nodelay  = 0,
+	.nodelay  = false,
 	.sktype   = PCTRL_NONE,
-	.skval    = 0,
-	.showtime = 0,
-	.no_pctrl = 0,
+	.skval    = false,
+	.showtime = false,
+	.no_pctrl = false,
 };
 
 /* Functions */
@@ -67,7 +68,7 @@ static void e_proc(int, struct rpldsk_packet *, struct pctrl_info *, char *,
 
 static unsigned long calc_ovcorr(unsigned long, int);
 static int find_next_packet(int, const struct pctrl_info *);
-static int get_options(int *, const char ***);
+static bool get_options(int *, const char ***);
 static void getopt_jump(const struct HXoptcb *);
 static void getopt_msec(const struct HXoptcb *);
 static void getopt_skip(const struct HXoptcb *);
@@ -88,7 +89,7 @@ int main(int argc, const char **argv)
 	int i;
 
 	load_locale(*argv);
-	if (get_options(&argc, &argv) <= 0)
+	if (!get_options(&argc, &argv))
 		return EXIT_FAILURE;
 
 	fprintf(stderr, "> ttyreplay " TTYRPLD_VERSION "\n");
@@ -471,7 +472,7 @@ static int find_next_packet(int fd, const struct pctrl_info *ps)
 #undef MAGIC_OFFSET
 }
 
-static int get_options(int *argc, const char ***argv)
+static bool get_options(int *argc, const char ***argv)
 {
     struct HXoption options_table[] = {
         {.ln = "no-pctrl", .type = HXTYPE_NONE, .ptr = &Opt.no_pctrl,
@@ -497,7 +498,7 @@ static int get_options(int *argc, const char ***argv)
         HXOPT_TABLEEND,
     };
 
-    return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR);
+    return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) <= 0;
 }
 
 static void getopt_jump(const struct HXoptcb *cbi)
