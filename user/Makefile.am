@@ -14,4 +14,4 @@ rpld_SOURCES      = infod.c lib.c rdsh.c rplctl.c rpld.c
 rpld_LDFLAGS      = -lHX -lpthread $(rpld_AC_LDLIBS)
 
 rplctl: rpld
-	ln -fs rpld rplctl;
+	ln -s rpld rplctl;
