@@ -38,7 +38,8 @@ struct Statmap_t {
 struct tty {
 	uint32_t dev;
 	uid_t uid;
-	int fd, status;
+	int fd;
+	unsigned int status;
 	unsigned long in, out;
 	hmc_t *log;
 	char *sdev, *full_dev;

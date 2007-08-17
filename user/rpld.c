@@ -62,7 +62,7 @@ static int check_parent_directory(const hmc_t *);
 static void fill_info(struct tty *, const char *);
 
 static int init_device(const char *);
-static void init_fdtable(int);
+static void init_fdtable(rlim_t);
 static int init_sighandler(void);
 static void sighandler_int(int);
 static void sighandler_alrm(int);
@@ -72,7 +72,7 @@ static bool find_devnode(uint32_t, char *, size_t, const char **);
 static bool find_devnode_dive(uint32_t, char *, size_t, const char *);
 static char *getnamefromuid(uid_t, char *, size_t);
 static uid_t getuidfromname(const char *);
-static int get_options(int *, const char ***);
+static bool get_options(int *, const char ***);
 static void getopt_config(const struct HXoptcb *);
 static void getopt_username(const struct HXoptcb *);
 static bool rate_limit(int, time_t);
@@ -121,7 +121,7 @@ int main(int argc, const char **argv)
 	if(strcmp(HX_basename(*argv), "rplctl") == 0)
 		return rplctl_main(argc, argv);
 
-	if(get_options(&argc, &argv) <= 0)
+	if (!get_options(&argc, &argv))
 		return EXIT_FAILURE;
 	memset(&Stats, 0, sizeof(Stats));
 
@@ -423,7 +423,7 @@ static void log_open(struct tty *tty)
 static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 {
 	char *buffer = alloca(packet->size);
-	int have;
+	ssize_t have;
 
 	if(tty->fd < 0)
 		log_open(tty);
@@ -591,7 +591,7 @@ static int init_device(const char *in_devs)
 	return fd;
 }
 
-static void init_fdtable(int nfd)
+static void init_fdtable(rlim_t nfd)
 {
 	struct rlimit rl = {
 		.rlim_cur = nfd,
@@ -599,7 +599,7 @@ static void init_fdtable(int nfd)
 	};
 	if(setrlimit(RLIMIT_NOFILE, &rl) != 0)
 		fprintf(stderr, _("Warning: Could not increase fd table size "
-		        "to %d: %s\n"), nfd, strerror(errno));
+		        "to %d: %s\n"), (int)nfd, strerror(errno));
 	return;
 }
 
@@ -753,25 +753,25 @@ static uid_t getuidfromname(const char *name)
 	return ep->pw_uid;
 }
 
-static int get_options(int *argc, const char ***argv)
+static bool get_options(int *argc, const char ***argv)
 {
-    const struct HXoption options_table[] = {
+    struct HXoption options_table[] = {
         {.sh = 'D', .type = HXTYPE_STRING, .ptr = &Opt.device,
          .help = _("Path to the RPL device"), .htyp = _("file")},
-        {.sh = 'I', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = 1,
+        {.sh = 'I', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = true,
          .help = _("Make statistics available through socket")},
-        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = 0,
+        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = false,
          .help = _("Do not make statistics available")},
         {.sh = 'O', .type = HXTYPE_STRING, .ptr = &GOpt.ofmt,
          .help = _("Override OFMT variable"), .htyp = _("string")},
-        {.sh = 'Q', .type = HXTYPE_VAL, .ptr = &Opt.dolog, .val = 0,
+        {.sh = 'Q', .type = HXTYPE_VAL, .ptr = &Opt.dolog, .val = false,
          .help = _("Deactivate logging, only do bytecounting")},
         {.sh = 'U', .type = HXTYPE_STRING, .cb = getopt_username,
          .help = _("User to change to"), .htyp = _("user")},
         {.sh = 'c', .type = HXTYPE_STRING, .cb = getopt_config,
          .help = _("Read configuration from file"),
          .htyp = _("file")},
-        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = 0,
+        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = false,
          .help = _("Do not start INFOD subcomponent")},
         {.sh = 's', .type = HXTYPE_NONE, .ptr = &GOpt.syslog,
          .help = _("Print warnings/errors to syslog")},
@@ -781,7 +781,7 @@ static int get_options(int *argc, const char ***argv)
         HXOPT_TABLEEND,
     };
 
-    return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR);
+    return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) <= 0;
 }
 
 static void getopt_config(const struct HXoptcb *cbi)
@@ -814,7 +814,7 @@ static bool rate_limit(int counter, time_t delta)
 
 static bool read_config(const char *file)
 {
-    static struct HXoption config_table[] = {
+	static const struct HXoption config_table[] = {
         {.ln = "DEVICE",      .type = HXTYPE_STRING, .ptr = &Opt.device},
         {.ln = "DO_LOG",      .type = HXTYPE_BOOL,   .ptr = &Opt.dolog},
         {.ln = "INFOD_PORT",  .type = HXTYPE_STRING, .ptr = &GOpt.infod_port},
