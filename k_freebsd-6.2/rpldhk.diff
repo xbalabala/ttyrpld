@@ -23,7 +23,7 @@ Index: freebsd-sys-6.2/kern/tty.c
 +static inline void rpldhk_open(const struct tty *tty)
 +{
 +	__typeof__(rpl_open) tmp = rpl_open;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(tty);
 +	return;
 +}
@@ -32,7 +32,7 @@ Index: freebsd-sys-6.2/kern/tty.c
 +    const struct tty *tty)
 +{
 +	__typeof__(rpl_read) tmp = rpl_read;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(buf, size, tty);
 +	return;
 +}
@@ -40,7 +40,7 @@ Index: freebsd-sys-6.2/kern/tty.c
 +static inline void rpldhk_read1(char c, const struct tty *tty)
 +{
 +	__typeof__(rpl_read) tmp = rpl_read;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(&c, sizeof(c), tty);
 +	return;
 +}
@@ -49,7 +49,7 @@ Index: freebsd-sys-6.2/kern/tty.c
 +    const struct tty *tty)
 +{
 +	__typeof__(rpl_write) tmp = rpl_write;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(buf, size, tty);
 +	return;
 +}
@@ -57,7 +57,7 @@ Index: freebsd-sys-6.2/kern/tty.c
 +static inline void rpldhk_lclose(const struct tty *tty)
 +{
 +	__typeof__(rpl_lclose) tmp = rpl_lclose;
-+	if(tmp != NULL)
++	if (tmp != NULL)
 +		tmp(tty);
 +	return;
 +}

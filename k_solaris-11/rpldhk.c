@@ -1,21 +1,21 @@
 /*
-	ttyrpld/k_solaris-11/rpldhk.c
-	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2006 - 2007
-
-	The contents of this file are subject to the terms of the Common
-	Development and Distribution License, Version 1.0 only (the "License").
-	You may not use this file except in compliance with the License.
-
-	You can obtain a copy of the license in the file "LICENSE.CDDL".
-	See the License for the specific language governing permissions
-	and limitations under the License.
-
-	When distributing Covered Code, include this CDDL HEADER in each
-	file and include the License file.
-	If applicable, add the following below this CDDL HEADER, with the
-	fields enclosed by brackets "[]" replaced with your own identifying
-	information: Portions Copyright [yyyy] [name of copyright owner]
-*/
+ *	ttyrpld/k_solaris-11/rpldhk.c
+ *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2006 - 2007
+ *
+ *	The contents of this file are subject to the terms of the Common
+ *	Development and Distribution License, Version 1.0 only (the "License").
+ *	You may not use this file except in compliance with the License.
+ *
+ *	You can obtain a copy of the license in the file "LICENSE.CDDL".
+ *	See the License for the specific language governing permissions
+ *	and limitations under the License.
+ *
+ *	When distributing Covered Code, include this CDDL HEADER in each
+ *	file and include the License file.
+ *	If applicable, add the following below this CDDL HEADER, with the
+ *	fields enclosed by brackets "[]" replaced with your own identifying
+ *	information: Portions Copyright [yyyy] [name of copyright owner]
+ */
 #include <sys/types.h>
 #include <sys/ccompile.h>
 #include <sys/cmn_err.h>
@@ -117,7 +117,7 @@ static int rpldhk_open(struct queue *q, dev_t *dev, int oflag, int sflag,
 {
 	typeof(rpl_open) tmp = rpl_open;
 	qprocson(q);
-	if(tmp != NULL)
+	if (tmp != NULL)
 		tmp(q);
 	return 0;
 }
@@ -140,7 +140,7 @@ static int rpldhk_lclose(struct queue *q, int flag, struct cred *cred)
 {
 	typeof(rpl_lclose) tmp = rpl_lclose;
 	qprocsoff(q);
-	if(tmp)
+	if (tmp)
 		tmp(q);
 	return 0;
 }
@@ -157,19 +157,19 @@ static void rpldhk_packet(struct queue *q, struct msgb *mp, int wr)
 	typeof(rpl_read)  tmpr  = rpl_read;
 	typeof(rpl_write) tmpw  = rpl_write;
 
-	for(mblk = mp; mblk != NULL; mblk = mblk->b_cont) {
+	for (mblk = mp; mblk != NULL; mblk = mblk->b_cont) {
 		const struct datab *dblk = mblk->b_datap;
-		if(mblk->b_rptr > mblk->b_wptr) {
+		if (mblk->b_rptr > mblk->b_wptr) {
 			cmn_err(CE_NOTE, "Strange mblk received: r > w\n");
 			continue;
 		}
 
-		if(dblk->db_type != M_DATA)
+		if (dblk->db_type != M_DATA)
 			continue;
 
-		if(wr && tmpw != NULL)
+		if (wr && tmpw != NULL)
 			tmpw(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
-		else if(!wr && tmpr != NULL)
+		else if (!wr && tmpr != NULL)
 			tmpr(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
 	}
 	return;

@@ -36,7 +36,7 @@ functions, when it shall go into action. That way, there is no overhead (read:
 
 <p class="code"><code>
 <b>#</b>ifdef CONFIG_RPLDHK<br />
-<b>if</b>(rpl_write <b>!=</b> NULL)<br />
+<b>if</b> (rpl_write <b>!=</b> NULL)<br />
 &nbsp; &nbsp; rpl_write(buf, ret, tty);<br />
 <b>#</b>endif</code></p>
 
@@ -74,7 +74,7 @@ protocol.</p>
 &nbsp; &nbsp; <b>struct</b> rpld_packet p;<br />
 <br />
 &nbsp; &nbsp; SKIP_PTM(tty);<br />
-&nbsp; &nbsp; if(count == 0) return 0;<br />
+&nbsp; &nbsp; if (count == 0) return 0;<br />
 <br />
 &nbsp; &nbsp; p.dev &nbsp; = TTY_DEVNR(tty);<br />
 &nbsp; &nbsp; p.size &nbsp;= cpu_to_le16(count);<br />
