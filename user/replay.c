@@ -76,7 +76,7 @@ static inline ssize_t read_nullfm(int, size_t);
 static ssize_t read_through(int, int, size_t);
 static ssize_t read_waitfm(int, void *, size_t, const struct pctrl_info *);
 static int seek_to_end(int, const struct pctrl_info *);
-static int usleep_ovcorr(struct timeval *, long *);
+static void usleep_ovcorr(struct timeval *, long *);
 static void tv_delta(const struct timeval *, const struct timeval *,
 	struct timeval *);
 static inline unsigned long long tv2usec(const struct timeval *);
@@ -632,7 +632,7 @@ static int seek_to_end(int fd, const struct pctrl_info *ps)
  *  @req:       how long to pause
  *  @skew:      skew counter
  */
-static int usleep_ovcorr(struct timeval *req, long *skew)
+static void usleep_ovcorr(struct timeval *req, long *skew)
 {
 	/*
 	 * The manual page for nanosleep(2) says this under the "BUGS" section:
@@ -673,7 +673,6 @@ static int usleep_ovcorr(struct timeval *req, long *skew)
 	struct timespec nano_req;
 	long long req_usec;
 	long dur, over;
-	int rv;
 
 	gettimeofday(&start, NULL);
 	req_usec = tv2usec(req);
@@ -696,7 +695,7 @@ static int usleep_ovcorr(struct timeval *req, long *skew)
 			 * can entirely skip this pause.)
 			 */
 			*skew -= req_usec;
-			return 0;
+			return;
 		}
 	} else if (*skew >= -Opt.ovcorr) {
 		/*
@@ -704,7 +703,7 @@ static int usleep_ovcorr(struct timeval *req, long *skew)
 		 * -1/HZ s (= having paused too few).
 		 */
 		*skew -= req_usec;
-		return 0;
+		return;
 	}
 
 	/*
@@ -713,7 +712,7 @@ static int usleep_ovcorr(struct timeval *req, long *skew)
 	 */
 	nano_req.tv_sec  = req->tv_sec;
 	nano_req.tv_nsec = req->tv_usec * 1000;
-	rv = nanosleep(&nano_req, NULL);
+	nanosleep(&nano_req, NULL);
 	gettimeofday(&stop, NULL);
 
 	/*
@@ -724,8 +723,7 @@ static int usleep_ovcorr(struct timeval *req, long *skew)
 	         (stop.tv_usec - start.tv_usec);
 	over   = dur - req_usec;
 	*skew += over;
-
-	return rv;
+	return;
 }
 
 /*
