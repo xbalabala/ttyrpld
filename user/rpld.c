@@ -51,10 +51,10 @@ enum {
 /* Functions */
 static void mainloop(int);
 
-static int packet_preprox(struct rpldev_packet *);
-static int packet_process(struct rpldev_packet *, struct tty *, int);
+static bool packet_preprox(struct rpldev_packet *);
+static bool packet_process(struct rpldev_packet *, struct tty *, int);
 
-static int evt_open(struct rpldev_packet *, struct tty *, int);
+static void evt_open(struct rpldev_packet *, struct tty *, int);
 static void log_open(struct tty *);
 static void log_write(struct rpldev_packet *, struct tty *, int);
 
@@ -227,7 +227,7 @@ static void mainloop(int fd)
 }
 
 //-----------------------------------------------------------------------------
-static int packet_preprox(struct rpldev_packet *packet)
+static bool packet_preprox(struct rpldev_packet *packet)
 {
 	static unsigned long *const tab[] = {
 		[EVT_OPEN]   = &Stats.open,
@@ -259,13 +259,13 @@ static int packet_preprox(struct rpldev_packet *packet)
 			notify(LOG_WARNING,
 			       _("Unknown packet type 0x%02X\n"),
 			       packet->event);
-		return 0;
+		return false;
 	} /* switch */
 
-	return 1;
+	return true;
 }
 
-static int packet_process(struct rpldev_packet *packet,
+static bool packet_process(struct rpldev_packet *packet,
     struct tty *tty, int fd)
 {
 	if(tty->status == IFP_DEFAULT) {
@@ -282,20 +282,21 @@ static int packet_process(struct rpldev_packet *packet,
 				tty->out += packet->size;
 				break;
 		}
-		return 0;
+		return false;
 	}
 
 	switch(packet->event) {
 		case EVT_OPEN:
-			return evt_open(packet, tty, fd);
+			evt_open(packet, tty, fd);
+			return true;
 		case EVT_READ:
 			tty->in += packet->size;
 			log_write(packet, tty, fd);
-			return 1;
+			return true;
 		case EVT_WRITE:
 			tty->out += packet->size;
 			log_write(packet, tty, fd);
-			return 1;
+			return true;
 		case EVT_LCLOSE:
 			log_close(tty);
 			break;
@@ -306,11 +307,11 @@ static int packet_process(struct rpldev_packet *packet,
 			break;
 	}
 
-	return 0;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-static int evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
+static void evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 {
 	/*
 	 * OPEN event:
@@ -321,21 +322,21 @@ static int evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 	 *   if owner has changed.
 	 */
 	char *sdev = alloca(packet->size + 1);
-	int owner_changed = 0, fill_it = 0;
+	bool owner_changed = false, fill_it = false;
 	struct stat sb;
 
 	read(fd, sdev, packet->size);
 	sdev[packet->size] = '\0';
 
 	if(tty->sdev == NULL)
-		fill_it = 1;
+		fill_it = true;
 
 	if(tty->uid != -1 && tty->full_dev != NULL &&
 	  stat(tty->full_dev, &sb) == 0 && sb.st_uid != tty->uid) {
 		/* Create new logfile if owner changed */
 		tty->in	      = tty->out = 0;
-		owner_changed = 1;
-		fill_it       = 1;
+		owner_changed = true;
+		fill_it       = true;
 	}
 
 	if(fill_it)
@@ -343,7 +344,7 @@ static int evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 	if(owner_changed)
 		log_open(tty);
 
-	return 1;
+	return;
 }
 
 static void log_open(struct tty *tty)
