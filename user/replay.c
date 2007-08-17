@@ -67,7 +67,7 @@ static void e_proc(int, struct rpldsk_packet *, struct pctrl_info *, char *,
 	struct timeval *, long *);
 
 static unsigned long calc_ovcorr(unsigned long, int);
-static int find_next_packet(int, const struct pctrl_info *);
+static bool find_next_packet(int, const struct pctrl_info *);
 static bool get_options(int *, const char ***);
 static void getopt_jump(const struct HXoptcb *);
 static void getopt_msec(const struct HXoptcb *);
@@ -75,7 +75,7 @@ static void getopt_skip(const struct HXoptcb *);
 static inline ssize_t read_nullfm(int, size_t);
 static ssize_t read_through(int, int, size_t);
 static ssize_t read_waitfm(int, void *, size_t, const struct pctrl_info *);
-static int seek_to_end(int, const struct pctrl_info *);
+static bool seek_to_end(int, const struct pctrl_info *);
 static void usleep_ovcorr(struct timeval *, long *);
 static void tv_delta(const struct timeval *, const struct timeval *,
 	struct timeval *);
@@ -349,7 +349,7 @@ static unsigned long calc_ovcorr(unsigned long ad, int rd)
 	return av;
 }
 
-static int find_next_packet(int fd, const struct pctrl_info *ps)
+static bool find_next_packet(int fd, const struct pctrl_info *ps)
 {
 	/* Interesting, there is more algorithmic code than simple
 	code in ttyreplay. Outstanding. */
@@ -359,10 +359,10 @@ static int find_next_packet(int fd, const struct pctrl_info *ps)
 	char buf[BZ];
 	struct rpldsk_packet *packet = static_cast(void *, buf);
 	size_t s;
-	int ok = 0;
+	unsigned int ok = 0;
 
 	if (read_waitfm(fd, buf, BZ, ps) < BZ)
-		return 0;
+		return false;
 
 	while (1) {
 		char *ptr;
@@ -384,7 +384,7 @@ static int find_next_packet(int fd, const struct pctrl_info *ps)
 				size_t cnt = buf + BZ - ctx;
 				ctx = memmove(buf, ctx, cnt);
 				if (read_waitfm(fd, buf + cnt, BZ - cnt, ps) < BZ - cnt)
-					return 0;
+					return false;
 			}
 		} else if (ptr != NULL) {
 			/*
@@ -394,7 +394,7 @@ static int find_next_packet(int fd, const struct pctrl_info *ps)
 			size_t cnt = buf + BZ - ptr - 1;
 			memmove(buf, ptr + 1, cnt);
 			if (read_waitfm(fd, buf + cnt, BZ - cnt, ps) < BZ - cnt)
-				return 0;
+				return false;
 			continue;
 		} else {
 			/*
@@ -403,7 +403,7 @@ static int find_next_packet(int fd, const struct pctrl_info *ps)
 			 */
 			memmove(buf, buf + BZ - LZ, BZ - LZ);
 			if (read_waitfm(fd, buf + LZ, BZ - LZ, ps) < BZ - LZ)
-				return 0;
+				return false;
 			continue;
 		}
 
@@ -417,25 +417,25 @@ static int find_next_packet(int fd, const struct pctrl_info *ps)
 			ok = 0;
 			memmove(buf, buf + LZ, BZ - LZ);
 			if (read_waitfm(fd, buf, BZ, ps) < BZ)
-				return 0;
+				return false;
 			continue;
 		}
 
 		if (s < LZ) {
 			memmove(buf, buf + LZ + s, BZ - LZ - s);
 			if (read_waitfm(fd, buf + BZ - LZ - s, LZ + s, ps) < LZ + s)
-				return 0;
+				return false;
 		} else {
 			/*
 			 * There is no header (according to .size) in our buffer, so we
 			 * can blindly munge lots of data.
 			 */
 			if (!read_nullfm(fd, s - LZ) || read_waitfm(fd, buf, BZ, ps) < BZ)
-				return 0;
+				return false;
 		}
 
 		if ((ptr = memchr(buf, MAGIC_SIG, MAGIC_OFFSET + 1)) == NULL ||
-		  ptr - buf != MAGIC_OFFSET) {
+		    ptr - buf != MAGIC_OFFSET) {
 			/*
 			 * If the size field does not match up with the next
 			 * magic byte, drop it all.
@@ -459,14 +459,14 @@ static int find_next_packet(int fd, const struct pctrl_info *ps)
 		memmove(buf, buf + LZ + s, BZ - LZ - s);
 		if (read_waitfm(fd, buf + BZ - LZ - s, s, ps) < s ||
 		    !read_nullfm(fd, packet->size))
-			return 0;
+			return false;
 	} else {
 		/* Just subtract what we have already read into the buffer */
 		if (!read_nullfm(fd, s - LZ))
-			return 0;
+			return false;
 	}
 
-	return 1;
+	return true;
 #undef BZ
 #undef LZ
 #undef MAGIC_OFFSET
@@ -601,9 +601,15 @@ static ssize_t read_waitfm(int fd, void *buf, size_t count,
 	return read_wait(fd, buf, count, ps);
 }
 
-static int seek_to_end(int fd, const struct pctrl_info *ps)
+static bool seek_to_end(int fd, const struct pctrl_info *ps)
 {
-	if (lseek(fd, 0, SEEK_END) == -1 && errno == ESPIPE) {
+	off_t a, b;
+
+	a = lseek(fd, 0, SEEK_END);
+	if (a >= 0) {
+		while ((b = lseek(fd, 0, SEEK_END)) != a)
+			a = b;
+	} else if (errno == ESPIPE) {
 		/*
 		 * Some workaround for non-seekable descriptors. G_skip() is
 		 * not suitable, since ... it's just not designed to do what is
@@ -620,9 +626,11 @@ static int seek_to_end(int fd, const struct pctrl_info *ps)
 			;
 		if (errno != EAGAIN) {
 			perror("read()");
-			return 0;
+			return false;
 		}
 		fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
+	} else {
+		return false;
 	}
 
 	return find_next_packet(fd, ps);
