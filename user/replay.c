@@ -364,7 +364,7 @@ static bool find_next_packet(int fd, const struct pctrl_info *ps)
 	if (read_waitfm(fd, buf, BZ, ps) < BZ)
 		return false;
 
-	while (1) {
+	while (true) {
 		char *ptr;
 
 		/*

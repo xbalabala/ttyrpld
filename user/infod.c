@@ -71,7 +71,7 @@ void *infod_main(void *arg)
 	/* The INFOD mainloop which waits for incoming connections. */
 	block_signals();
 
-	while (1) {
+	while (true) {
 		socklen_t sz = sizeof(struct sockaddr_un);
 		struct sockaddr_un remote;
 		pthread_t id;
@@ -93,11 +93,11 @@ static void *client_thread(void *arg)
 {
 	int fd = reinterpret_cast(int, arg);
 
-	while (1) {
+	while (true) {
 		static const uint32_t zero = 0;
 		unsigned char req;
 		uint32_t gint;
-		int ret = 0;
+		bool ret = false;
 
 		ret |= !RECEIVE_FULL(fd, &req, sizeof(unsigned char));
 		ret |= !RECEIVE_FULL(fd, &gint, sizeof(gint));

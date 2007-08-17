@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,7 +61,7 @@ int pctrl_init(void)
 
 static void *pctrl_thread(void *arg)
 {
-	while (1) {
+	while (true) {
 		fd_set set;
 		char c = 0;
 

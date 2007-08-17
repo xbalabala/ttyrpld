@@ -14,6 +14,7 @@
 #include <sys/un.h>
 #include <errno.h>
 #include <sched.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,12 +36,13 @@ static void getopt_proc(const struct HXoptcb *);
 
 /* Global variables */
 static struct {
-	int do_listing, parseable;
+	unsigned int do_listing, parseable;
 } Opt = {
-	.do_listing = 0,
-	.parseable  = 0,
+	.do_listing = false,
+	.parseable  = false,
 };
-static int Sockfd = -1, Got_arg = 0;
+static int Sockfd = -1;
+static bool Got_arg = false;
 
 //-----------------------------------------------------------------------------
 int rplctl_main(int argc, const char **argv)
@@ -54,7 +56,7 @@ int rplctl_main(int argc, const char **argv)
 		return EXIT_FAILURE;
 	}
 
-	if(Got_arg == 0) {
+	if (!Got_arg) {
 		if(!Opt.parseable)
 			printf("A %-7s %13s %9s %s\n", _("TTY"), _("BYTES IN"),
 			       _("OUT"), _("FILENAME"));
@@ -70,7 +72,7 @@ int rplctl_main(int argc, const char **argv)
 static uint32_t getdev(const char *s)
 {
 	uint32_t major, minor;
-	int found = 0;
+	bool found = false;
 
 	if(s == NULL)
 	        return 0;
@@ -106,7 +108,7 @@ static uint32_t getdev(const char *s)
 			char buf[MAXFNLEN];
 			snprintf(buf, MAXFNLEN, "%s/%s", *dirp, s);
 			if(stat(buf, &sb) == 0) {
-				++found;
+				found = true;
 				break;
 			}
 			if(errno != ENOENT) {
@@ -132,7 +134,7 @@ static void read_reply(int fd)
 {
 	char buf[4096];
 
-	while(1) {
+	while (true) {
 		uint32_t reply_size = 0;
 		fd_set rd;
 
@@ -225,7 +227,7 @@ static void getopt_proc(const struct HXoptcb *cbi)
 	case 'S':
 	case 'X': {
 		uint32_t dev;
-		++Got_arg;
+		Got_arg = true;
 		if((dev = getdev(cbi->data)) != 0)
 			send_int(Sockfd, mapping[static_cast(int,
 			         cbi->match_sh)], dev);
@@ -233,13 +235,13 @@ static void getopt_proc(const struct HXoptcb *cbi)
 	}
 	case 'L': {
 		uint32_t dev = (cbi->data != NULL) ? getdev(cbi->data) : 0;
-		++Got_arg;
+		Got_arg = true;
 		send_int(Sockfd, IFP_GETINFO_A, dev);
 		break;
 	}
 	case 'Z': {
 		uint32_t dev = (cbi->data != NULL) ? getdev(cbi->data) : 0;
-		++Got_arg;
+		Got_arg = true;
 		send_int(Sockfd, mapping[static_cast(int, cbi->match_sh)], dev);
 		break;
 	}

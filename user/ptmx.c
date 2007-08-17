@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -88,7 +89,7 @@ int main(int argc, const char **argv)
 		return EXIT_SUCCESS;
 	}
 
-	while (1) {
+	while (true) {
 		if (pthread_create(&id, NULL, ptmx_runner, NULL) != 0) {
 			fprintf(stderr, "[0] Could not create thread: "
 			        "%s\n", strerror(errno));
