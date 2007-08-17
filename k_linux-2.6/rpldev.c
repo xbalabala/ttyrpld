@@ -19,6 +19,7 @@
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/poll.h>
+#include <linux/spinlock.h>
 #include <linux/string.h>
 #include <linux/time.h>
 #include <linux/tty.h>
@@ -55,7 +56,7 @@
 #ifndef SEEK_END
 #	define SEEK_END 2
 #endif
-#define SKIP_PTM(tty)   if(IS_PTY_MASTER(tty)) return 0;
+#define SKIP_PTM(tty) if (IS_PTY_MASTER(tty)) return 0;
 
 /* Stage 2 functions */
 static int rpldhc_open(const struct tty_struct *, const struct file *);
@@ -86,7 +87,7 @@ static inline uint32_t mkdev_26(unsigned long, unsigned long);
 /* Variables */
 static DECLARE_WAIT_QUEUE_HEAD(Pull_queue);
 static DECLARE_MUTEX(Buffer_lock);
-static DECLARE_MUTEX(Open_lock);
+static spinlock_t Open_lock;
 static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
 static unsigned int Bufsize = 32 * 1024;
 static unsigned int Minor_nr = MISC_DYNAMIC_MINOR, Open_count = 0;
@@ -122,6 +123,7 @@ static __init int rpldev_init(void)
 {
 	int ret;
 
+	spin_lock_init(&Open_lock);
 	kmi_miscinfo.minor = Minor_nr;
 	if ((ret = misc_register(&kmi_miscinfo)) != 0)
 		return ret;
@@ -250,13 +252,13 @@ static int rpldev_open(struct inode *inode, struct file *filp)
 	 * The RPL device should only be opened once, since otherwise,
 	 * different packets could go to different readers.
 	 */
-	down(&Open_lock);
+	spin_lock(&Open_lock);
 	if (Open_count) {
-		up(&Open_lock);
+		spin_unlock(&Open_lock);
 		return -EBUSY;
 	}
 	++Open_count;
-	up(&Open_lock);
+	spin_unlock(&Open_lock);
 
 	if ((Buffer = vmalloc(Bufsize)) == NULL) {
 		--Open_count;
