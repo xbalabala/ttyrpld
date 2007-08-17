@@ -108,24 +108,24 @@ int main(int argc, const char **argv)
 	 * Yep, the config file is what is needed by all three
 	 * (rpld, infod, rplctl).
 	 */
-	if(!read_config("/etc/rpld.conf") && errno != ENOENT)
+	if (!read_config("/etc/rpld.conf") && errno != ENOENT)
 		fprintf(stderr, _("/etc/rpld.conf exists but could not be "
                         "read: %s\n"), strerror(errno));
-	if(!read_config("/usr/local/etc/rpld.conf") && errno != ENOENT)
+	if (!read_config("/usr/local/etc/rpld.conf") && errno != ENOENT)
 		fprintf(stderr, _("/usr/local/etc/rpld.conf exists but could "
 		        "not be read: %s\n"), strerror(errno));
-	if(!read_config_bp(*argv, "rpld.conf") && errno != ENOENT)
+	if (!read_config_bp(*argv, "rpld.conf") && errno != ENOENT)
 		fprintf(stderr, _("$BINPATH/rpld.conf exists but could not be"
 		        " read: %s\n"), strerror(errno));
 
-	if(strcmp(HX_basename(*argv), "rplctl") == 0)
+	if (strcmp(HX_basename(*argv), "rplctl") == 0)
 		return rplctl_main(argc, argv);
 
 	if (!get_options(&argc, &argv))
 		return EXIT_FAILURE;
 	memset(&Stats, 0, sizeof(Stats));
 
-	if(GOpt.verbose) {
+	if (GOpt.verbose) {
 		printf("# rpld " TTYRPLD_VERSION "\n");
 		printf(_(
 		       "This program comes with ABSOLUTELY NO WARRANTY; it is free software and you\n"
@@ -135,28 +135,28 @@ int main(int argc, const char **argv)
 		printf("\n");
 	}
 
-	if((Ttys = HXbtree_init(HXBT_MAP | HXBT_ICMP)) == NULL) {
+	if ((Ttys = HXbtree_init(HXBT_MAP | HXBT_ICMP)) == NULL) {
 		perror("Ttys = HXbtree_init()");
 		return EXIT_FAILURE;
 	}
 
-	if(Opt.max_fd > 4)
+	if (Opt.max_fd > 4)
 		init_fdtable(Opt.max_fd);
 
-	if((fd = init_device(Opt.device)) < 0) {
+	if ((fd = init_device(Opt.device)) < 0) {
 		fprintf(stderr, _("No device could be opened, aborting.\n"));
 		return EXIT_FAILURE;
 	}
 
 	init_sighandler();
-	if(Opt.infod_start)  infod_init();
-	if(GOpt.syslog)      openlog("rpld", LOG_PID, LOG_DAEMON);
-	if(GOpt.user_id > 0) setuid(GOpt.user_id);
-	if(Opt.infod_start)  pthread_create(&infod_id, NULL, infod_main, NULL);
-	if(GOpt.verbose)     alarm(1);
+	if (Opt.infod_start)  infod_init();
+	if (GOpt.syslog)      openlog("rpld", LOG_PID, LOG_DAEMON);
+	if (GOpt.user_id > 0) setuid(GOpt.user_id);
+	if (Opt.infod_start)  pthread_create(&infod_id, NULL, infod_main, NULL);
+	if (GOpt.verbose)     alarm(1);
 	mainloop(fd);
 
-	if(Opt.infod_start) {
+	if (Opt.infod_start) {
 		unlink(GOpt.infod_port);
 		pthread_cancel(infod_id);
 		pthread_join(infod_id, NULL);
@@ -168,20 +168,20 @@ int main(int argc, const char **argv)
 
 static void mainloop(int fd)
 {
-    while(Opt._running) {
+    while (Opt._running) {
 	struct rpldev_packet packet;
 	struct tty *tty;
 	ssize_t ret;
 
-	if((ret = read(fd, &packet, sizeof(struct rpldev_packet))) <
-	  static_cast(ssize_t, sizeof(struct rpldev_packet))) {
+	if ((ret = read(fd, &packet, sizeof(struct rpldev_packet))) <
+	    static_cast(ssize_t, sizeof(struct rpldev_packet))) {
 		struct stat sb;
 #if defined(__OpenBSD__) || defined(__NetBSD__)
-		if(errno == EINTR)
+		if (errno == EINTR)
 			continue;
 #endif
 		fstat(fd, &sb);
-		if(!S_ISREG(sb.st_mode))
+		if (!S_ISREG(sb.st_mode))
 			fprintf(stderr, _("\n" "Short read: %ld bytes only. "
 					"Error %d: %s\n"), static_cast(long, ret), errno,
 					strerror(errno));
@@ -194,16 +194,16 @@ static void mainloop(int fd)
 	SWAB1(&packet.time.tv_sec);
 	SWAB1(&packet.time.tv_usec);
 
-	if(packet.magic != MAGIC_SIG) {
+	if (packet.magic != MAGIC_SIG) {
 		++Stats.badpack;
-		if(rate_limit(C_BADPACKET, 2))
+		if (rate_limit(C_BADPACKET, 2))
 			notify(LOG_WARNING,
 			       _("Bogus packet (magic is 0x%02X)!\n"),
 			       packet.magic);
 		continue;
 	}
 
-	if(!packet_preprox(&packet)) {
+	if (!packet_preprox(&packet)) {
 		G_skip(fd, packet.size, 0);
 		continue;
 	}
@@ -215,7 +215,7 @@ static void mainloop(int fd)
 		continue;
 	}
 
-	if(!packet_process(&packet, tty, fd))
+	if (!packet_process(&packet, tty, fd))
 		/*
 		 * packet_process() always succeeds, but it returns 0 to
 		 * indicate if it wants to skip the payload.
@@ -239,11 +239,11 @@ static bool packet_preprox(struct rpldev_packet *packet)
 		[EVT_max]    = NULL,
 	};
 
-	if(packet->event < EVT_max && tab[packet->event] != NULL)
+	if (packet->event < EVT_max && tab[packet->event] != NULL)
 		++*tab[packet->event];
 
 	/* General packet classification (first stage drop) */
-	switch(packet->event) {
+	switch (packet->event) {
 	/* These will be processed */
 	case EVT_OPEN:
 	case EVT_LCLOSE:
@@ -257,7 +257,7 @@ static bool packet_preprox(struct rpldev_packet *packet)
 		Stats.out += packet->size;
 		break;
 	default:
-		if(rate_limit(C_PKTTYPE, 2))
+		if (rate_limit(C_PKTTYPE, 2))
 			notify(LOG_WARNING,
 			       _("Unknown packet type 0x%02X\n"),
 			       packet->event);
@@ -270,13 +270,13 @@ static bool packet_preprox(struct rpldev_packet *packet)
 static bool packet_process(struct rpldev_packet *packet,
     struct tty *tty, int fd)
 {
-	if(tty->status == IFP_DEFAULT) {
+	if (tty->status == IFP_DEFAULT) {
 		fill_info(tty, NULL);
 		tty->status = Opt.dolog ? IFP_ACTIVATE : IFP_DEACTIVATE;
 	}
 
-	if(tty->status != IFP_ACTIVATE) {
-		switch(packet->event) {
+	if (tty->status != IFP_ACTIVATE) {
+		switch (packet->event) {
 			case EVT_READ:
 				tty->in += packet->size;
 				break;
@@ -287,7 +287,7 @@ static bool packet_process(struct rpldev_packet *packet,
 		return false;
 	}
 
-	switch(packet->event) {
+	switch (packet->event) {
 		case EVT_OPEN:
 			evt_open(packet, tty, fd);
 			return true;
@@ -330,20 +330,20 @@ static void evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 	read(fd, sdev, packet->size);
 	sdev[packet->size] = '\0';
 
-	if(tty->sdev == NULL)
+	if (tty->sdev == NULL)
 		fill_it = true;
 
-	if(tty->uid != -1 && tty->full_dev != NULL &&
-	  stat(tty->full_dev, &sb) == 0 && sb.st_uid != tty->uid) {
+	if (tty->uid != -1 && tty->full_dev != NULL &&
+	    stat(tty->full_dev, &sb) == 0 && sb.st_uid != tty->uid) {
 		/* Create new logfile if owner changed */
 		tty->in	      = tty->out = 0;
 		owner_changed = true;
 		fill_it       = true;
 	}
 
-	if(fill_it)
+	if (fill_it)
 		fill_info(tty, sdev);
-	if(owner_changed)
+	if (owner_changed)
 		log_open(tty);
 
 	return;
@@ -357,12 +357,12 @@ static void log_open(struct tty *tty)
 	time_t now_sec;
 	size_t s;
 
-	if(check_parent_directory(tty->log) <= 0 && rate_limit(C_LOGOPEN, 5))
+	if (check_parent_directory(tty->log) <= 0 && rate_limit(C_LOGOPEN, 5))
 		notify(LOG_ERR, _("Directory permission denied: It won't be "
 		       "possible to write to the file %s, expect warnings.\n"),
 		       tty->log);
 
-	if(tty->fd >= 0)
+	if (tty->fd >= 0)
 		close(tty->fd);
 
 	tty->fd = open(tty->log, O_WRONLY | O_CREAT | O_APPEND,
@@ -409,7 +409,7 @@ static void log_open(struct tty *tty)
 	write(tty->fd, tty->full_dev, s);
 
 	/* ... as well as the username (or UID) the tty belongs to */
-	if(getnamefromuid(tty->uid, buf, sizeof(buf)) == NULL)
+	if (getnamefromuid(tty->uid, buf, sizeof(buf)) == NULL)
 		snprintf(buf, sizeof(buf), "%ld", static_cast(long, tty->uid));
 	p.event = EVT_ID_USER;
 	s = p.size = strlen(buf) + 1;
@@ -425,11 +425,11 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 	char *buffer = alloca(packet->size);
 	ssize_t have;
 
-	if(tty->fd < 0)
+	if (tty->fd < 0)
 		log_open(tty);
-	if((have = read(fd, buffer, packet->size)) <= 0)
+	if ((have = read(fd, buffer, packet->size)) <= 0)
 		return;
-	if(have != packet->size)
+	if (have != packet->size)
 		packet->size = have;
 
 	SWAB1(&packet->size);
@@ -446,7 +446,7 @@ static int check_parent_directory(const hmc_t *s)
 	char *path = alloca(strlen(s) + 1), *p;
 
 	strcpy(path, s);
-	if((p = strrchr(path, '/')) == NULL)
+	if ((p = strrchr(path, '/')) == NULL)
 		/* Current dirctory, no more dir checks needed */
 		return 1;
 
@@ -467,20 +467,20 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	 * The rpldev kernel module provides us with the real dentry name
 	 * (aux_sdev) that was used open the device. Use it, if available.
 	 */
-	if(aux_sdev != NULL && *aux_sdev != '\0') {
+	if (aux_sdev != NULL && *aux_sdev != '\0') {
 		const char **dirp = Device_dirs;
 		HX_strlcpy(full_dev, aux_sdev, sizeof(full_dev));
-		while(*dirp != NULL) {
-			if(strncmp(full_dev, *dirp, strlen(*dirp)) == 0) {
+		while (*dirp != NULL) {
+			if (strncmp(full_dev, *dirp, strlen(*dirp)) == 0) {
 				pbase = *dirp;
 				break;
 			}
 			++dirp;
 		}
-		if(pbase == NULL && *full_dev == '/')
+		if (pbase == NULL && *full_dev == '/')
 			pbase = "";
-	} else if(!find_devnode(tty->dev, full_dev,
-	  sizeof(full_dev), &pbase)) {
+	} else if (!find_devnode(tty->dev, full_dev,
+	    sizeof(full_dev), &pbase)) {
 		/*
 		 * Use [MAJOR:MINOR] as a fictitious filename if the device
 		 * node could not be found.
@@ -493,12 +493,12 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	 * rpld is able to sort logs by user (by putting each user's logfiles
 	 * into a separate directory) -- for that, we need the username.
 	 */
-	if(stat(full_dev, &sb) < 0) {
+	if (stat(full_dev, &sb) < 0) {
 		/* This will happen if we get a [MAJOR:MINOR] name... */
 		strcpy(user, _("NONE"));
 	} else {
 		tty->uid = sb.st_uid;
-		if(getnamefromuid(sb.st_uid, user, sizeof(user)) == NULL)
+		if (getnamefromuid(sb.st_uid, user, sizeof(user)) == NULL)
 			/* Well, at least the UID. */
 			snprintf(user, sizeof(user), "%ld",
 			         static_cast(long, sb.st_uid));
@@ -510,7 +510,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	 * them since a filename cannot contain a slash -- it would otherwise
 	 * always be treated as another directory component.
 	 */
-	if(pbase != NULL)
+	if (pbase != NULL)
 		/* only copy "pts/2" part - copy includes '\0' */
 		memmove(sdev, full_dev + strlen(pbase) + 1,
 		        strlen(full_dev) - strlen(pbase));
@@ -518,8 +518,8 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 		/* Usually this is [MAJOR:MINOR] */
 		HX_strlcpy(sdev, full_dev, sizeof(sdev));
 
-	while(i < sizeof(sdev) && sdev[i] != '\0') {
-		if(sdev[i] == '/')
+	while (i < sizeof(sdev) && sdev[i] != '\0') {
+		if (sdev[i] == '/')
 			sdev[i] = '-';
 		++i;
 	}
@@ -529,7 +529,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	 * major-minor may stay the same, but the device node may be named
 	 * differently. (I know this does not happen, but let's have it.)
 	 */
-	if(tty->sdev == NULL) {
+	if (tty->sdev == NULL) {
 		HX_strclone(&tty->sdev, sdev);
 		HX_strclone(&tty->full_dev, full_dev);
 	}
@@ -559,20 +559,20 @@ static int init_device(const char *in_devs)
 	char *copy = HX_strdup(in_devs), *workp = copy, *devp;
 	int fd = -1;
 
-	while((devp = HX_strsep(&workp, " ")) != NULL) {
-		if(devp[0] == '-' && devp[1] == '\0') {
+	while ((devp = HX_strsep(&workp, " ")) != NULL) {
+		if (devp[0] == '-' && devp[1] == '\0') {
 			fd = STDIN_FILENO;
-			if(GOpt.verbose)
+			if (GOpt.verbose)
 				printf(_("Connected to %s\n"), "<stdin>");
 			break;
 		}
-		if((fd = open(devp, O_RDONLY)) >= 0) {
-			if(GOpt.verbose)
+		if ((fd = open(devp, O_RDONLY)) >= 0) {
+			if (GOpt.verbose)
 				printf(_("Connected to %s\n"), devp);
 			break;
 		}
-		if(errno != ENOENT) {
-			if(errno == EACCES)
+		if (errno != ENOENT) {
+			if (errno == EACCES)
 				fprintf(stderr, _("The device should be owned "
 				        "by the user running rpld (UID %ld) "
 				        "and have mode 0400.\n"),
@@ -580,7 +580,7 @@ static int init_device(const char *in_devs)
 			fprintf(stderr, _("static_find(): Could not open %s "
 			        "even though it exists: %s (trying next "
 			        "device)\n"), devp, strerror(errno));
-		} else if(errno == EBUSY) {
+		} else if (errno == EBUSY) {
 			fprintf(stderr, _("\t" "The RPL device can only be "
 			        "opened once,\n\t" "there is probably an "
 			        "instance of rpld running!\n"));
@@ -597,7 +597,7 @@ static void init_fdtable(rlim_t nfd)
 		.rlim_cur = nfd,
 		.rlim_max = nfd,
 	};
-	if(setrlimit(RLIMIT_NOFILE, &rl) != 0)
+	if (setrlimit(RLIMIT_NOFILE, &rl) != 0)
 		fprintf(stderr, _("Warning: Could not increase fd table size "
 		        "to %d: %s\n"), (int)nfd, strerror(errno));
 	return;
@@ -632,13 +632,13 @@ static int init_sighandler(void)
 
 static void sighandler_int(int s)
 {
-	if(Opt._running-- == 0) {
-		if(GOpt.verbose)
+	if (Opt._running-- == 0) {
+		if (GOpt.verbose)
 			printf(_("Second time we received SIGINT/SIGTERM,"
 			 " exiting immediately.\n"));
 		exit(EXIT_FAILURE);
 	}
-	if(GOpt.verbose)
+	if (GOpt.verbose)
 		printf(_("\n" "Received SIGINT/SIGTERM, shutting down.\n"));
 	Opt._running = 0;
 	return;
@@ -649,7 +649,7 @@ static void sighandler_alrm(int s)
 	printf("\r\e[2K" "read %lluB/%luP, write %lluB/%luP",
 	       Stats.in, Stats.read, Stats.out, Stats.write);
 	fflush(stdout);
-	if(GOpt.verbose)
+	if (GOpt.verbose)
 		alarm(1);
 	return;
 }
@@ -671,9 +671,9 @@ static bool find_devnode(uint32_t id, char *dest, size_t len,
 	 * search in arbitrary locations, such as chroot jails.
 	 */
 	const char **dirp = Device_dirs;
-	while(*dirp != NULL) {
-		if(find_devnode_dive(id, dest, len, *dirp)) {
-			if(loc_pbase != NULL)
+	while (*dirp != NULL) {
+		if (find_devnode_dive(id, dest, len, *dirp)) {
+			if (loc_pbase != NULL)
 				*loc_pbase = *dirp;
 			return true;
 		}
@@ -698,29 +698,30 @@ static bool find_devnode_dive(uint32_t id, char *dest, size_t len,
 	bool ret = false;
 	void *dx;
 
-	if((dx = HXdir_open(dir)) == NULL) {
-		if(errno != ENOENT && rate_limit(C_KERNEL, 10))
+	if ((dx = HXdir_open(dir)) == NULL) {
+		if (errno != ENOENT && rate_limit(C_KERNEL, 10))
 			notify(LOG_WARNING, _("Could not open %s: %s\n"),
 			       dir, strerror(errno));
 		return false;
 	}
 
-	while((de = HXdir_read(dx)) != NULL) {
-		if(*de == '.')
+	while ((de = HXdir_read(dx)) != NULL) {
+		if (*de == '.')
 			continue;
 		snprintf(buf, sizeof(buf), "%s/%s", dir, de);
-		if(lstat(buf, &sb_self) < 0 || stat(buf, &sb_deref) < 0)
+
+		if (lstat(buf, &sb_self) < 0 || stat(buf, &sb_deref) < 0)
 			continue;
-		if(S_ISCHR(sb_deref.st_mode) &&
-		  K26_MKDEV(COMPAT_MAJOR(sb_deref.st_rdev),
-		  COMPAT_MINOR(sb_deref.st_rdev)) == id) {
+		if (S_ISCHR(sb_deref.st_mode) &&
+		    K26_MKDEV(COMPAT_MAJOR(sb_deref.st_rdev),
+		    COMPAT_MINOR(sb_deref.st_rdev)) == id) {
 			HX_strlcpy(dest, buf, len);
 			ret = true;
 			break;
-		} else if(!S_ISLNK(sb_self.st_mode) &&
-		  S_ISDIR(sb_deref.st_mode)) {
+		} else if (!S_ISLNK(sb_self.st_mode) &&
+		    S_ISDIR(sb_deref.st_mode)) {
 			snprintf(buf, sizeof(buf), "%s/%s", dir, de);
-			if(!find_devnode_dive(id, dest, len, buf))
+			if (!find_devnode_dive(id, dest, len, buf))
 				continue;
 			ret = true;
 			break;
@@ -737,7 +738,7 @@ static char *getnamefromuid(uid_t uid, char *result, size_t len)
 	struct passwd ent, *ep;
 	char additional[1024];
 	ep = rpld_getpwuid(uid, &ent, additional, sizeof(additional));
-	if(ep == NULL)
+	if (ep == NULL)
 		return NULL;
 	HX_strlcpy(result, ep->pw_name, len);
 	return result;
@@ -748,40 +749,39 @@ static uid_t getuidfromname(const char *name)
 	struct passwd ent, *ep;
 	char additional[1024];
 	ep = rpld_getpwnam(name, &ent, additional, sizeof(additional));
-	if(ep == NULL)
+	if (ep == NULL)
 		return -1;
 	return ep->pw_uid;
 }
 
 static bool get_options(int *argc, const char ***argv)
 {
-    struct HXoption options_table[] = {
-        {.sh = 'D', .type = HXTYPE_STRING, .ptr = &Opt.device,
-         .help = _("Path to the RPL device"), .htyp = _("file")},
-        {.sh = 'I', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = true,
-         .help = _("Make statistics available through socket")},
-        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = false,
-         .help = _("Do not make statistics available")},
-        {.sh = 'O', .type = HXTYPE_STRING, .ptr = &GOpt.ofmt,
-         .help = _("Override OFMT variable"), .htyp = _("string")},
-        {.sh = 'Q', .type = HXTYPE_VAL, .ptr = &Opt.dolog, .val = false,
-         .help = _("Deactivate logging, only do bytecounting")},
-        {.sh = 'U', .type = HXTYPE_STRING, .cb = getopt_username,
-         .help = _("User to change to"), .htyp = _("user")},
-        {.sh = 'c', .type = HXTYPE_STRING, .cb = getopt_config,
-         .help = _("Read configuration from file"),
-         .htyp = _("file")},
-        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = false,
-         .help = _("Do not start INFOD subcomponent")},
-        {.sh = 's', .type = HXTYPE_NONE, .ptr = &GOpt.syslog,
-         .help = _("Print warnings/errors to syslog")},
-        {.sh = 'v', .type = HXTYPE_NONE | HXOPT_INC, .ptr = &GOpt.verbose,
-         .help = _("Print statistics while rpld is running (overrides -s)")},
-        HXOPT_AUTOHELP,
-        HXOPT_TABLEEND,
-    };
+	struct HXoption options_table[] = {
+	        {.sh = 'D', .type = HXTYPE_STRING, .ptr = &Opt.device,
+	         .help = _("Path to the RPL device"), .htyp = _("file")},
+	        {.sh = 'I', .type = HXTYPE_VAL, .ptr = &Opt.infod_start,
+		 .val = true, .help = _("Make statistics available through socket")},
+	        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start,
+		 .val = false, .help = _("Do not make statistics available")},
+	        {.sh = 'O', .type = HXTYPE_STRING, .ptr = &GOpt.ofmt,
+	         .help = _("Override OFMT variable"), .htyp = _("string")},
+	        {.sh = 'Q', .type = HXTYPE_VAL, .ptr = &Opt.dolog, .val = false,
+	         .help = _("Deactivate logging, only do bytecounting")},
+	        {.sh = 'U', .type = HXTYPE_STRING, .cb = getopt_username,
+	         .help = _("User to change to"), .htyp = _("user")},
+	        {.sh = 'c', .type = HXTYPE_STRING, .cb = getopt_config,
+	         .help = _("Read configuration from file"), .htyp = _("file")},
+	        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start, .val = false,
+	         .help = _("Do not start INFOD subcomponent")},
+	        {.sh = 's', .type = HXTYPE_NONE, .ptr = &GOpt.syslog,
+	         .help = _("Print warnings/errors to syslog")},
+	        {.sh = 'v', .type = HXTYPE_NONE | HXOPT_INC, .ptr = &GOpt.verbose,
+	         .help = _("Print statistics while rpld is running (overrides -s)")},
+	        HXOPT_AUTOHELP,
+	        HXOPT_TABLEEND,
+	};
 
-    return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) <= 0;
+	return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) <= 0;
 }
 
 static void getopt_config(const struct HXoptcb *cbi)
@@ -792,7 +792,7 @@ static void getopt_config(const struct HXoptcb *cbi)
 
 static void getopt_username(const struct HXoptcb *cbi)
 {
-	if((GOpt.user_id = getuidfromname(cbi->data)) < 0) {
+	if ((GOpt.user_id = getuidfromname(cbi->data)) < 0) {
 		fprintf(stderr, _("No such user: %s\n"), cbi->data);
 		exit(EXIT_FAILURE);
 	}
@@ -804,7 +804,7 @@ static bool rate_limit(int counter, time_t delta)
 	static time_t last_time[C_MAX] = {};
 	time_t now = time(NULL);
 
-	if(now > last_time[counter] + delta) {
+	if (now > last_time[counter] + delta) {
 		last_time[counter] = now;
 		return true;
 	}
@@ -815,23 +815,23 @@ static bool rate_limit(int counter, time_t delta)
 static bool read_config(const char *file)
 {
 	static const struct HXoption config_table[] = {
-        {.ln = "DEVICE",      .type = HXTYPE_STRING, .ptr = &Opt.device},
-        {.ln = "DO_LOG",      .type = HXTYPE_BOOL,   .ptr = &Opt.dolog},
-        {.ln = "INFOD_PORT",  .type = HXTYPE_STRING, .ptr = &GOpt.infod_port},
-        {.ln = "MAX_FD",      .type = HXTYPE_INT,    .ptr = &Opt.max_fd},
-        {.ln = "START_INFOD", .type = HXTYPE_BOOL,   .ptr = &Opt.infod_start},
-        {.ln = "OFMT",        .type = HXTYPE_STRING, .ptr = &GOpt.ofmt},
-        {.ln = "USER",        .type = HXTYPE_NONE,   .ptr = &GOpt.user_id,
-         .cb = getopt_username},
-        {NULL},
-    };
+	        {.ln = "DEVICE",      .type = HXTYPE_STRING, .ptr = &Opt.device},
+	        {.ln = "DO_LOG",      .type = HXTYPE_BOOL,   .ptr = &Opt.dolog},
+	        {.ln = "INFOD_PORT",  .type = HXTYPE_STRING, .ptr = &GOpt.infod_port},
+	        {.ln = "MAX_FD",      .type = HXTYPE_INT,    .ptr = &Opt.max_fd},
+	        {.ln = "START_INFOD", .type = HXTYPE_BOOL,   .ptr = &Opt.infod_start},
+	        {.ln = "OFMT",        .type = HXTYPE_STRING, .ptr = &GOpt.ofmt},
+	        {.ln = "USER",        .type = HXTYPE_NONE,   .ptr = &GOpt.user_id,
+	         .cb = getopt_username},
+		HXOPT_TABLEEND,
+	};
 	return HX_shconfig(file, config_table) <= 0;
 }
 
 static bool read_config_bp(const char *app_path, const char *file)
 {
 	char *fpath = HX_strdup(app_path), *ptr, construct[MAXFNLEN];
-	if((ptr = strrchr(fpath, '/')) == NULL) {
+	if ((ptr = strrchr(fpath, '/')) == NULL) {
 		HX_strlcpy(construct, file, sizeof(construct));
 	} else {
 		*ptr++ = '\0';

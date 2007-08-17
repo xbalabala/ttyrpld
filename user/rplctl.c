@@ -47,17 +47,17 @@ static bool Got_arg = false;
 //-----------------------------------------------------------------------------
 int rplctl_main(int argc, const char **argv)
 {
-	if(get_options(&argc, &argv) <= 0)
+	if (get_options(&argc, &argv) <= 0)
 		return EXIT_FAILURE;
 
-	if((Sockfd = unix_client(GOpt.infod_port)) < 0) {
+	if ((Sockfd = unix_client(GOpt.infod_port)) < 0) {
 		fprintf(stderr, _("Connection to %s failed: %s\n"),
 		        GOpt.infod_port, strerror(errno));
 		return EXIT_FAILURE;
 	}
 
 	if (!Got_arg) {
-		if(!Opt.parseable)
+		if (!Opt.parseable)
 			printf("A %-7s %13s %9s %s\n", _("TTY"), _("BYTES IN"),
 			       _("OUT"), _("FILENAME"));
 		send_int(Sockfd, IFP_GETINFO_A, 0);
@@ -74,16 +74,16 @@ static uint32_t getdev(const char *s)
 	uint32_t major, minor;
 	bool found = false;
 
-	if(s == NULL)
+	if (s == NULL)
 	        return 0;
-	if(*s == '=') {
+	if (*s == '=') {
 		/*
 		 * The user can specify a major-minor number combination in
 		 * form of "=MAJOR,MINOR".
 		 */
 		char *sdup = HX_strdup(s), *p = sdup, *minor_str;
-		if((minor_str = strpbrk(p + 1, ",.:")) == NULL ||
-		  p + 1 == minor_str) {
+		if ((minor_str = strpbrk(p + 1, ",.:")) == NULL ||
+		    p + 1 == minor_str) {
 			fprintf(stderr, _("getdev(): Incorrect device number "
 			        "specification \"%s\", should be "
 			        "\"=%%d:%%d\"\n"), s);
@@ -104,21 +104,21 @@ static uint32_t getdev(const char *s)
 		const char *dirs[] = {"", "/dev/", NULL}, **dirp = dirs;
 		struct stat sb;
 
-		while(*dirp != NULL) {
+		while (*dirp != NULL) {
 			char buf[MAXFNLEN];
 			snprintf(buf, MAXFNLEN, "%s/%s", *dirp, s);
-			if(stat(buf, &sb) == 0) {
+			if (stat(buf, &sb) == 0) {
 				found = true;
 				break;
 			}
-			if(errno != ENOENT) {
+			if (errno != ENOENT) {
 				fprintf(stderr, _("Cannot stat %s: %s\n"),
 				        buf, strerror(errno));
 				return 0;
 			}
 			++dirp;
 		}
-		if(!found) {
+		if (!found) {
 			fprintf(stderr, _("Cannot find %s\n"), s);
 			return 0;
 		}
@@ -140,14 +140,14 @@ static void read_reply(int fd)
 
 		recv(fd, &reply_size, sizeof(uint32_t), MSG_WAITALL);
 		SWAB1(&reply_size);
-		if(reply_size == 0)
+		if (reply_size == 0)
 			break;
 
-		while(reply_size > 0) {
+		while (reply_size > 0) {
 			FD_ZERO(&rd);
 			FD_SET(fd, &rd);
 			select(fd + 1, &rd, NULL, NULL, NULL);
-			if(FD_ISSET(fd, &rd)) {
+			if (FD_ISSET(fd, &rd)) {
 				ssize_t ret;
 				ret = recv(fd, buf, min_uint(sizeof(buf),
 				      reply_size), 0);
@@ -176,9 +176,9 @@ static int unix_client(const char *port)
 	sk.sun_family = AF_UNIX;
 	HX_strlcpy(sk.sun_path, port, sizeof(sk.sun_path));
 
-	if((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0 ||
-	  connect(fd, reinterpret_cast(void *, &sk),
-	  sizeof(struct sockaddr_un)) < 0)
+	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0 ||
+	    connect(fd, reinterpret_cast(void *, &sk),
+	    sizeof(struct sockaddr_un)) < 0)
 		return -1;
 
 	return fd;
@@ -221,14 +221,14 @@ static void getopt_proc(const struct HXoptcb *cbi)
 		['X'] = IFP_REMOVE,
 		['Z'] = IFP_ZERO,
 	};
-	switch(cbi->match_sh) {
+	switch (cbi->match_sh) {
 	case 'A':
 	case 'D':
 	case 'S':
 	case 'X': {
 		uint32_t dev;
 		Got_arg = true;
-		if((dev = getdev(cbi->data)) != 0)
+		if ((dev = getdev(cbi->data)) != 0)
 			send_int(Sockfd, mapping[static_cast(int,
 			         cbi->match_sh)], dev);
 		break;
