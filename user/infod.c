@@ -14,6 +14,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -111,7 +112,7 @@ static void *client_thread(void *arg)
 		case IFP_REMOVE: {
 			struct tty *tty;
 			pthread_mutex_lock(&Ttys_lock);
-			if ((tty = get_tty(gint, 0)) != NULL)
+			if ((tty = get_tty(gint, false)) != NULL)
 				log_close(tty);
 			pthread_mutex_unlock(&Ttys_lock);
 			break;
@@ -163,7 +164,7 @@ static void getinfo_text(uint32_t dev, int fd)
 		getinfo_text_all(fd);
 	} else {
 		struct tty *tty;
-		if ((tty = get_tty(dev, 0)) == NULL) {
+		if ((tty = get_tty(dev, false)) == NULL) {
 			pthread_mutex_unlock(&Ttys_lock);
 			return;
 		}
@@ -219,7 +220,7 @@ static void getinfo_bin(uint32_t dev, int fd)
 		getinfo_bin_all(fd);
 	} else {
 		struct tty *tty;
-		if ((tty = get_tty(dev, 0)) == NULL) {
+		if ((tty = get_tty(dev, false)) == NULL) {
 			pthread_mutex_unlock(&Ttys_lock);
 			return;
 		}
@@ -267,7 +268,7 @@ static void set_session_status(uint32_t dev, int req)
 	struct tty *tty;
 
 	pthread_mutex_lock(&Ttys_lock);
-	if ((tty = get_tty(dev, 1)) == NULL) {
+	if ((tty = get_tty(dev, true)) == NULL) {
 		pthread_mutex_unlock(&Ttys_lock);
 		return;
 	}
@@ -293,7 +294,7 @@ static void zero_counters(uint32_t dev)
 		HXbtrav_free(trav);
 	} else {
 		struct tty *tty;
-		if ((tty = get_tty(dev, 0)) == NULL) {
+		if ((tty = get_tty(dev, false)) == NULL) {
 			pthread_mutex_unlock(&Ttys_lock);
 			return;
 		}

@@ -209,7 +209,7 @@ static void mainloop(int fd)
 	}
 
 	pthread_mutex_lock(&Ttys_lock);
-	if((tty = get_tty(packet.dev, 1)) == NULL) {
+	if ((tty = get_tty(packet.dev, true)) == NULL) {
 		G_skip(fd, packet.size, 0);
 		pthread_mutex_unlock(&Ttys_lock);
 		continue;

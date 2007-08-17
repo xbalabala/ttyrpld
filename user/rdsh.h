@@ -12,6 +12,7 @@
 
 #include <sys/types.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include "rpl_stdint.h"
 #include <libHX.h>
 
@@ -75,7 +76,7 @@ extern struct HXbtree *Ttys;
 extern struct Statmap_t Stats;
 extern struct GOptmap_t GOpt;
 
-extern struct tty *get_tty(uint32_t, int);
+extern struct tty *get_tty(uint32_t, bool);
 extern void log_close(struct tty *);
 extern void notify(int, const char *, ...);
 extern ssize_t send_wait(int, const void *, size_t);

@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +47,7 @@ static unsigned long k_version_data = 0;
 static pthread_mutex_t k_version_lock = PTHREAD_MUTEX_INITIALIZER;
 
 //-----------------------------------------------------------------------------
-struct tty *get_tty(uint32_t dev, int create)
+struct tty *get_tty(uint32_t dev, bool create)
 {
 	const struct HXbtree_node *ts;
 	struct tty *ret = NULL, *tty;
