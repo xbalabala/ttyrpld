@@ -133,7 +133,7 @@ static void *client_thread(void *arg)
 			goto clthr__exit;
 		} /* switch */
 
-		send_wait(fd, &zero, sizeof(uint32_t), 0);
+		send_wait(fd, &zero, sizeof(uint32_t));
 	}
 
  clthr__exit:
@@ -336,8 +336,8 @@ static int skprintf(int fd, const char *fmt, ...)
 	va_start(argp, fmt);
 	le = s = vsnprintf(buf, sizeof(buf), fmt, argp);
 	SWAB1(&le);
-	send_wait(fd, &le, sizeof(uint32_t), 0);
-	send_wait(fd, buf, s, 0);
+	send_wait(fd, &le, sizeof(uint32_t));
+	send_wait(fd, buf, s);
 
 	va_end(argp);
 	return s;

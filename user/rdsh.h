@@ -78,6 +78,6 @@ extern struct GOptmap_t GOpt;
 extern struct tty *get_tty(uint32_t, int);
 extern void log_close(struct tty *);
 extern void notify(int, const char *, ...);
-extern ssize_t send_wait(int, const void *, size_t, int);
+extern ssize_t send_wait(int, const void *, size_t);
 
 #endif /* TTYRPLD_RDSH_H */

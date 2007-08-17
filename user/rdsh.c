@@ -125,11 +125,11 @@ void notify(int lv, const char *fmt, ...)
 	return;
 }
 
-ssize_t send_wait(int fd, const void *buf, size_t count, int flags)
+ssize_t send_wait(int fd, const void *buf, size_t count)
 {
 	size_t rem = count;
 	while (rem > 0) {
-		ssize_t ret = send(fd, buf, rem, flags);
+		ssize_t ret = send(fd, buf, rem, 0);
 		if (ret < 0)
 			return -errno;
 		if (ret == rem)

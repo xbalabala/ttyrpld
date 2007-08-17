@@ -159,9 +159,9 @@ static void read_reply(int fd)
 
 static void send_int(int fd, unsigned char req, uint32_t dev)
 {
-	send_wait(fd, &req, sizeof(unsigned char), 0);
+	send_wait(fd, &req, sizeof(unsigned char));
 	SWAB1(&dev);
-	send_wait(fd, &dev, sizeof(uint32_t), 0);
+	send_wait(fd, &dev, sizeof(uint32_t));
 	read_reply(fd);
 	return;
 }
