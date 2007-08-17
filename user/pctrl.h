@@ -10,6 +10,8 @@
 #ifndef TTYRPLD_PCTRL_H
 #define TTYRPLD_PCTRL_H 1
 
+#include <stdbool.h>
+
 enum {
 	PCTRL_NONE = 0,
 	PCTRL_PREV,
@@ -21,10 +23,9 @@ enum {
 
 struct pctrl_info {
 	double factor;
-	int sktype;
 	long skval;
-	unsigned int break_command;
-	unsigned char paused, echo;
+	unsigned int sktype, break_command;
+	bool paused, echo;
 };
 
 extern int pctrl_init(void);

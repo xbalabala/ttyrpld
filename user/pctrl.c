@@ -79,7 +79,7 @@ static void *pctrl_thread(void *arg)
 		read(ctty, &c, 1);
 		switch (tolower(c)) {
 		case ' ':
-			pstatus->paused ^= static_cast(unsigned long, -1);
+			pstatus->paused = !pstatus->paused;
 			break;
 		case '<':
 			pstatus->break_command = PCTRL_PREV;
@@ -97,19 +97,19 @@ static void *pctrl_thread(void *arg)
 			pstatus->factor *= 1.0 + 1.0 / 3.0;
 			break;
 		case 'e':
-			pstatus->echo ^= static_cast(unsigned long, -1);
+			pstatus->echo = !pstatus->echo;
 			break;
 		case '6':
 			if (pstatus->skval < 0)
 				pstatus->skval = 0;
-			pstatus->paused = 0;
+			pstatus->paused = false;
 			pstatus->sktype = PCTRL_SKTIME;
 			pstatus->skval += 10 * 1000;
 			break;
 		case '9':
 			if (pstatus->skval < 0)
 				pstatus->skval = 0;
-			pstatus->paused = 0;
+			pstatus->paused = false;
 			pstatus->sktype = PCTRL_SKTIME;
 			pstatus->skval += 60 * 1000;
 			break;

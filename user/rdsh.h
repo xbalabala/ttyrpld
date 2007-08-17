@@ -25,9 +25,9 @@
 #define static_cast(type, expr)      ((type)(expr))
 
 struct GOptmap_t {
-	int syslog, verbose;
 	long user_id;
 	const char *infod_port, *ofmt;
+	unsigned int syslog, verbose;
 };
 
 struct Statmap_t {

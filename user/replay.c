@@ -86,7 +86,7 @@ static inline void usec2tv(unsigned long long, struct timeval *);
 int main(int argc, const char **argv)
 {
 	const char *auto_stdin[] = {"/dev/stdin", NULL};
-	int i;
+	unsigned int i;
 
 	load_locale(*argv);
 	if (!get_options(&argc, &argv))

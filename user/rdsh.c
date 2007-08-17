@@ -36,8 +36,8 @@ struct HXbtree *Ttys = NULL;
 struct Statmap_t Stats;
 struct GOptmap_t GOpt = {
 	.user_id    = -1,
-	.syslog     = 0,
-	.verbose    = 0,
+	.syslog     = false,
+	.verbose    = false,
 	.infod_port = "/var/run/.rpld_socket",
 	.ofmt       = "%(USER)/%(DATE).%(TIME).%(TTY)",
 };
