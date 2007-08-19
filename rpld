@@ -1,10 +1,4 @@
 #!/bin/bash
-#==============================================================================
-# ttyrpld - TTY replay daemon
-# /etc/init.d/rpld - Init script for RPLD
-#   by Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
-#   This file is released in the Public Domain.
-#==============================================================================
 ### BEGIN INIT INFO
 # Provides:       rpld
 # Required-Start:
@@ -24,7 +18,8 @@ else
 		_saved=$?;
 		return 1;
 	}
-	function rc_status() {
+	function rc_status()
+	{
 		_saved=$?;
 		case "$_saved" in
 			0) echo -e "\e[150C\e[10D\e[1;32m""done""\e[0m";;
@@ -32,10 +27,12 @@ else
 		esac;
 		return $?;
 	}
-	function rc_exit() {
+	function rc_exit()
+	{
 		return $?;
 	}
-	function rc_reset() {
+	function rc_reset()
+	{
 		return 0;
 	}
 fi;
@@ -100,5 +97,3 @@ case "$1" in
 esac;
 
 rc_exit;
-
-#==============================================================================
