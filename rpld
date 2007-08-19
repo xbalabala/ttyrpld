@@ -56,7 +56,6 @@ case "$1" in
 		[ -n "$verbose" ] && echo -n "... error inserting module";
 		rc_failed;
 	else
-		chmod 400 /dev/rpl /dev/misc/rpl &>/dev/null;
 		checkproc "$DAEMON_BIN" && [ $verbose ] && echo " (already running)";
 		startproc -s "$DAEMON_BIN" -s;
 	fi;
