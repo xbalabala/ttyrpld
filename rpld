@@ -57,20 +57,20 @@ case "$1" in
 		rc_failed;
 	else
 		chmod 400 /dev/rpl /dev/misc/rpl &>/dev/null;
-		checkproc $DAEMON_BIN && [ $verbose ] && echo " (already running)";
-		startproc -s $DAEMON_BIN -s;
+		checkproc "$DAEMON_BIN" && [ $verbose ] && echo " (already running)";
+		startproc -s "$DAEMON_BIN" -s;
 	fi;
 	rc_status $verbose;
 	;;
     (stop)
 	[ -n "$verbose" ] && echo -n "Shutting down rpld";
-	checkproc $DAEMON_BIN || ([ $verbose ] && echo -n " (not running)");
-	killproc $DAEMON_BIN;
+	checkproc "$DAEMON_BIN" || ([ $verbose ] && echo -n " (not running)");
+	killproc "$DAEMON_BIN";
 	rc_status $verbose;
 	;;
     (status)
 	[ -n "$verbose" ] && echo -n "Checking for rpld";
-	checkproc $DAEMON_BIN;
+	checkproc "$DAEMON_BIN";
 	rc_status $verbose;
 	;;
     (restart)
