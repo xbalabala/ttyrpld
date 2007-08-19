@@ -3,11 +3,12 @@ AC_INIT(ttyrpld, 2.19)
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE
 AC_PROG_CC
+AM_PROG_CC_C_O
 
 AC_HAVE_HEADERS(alloca.h)
-AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_AC_LDLIBS="$ttyreplay_AC_LDLIBS -lrt"])
-AC_CHECK_LIB([socket], [accept], [rpld_AC_LDLIBS="$rpld_AC_LDLIBS -lsocket -lnsl"])
-AC_CHECK_LIB([intl], [gettext], [AC_LDLIBS="$AC_LDLIBS -lintl"])
+AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_AC_LIBS="$ttyreplay_AC_LIBS -lrt"])
+AC_CHECK_LIB([socket], [accept], [rpld_AC_LIBS="$rpld_AC_LIBS -lsocket -lnsl"])
+AC_CHECK_LIB([intl], [gettext], [AC_LIBS="$AC_LIBS -lintl"])
 AC_CHECK_HEADER([libHX.h], [],
 	AC_MSG_ERROR([Need at least libHX 1.10 (http://jengelh.hopto.org/p/libHX/)]),
 	[
@@ -24,7 +25,7 @@ AC_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
 	-Winline -pipe"
 AC_SUBST(AC_CFLAGS)
-AC_SUBST(AC_LDLIBS)
-AC_SUBST(ttyreplay_AC_LDLIBS)
-AC_SUBST(rpld_AC_LDLIBS)
-AC_OUTPUT(Makefile doc/GNUmakefile locale/GNUmakefile user/Makefile)
+AC_SUBST(AC_LIBS)
+AC_SUBST(ttyreplay_AC_LIBS)
+AC_SUBST(rpld_AC_LIBS)
+AC_OUTPUT([Makefile doc/GNUmakefile locale/GNUmakefile user/Makefile])
