@@ -1,12 +1,11 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:       rpld
+# Provides:		rpld
 # Required-Start:
-# X-UnitedLinux-Should-Start:
 # Required-Stop:
-# Default-Start:  2 3 5
-# Default-Stop:   0 1 6
-# Description:    ttyrpld master daemon
+# Default-Start:	2 3 5
+# Default-Stop:		0 1 6
+# Description:		ttyrpld userspace logging daemon
 ### END INIT INFO
 
 if [ -e /etc/rc.status ]; then
@@ -38,8 +37,10 @@ else
 fi;
 
 verbose="-v";
-grep -q "^ETCINITD_QUIET=yes" /etc/rpld.conf 2>/dev/null && verbose="";
-DAEMON_BIN="/usr/sbin/rpld";
+prefix="@prefix@";
+exec_prefix="@exec_prefix@";
+grep -q "^ETCINITD_QUIET=yes" "@sysconfdir@/rpld.conf" 2>/dev/null && verbose="";
+daemon_bin="@sbindir@/rpld";
 
 rc_reset;
 
@@ -56,20 +57,20 @@ case "$1" in
 		[ -n "$verbose" ] && echo -n "... error inserting module";
 		rc_failed;
 	else
-		checkproc "$DAEMON_BIN" && [ $verbose ] && echo " (already running)";
-		startproc -s "$DAEMON_BIN" -s;
+		checkproc "$daemon_bin" && [ $verbose ] && echo " (already running)";
+		startproc -s "$daemon_bin" -s;
 	fi;
 	rc_status $verbose;
 	;;
     (stop)
 	[ -n "$verbose" ] && echo -n "Shutting down rpld";
-	checkproc "$DAEMON_BIN" || ([ $verbose ] && echo -n " (not running)");
-	killproc "$DAEMON_BIN";
+	checkproc "$daemon_bin" || ([ $verbose ] && echo -n " (not running)");
+	killproc "$daemon_bin";
 	rc_status $verbose;
 	;;
     (status)
 	[ -n "$verbose" ] && echo -n "Checking for rpld";
-	checkproc "$DAEMON_BIN";
+	checkproc "$daemon_bin";
 	rc_status $verbose;
 	;;
     (restart)

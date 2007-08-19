@@ -28,4 +28,5 @@ AC_SUBST(AC_CFLAGS)
 AC_SUBST(AC_LIBS)
 AC_SUBST(ttyreplay_AC_LIBS)
 AC_SUBST(rpld_AC_LIBS)
-AC_OUTPUT([Makefile doc/GNUmakefile locale/GNUmakefile user/Makefile])
+AC_OUTPUT([Makefile etc/Makefile etc/rpld doc/GNUmakefile locale/GNUmakefile
+	user/Makefile])
