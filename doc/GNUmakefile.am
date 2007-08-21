@@ -3,12 +3,13 @@
 targets = $(patsubst %.php,%.html,$(wildcard *.php)) \
           $(patsubst %.php,%.txt,$(wildcard *.php))
 
-CLEANFILES = $(targets)
+CLEANFILES = ${targets}
+AM_VERBOSE_GEN = $(if $(V),,@echo "  GEN     " $@;)
 
-all: $(targets)
+all: ${targets}
 
 %.html: %.php
-	php -q $< man | perl -pe 's{href="([^/]*?)\.php"}{href="$$1.html"}' >$@;
+	${AM_VERBOSE_GEN}${PHP} -q $< man | ${PERL} -pe 's{href="([^/]*?)\.php"}{href="$$1.html"}' >$@;
 
 %.txt: %.html
-	w3m -dump $< >$@;
+	${AM_VERBOSE_GEN}${W3M} -dump $< >$@;
