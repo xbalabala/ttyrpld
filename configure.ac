@@ -18,6 +18,25 @@ AC_CHECK_HEADER([libHX.h], [],
 #endif
 ])
 
+AC_PATH_PROG([MSGFMT], [gmsgfmt])
+if [[ -z "$MSGFMT" ]]; then
+	AC_PATH_PROG([MSGFMT], [msgfmt])
+fi;
+AC_PATH_PROG([PERL], [perl])
+if [[ -z "$PERL" ]]; then
+	AC_PATH_PROG([perl5])
+fi;
+AC_PATH_PROG([PHP], [php5])
+if [[ -z "$PHP" ]]; then
+	AC_PATH_PROG([php])
+fi;
+AC_PATH_PROG([W3M], [w3m])
+
+AM_CONDITIONAL([GOT_TOOLS_FOR_DOC],
+	[$am_make -v | grep -q GNU && test -n "$PERL" -a -n "$PHP" -a -n "$W3M"])
+AM_CONDITIONAL([GOT_TOOLS_FOR_LOCALE],
+	[$am_make -v | grep -q GNU && test -n "$MSGFMT"])
+
 m4_sinclude(m4lib/getpwuid.m4)
 
 AC_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
@@ -28,5 +47,5 @@ AC_SUBST(AC_CFLAGS)
 AC_SUBST(AC_LIBS)
 AC_SUBST(ttyreplay_AC_LIBS)
 AC_SUBST(rpld_AC_LIBS)
-AC_OUTPUT([Makefile etc/Makefile etc/rpld doc/GNUmakefile locale/GNUmakefile
-	user/Makefile])
+AC_OUTPUT([Makefile etc/Makefile etc/rpld user/Makefile
+	doc/GNUmakefile locale/GNUmakefile])
