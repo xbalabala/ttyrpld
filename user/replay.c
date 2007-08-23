@@ -498,7 +498,7 @@ static bool get_options(int *argc, const char ***argv)
         HXOPT_TABLEEND,
     };
 
-    return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) <= 0;
+    return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) > 0;
 }
 
 static void getopt_jump(const struct HXoptcb *cbi)
