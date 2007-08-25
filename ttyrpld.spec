@@ -1,17 +1,17 @@
 
-Name:           ttyrpld
-Version:        2.18
-Release:        0
-Group:          Productivity/Security
-Summary:        kernel-based tty screen- and keylogger
-License:        LGPL/others
-URL:            http://%name.sourceforge.net/
+Name:		ttyrpld
+Version:	2.18.svn200
+Release:	0
+Group:		Productivity/Security
+Summary:	Kernel-based tty screen- and keylogger
+License:	LGPL/others
+URL:		http://%name.sourceforge.net/
 
 # Build KMP packages yes or no, 0 or 1
 %define kernel  1
 
-Source:         http://heanet.dl.sourceforge.net/sourceforge/%name/%name-%version.tar.bz2
-BuildRoot:      %_tmppath/%name-%version-build
+Source:		http://heanet.dl.sourceforge.net/sourceforge/%name/%name-%version.tar.bz2
+BuildRoot:	%_tmppath/%name-%version-build
 BuildRequires:	gettext-devel, libHX >= 1.10, php5, perl >= 5.8.0, w3m
 %if 0%kernel
 BuildRequires:	kernel-source, kernel-syms
@@ -75,6 +75,13 @@ export INSTALL_MOD_PATH="$b";
 	done;
 %endif
 
+%preun
+%stop_on_removal rpld
+
+%postun
+%restart_on_update rpld
+%insserv_cleanup
+
 %files
 %defattr(-,root,root)
 %config %_sysconfdir/rpld.conf
@@ -85,3 +92,5 @@ export INSTALL_MOD_PATH="$b";
 
 %files doc
 %doc doc/*.css doc/*.html doc/*.txt doc/*.png
+
+%changelog -n ttyrpld
