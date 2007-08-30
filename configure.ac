@@ -7,9 +7,9 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 
 AC_HAVE_HEADERS(alloca.h)
-AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_AC_LIBS="$ttyreplay_AC_LIBS -lrt"])
-AC_CHECK_LIB([socket], [accept], [rpld_AC_LIBS="$rpld_AC_LIBS -lsocket -lnsl"])
-AC_CHECK_LIB([intl], [gettext], [AC_LIBS="$AC_LIBS -lintl"])
+AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_LIBS="$ttyreplay_LIBS -lrt"])
+AC_CHECK_LIB([socket], [accept], [rpld_LIBS="$rpld_LIBS -lsocket -lnsl"])
+AC_CHECK_LIB([intl], [gettext], [regular_LIBS="$regular_LIBS -lintl"])
 AC_CHECK_HEADER([libHX.h], [],
 	AC_MSG_ERROR([Need at least libHX 1.10 (http://jengelh.hopto.org/p/libHX/)]),
 	[
@@ -40,13 +40,13 @@ AM_CONDITIONAL([GOT_TOOLS_FOR_LOCALE],
 
 m4_sinclude(m4lib/getpwuid.m4)
 
-AC_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
+regular_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
 	-Winline -pipe"
-AC_SUBST(AC_CFLAGS)
-AC_SUBST(AC_LIBS)
-AC_SUBST(ttyreplay_AC_LIBS)
-AC_SUBST(rpld_AC_LIBS)
+AC_SUBST(regular_CFLAGS)
+AC_SUBST(regular_LIBS)
+AC_SUBST(ttyreplay_LIBS)
+AC_SUBST(rpld_LIBS)
 AC_OUTPUT([Makefile etc/Makefile etc/rpld user/Makefile
 	doc/GNUmakefile locale/GNUmakefile])
