@@ -94,7 +94,7 @@ static unsigned int Minor_nr = MISC_DYNAMIC_MINOR, Open_count = 0;
 static unsigned int Enable_ioctl_proc = 0;
 
 /* Kernel module info (kmi) stuff */
-static struct file_operations kmi_fops = {
+static const struct file_operations kmi_fops = {
 	.open    = rpldev_open,
 	.read    = rpldev_read,
 	.llseek  = rpldev_seek,
