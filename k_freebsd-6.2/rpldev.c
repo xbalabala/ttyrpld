@@ -285,7 +285,10 @@ static int rpldev_ioctl(struct cdev *cd, u_long cmd, caddr_t data, int flags,
 
 	switch (cmd) {
 		case RPL_IOC_GETBUFSIZE:
-			/* This is BSD. No put_user() like in Linux. */
+			/*
+			 * This is BSD. No put_user() like in Linux.
+			 * At least it seems so.
+			 */
 			*ptr = Bufsize;
 			return 0;
 		case RPL_IOC_GETRAVAIL:
