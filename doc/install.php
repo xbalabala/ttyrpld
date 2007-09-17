@@ -12,7 +12,7 @@
     <td class="t2"><a
       href="http://jengelh.hopto.org/coding/libHX.php">libHX</a></td>
     <td class="t2">1.10.0</li>
-    <td class="t2">1.10.0</li>
+    <td class="t2">1.10.1</li>
   </tr>
   <tr>
     <td class="t1">GNU C Compiler</td>
@@ -28,8 +28,8 @@
     <td colspan="2" class="t1">any</td>
   </tr>
   <tr>
-    <td colspan="3" class="t2"><i>If you want to recreate the
-      documentation:</i></td>
+    <td colspan="3" class="t2"><b>If you want to recreate the
+      documentation:</b></td>
   </tr>
   <tr>
     <td class="t2">gmake (for doc)</td>
@@ -39,7 +39,7 @@
   <tr>
     <td class="t1">perl (for doc)</td>
     <td class="t1">-</td>
-    <td class="t1">5.6.0</td>
+    <td class="t1">5.8.0</td>
   </tr>
   <tr>
     <td class="t2">php (for doc)</td>
