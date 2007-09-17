@@ -49,7 +49,6 @@ The rpldhk kernel module needs to be built into the kernel already.
 %setup
 
 %build
-./autogen.sh;
 %configure
 make %{?jobs:-j%jobs};
 mkdir obj;
