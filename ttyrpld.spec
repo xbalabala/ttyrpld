@@ -1,6 +1,6 @@
 
 Name:		ttyrpld
-Version:	2.18.svn200
+Version:	2.19
 Release:	0
 Group:		Productivity/Security
 Summary:	Kernel-based tty screen- and keylogger
