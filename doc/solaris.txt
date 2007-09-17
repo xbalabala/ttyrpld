@@ -1,0 +1,13 @@
+
+ (some hints to get it running)
+
+Compile kernel modules; copy rpldhk module into /platform/<arch>/strmod; edit
+/etc/iu.ap to add rpldhk for the cn (console), wc (console?) and pts (unix98
+ptys).. something like this:
+
+cn 0 0 rpldhk
+wc 0 0 rpldhk ldterm ttcompat
+pts -1 0 rpldhk
+
+(ldterm and compat are part of the Solaris default install.) Reboot, load the
+rpldev module; then you can use the userspace program rpld.
