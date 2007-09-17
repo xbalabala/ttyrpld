@@ -1,18 +1,18 @@
 
 Name:		ttyrpld
 Version:	2.19
-Release:	0
+Release:	ccj0
 Group:		Productivity/Security
 Summary:	Kernel-based tty screen- and keylogger
 License:	LGPL/others
 URL:		http://%name.sourceforge.net/
 
-# Build KMP packages yes or no, 0 or 1
+# Build KMP packages yes or no, 1 or 0
 %define kernel  1
 
 Source:		http://heanet.dl.sourceforge.net/sourceforge/%name/%name-%version.tar.bz2
 BuildRoot:	%_tmppath/%name-%version-build
-BuildRequires:	gettext-devel, libHX >= 1.10, php5, perl >= 5.8.0, w3m
+BuildRequires:	gettext-devel, libHX-devel >= 1.10, php5, perl >= 5.8.0, w3m
 %if 0%kernel
 BuildRequires:	kernel-source, kernel-syms
 
