@@ -14,25 +14,42 @@ releases.</p>
   </tr>
   <tr>
     <td class="t2">Linux</td>
-    <td class="t2">2.16</td>
-    <td class="t2">2.16</td>
+    <td class="t2">2.19</td>
+    <td class="t2">2.19</td>
   </tr>
   <tr>
     <td class="t1">FreeBSD</td>
-    <td class="t1">2.16</td>
-    <td class="t1">2.16</td>
+    <td class="t1">2.19</td>
+    <td class="t1">2.19</td>
   </tr>
   <tr>
     <td class="t2">OpenBSD</td>
-    <td class="t2">2.18</td>
+    <td class="t2">2.19</td>
     <td class="t2">modules not really supported</td>
   </tr>
   <tr>
     <td class="t1">NetBSD</td>
-    <td class="t1">2.16</td>
-    <td class="t1">2.16</td>
+    <td class="t1">2.19</td>
+    <td class="t1">2.19</td>
   </tr>
 </table>
+
+<h1>To 2.19 (released 2007-09-17)</h1>
+
+<ul>
+  <li class="star">The kernel interface has been reduced (hooks removed).
+    The 2.19 userspace is still compatible (throws warnings though) with
+    2.18 kernel components however. The 2.19 kernel patch is for 2.6.22.</li>
+  <li class="plus">an experimental Solaris kernel driver has been added -
+    tested with Solaris 11.snv only, but may work with older ones.</li>
+  <li class="star">fix a file descriptor leak in rpld (thanks J.Eller)</li>
+  <li class="star">fix a symlink recursion when walking <code>/dev</code>
+    (J.Eller)</li>
+  <li class="plus">raise maximum number of open files (J.Eller)</li>
+  <li class="star">handle permission restrictions on <code>/dev</code> nodes</li>
+  <li class="star">fix directory name of Persian translation</li>
+  <li class="star">moved to autotools</li>
+  <li class="star">build with new libHX 1.10</li>
 
 <h1>To 2.18 (released on 2006-07-01)</h1>
 
