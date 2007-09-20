@@ -825,7 +825,7 @@ static bool read_config(const char *file)
 	         .cb = getopt_username},
 		HXOPT_TABLEEND,
 	};
-	return HX_shconfig(file, config_table) <= 0;
+	return HX_shconfig(file, config_table) > 0;
 }
 
 static bool read_config_bp(const char *app_path, const char *file)
