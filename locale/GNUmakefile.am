@@ -1,13 +1,14 @@
 # -*- Makefile -*-
 
-LOCALES := $(patsubst ${top_srcdir}/locale/%.po,%,$(wildcard ${top_srcdir}/locale/*.po))
+LOCALES := $(patsubst ${srcdir}/%.po,%,$(wildcard ${srcdir}/*.po))
 TARGETS := $(addsuffix .mo,${LOCALES})
+CLEANFILES = ${TARGETS}
 
-.PHONY: all install uninstall clean
+.PHONY: all install uninstall clean distclean
 
 all: ${TARGETS}
 
-%.mo: %.po
+%.mo: ${srcdir}/%.po
 	@echo -en "  MSGFMT    $*: ";
 	@${MSGFMT} --statistics -o $@ $<;
 
@@ -20,6 +21,3 @@ install: all
 
 uninstall:
 	rm -f ${DESTDIR}${localedir}/*/LC_MESSAGES/ttyrpld.mo;
-
-clean:
-	rm -Rf ${TARGETS};

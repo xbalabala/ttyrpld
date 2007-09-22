@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 
-targets = $(patsubst %.php,%.html,$(wildcard *.php)) \
-          $(patsubst %.php,%.txt,$(wildcard *.php))
+targets = $(patsubst ${srcdir}/%.php,%.html,$(wildcard ${srcdir}/*.php)) \
+          $(patsubst ${srcdir}/%.php,%.txt,$(wildcard ${srcdir}/*.php))
 
 CLEANFILES = ${targets}
 AM_VERBOSE_GEN = $(if $(V),,@echo "  GEN     " $@;)
