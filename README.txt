@@ -29,7 +29,3 @@ In case you are updating from an earlier version,
 the "CHANGES.txt" file tells you whether you need
 to recompile the Kernel (e.g. new kpatch).
 
-
-
-Jan Engelhardt
-<jengelh [at] gmx de>

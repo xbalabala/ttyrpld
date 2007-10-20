@@ -1,6 +1,7 @@
 /*
  *	ttyrpld/k_solaris-11/rpldhk.c
- *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2006 - 2007
+ *	Copyright © CC Computer Consultants GmbH, 2006 - 2007
+ *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
  *
  *	The contents of this file are subject to the terms of the Common
  *	Development and Distribution License, Version 1.0 only (the "License").

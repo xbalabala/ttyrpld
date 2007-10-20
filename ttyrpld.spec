@@ -25,7 +25,7 @@ ttyrpld is a multi-os kernel-level tty keylogger and screenlogger with
 
 Authors:
 --------
-	Jan Engelhardt <jengelh [at] gmx de>
+	Jan Engelhardt
 
 %package doc
 Group:          Documentation/HTML

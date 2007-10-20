@@ -1,6 +1,7 @@
 /*
  *	ttyrpld/k_netbsd-3.1/rpldev.c
- *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
+ *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
  *
  *	Redistribution and use in source and binary forms, with or without
  *	modification, are permitted provided that the following conditions

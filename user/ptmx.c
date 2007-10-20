@@ -1,6 +1,7 @@
 /*
  *	ttyrpld/user/ptmx.c
- *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2007
+ *	Copyright © CC Computer Consultants GmbH, 2007
+ *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU

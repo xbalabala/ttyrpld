@@ -1,6 +1,7 @@
 /*
  *	ttyrpld/k_linux-2.6/rpldev.c
- *	Copyright © Jan Engelhardt <jengelh [at] gmx de>, 2004 - 2007
+ *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
+ *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -110,7 +111,7 @@ static struct miscdevice kmi_miscinfo = {
 };
 
 MODULE_DESCRIPTION("ttyrpld kernel interface");
-MODULE_AUTHOR("Jan Engelhardt <jengelh [at] gmx de>");
+MODULE_AUTHOR("Jan Engelhardt <jengelh [at] computergmbh de>");
 MODULE_LICENSE("GPL and additional rights");
 MODULE_PARM_DESC(Bufsize, "Buffer size (default 32K)");
 MODULE_PARM_DESC(Minor_nr, "Minor number to use (default: 255(=DYNAMIC))");
