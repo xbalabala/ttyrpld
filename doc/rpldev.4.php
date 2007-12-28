@@ -64,8 +64,8 @@ gaps. It can be represented in this C struct:</p>
 
 <p class="code"><code>
 <b>struct</b> rpltime {<br />
-&nbsp; &nbsp; <b>uint32_t</b> tv_sec;<br />
-&nbsp; &nbsp; <b>uint64_t</b> tv_usec;<br />
+&nbsp; &nbsp; <b>uint64_t</b> tv_sec;<br />
+&nbsp; &nbsp; <b>uint32_t</b> tv_usec;<br />
 };<br />
 <br />
 <b>struct</b> rpldev_packet {<br />
