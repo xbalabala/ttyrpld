@@ -63,11 +63,16 @@ itself. All fields are little-endian and packed, i.e. there are no alignment
 gaps. It can be represented in this C struct:</p>
 
 <p class="code"><code>
+<b>struct</b> rpltime {<br />
+&nbsp; &nbsp; <b>uint32_t</b> tv_sec;<br />
+&nbsp; &nbsp; <b>uint64_t</b> tv_usec;<br />
+};<br />
+<br />
 <b>struct</b> rpldev_packet {<br />
 &nbsp; &nbsp; <b>uint32_t</b> dev;<br />
 &nbsp; &nbsp; <b>uint16_t</b> size;<br />
 &nbsp; &nbsp; <b>uint8_t</b> event, magic;<br />
-&nbsp; &nbsp; <b>struct</b> timeval time;<br />
+&nbsp; &nbsp; <b>struct</b> rpltime time;<br />
 } <i>__attribute__((packed))</i>;</code></p>
 
 <p class="block">The data itself is actually not included in the struct, since

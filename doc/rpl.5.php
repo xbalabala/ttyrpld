@@ -13,7 +13,7 @@ rpldev_packet</code>:</p>
 <b>struct</b> rpldsk_packet {<br />
 &nbsp; &nbsp; <b>uint16_t</b> size;<br />
 &nbsp; &nbsp; <b>uint8_t</b> event, magic;<br />
-&nbsp; &nbsp; <b>struct</b> timeval time;<br />
+&nbsp; &nbsp; <b>struct</b> rpltime time;<br />
 } <i>__attribute__((packed))</i>;</code></p>
 
 <p class="block">The <code>-&gt;magic</code> is always <code>0xEE</code>.</p>
