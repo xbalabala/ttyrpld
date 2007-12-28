@@ -374,7 +374,7 @@ static void log_open(struct tty *tty)
 	 * may contain _anything_, while EVT_MAGIC is fixed. See
 	 * share/ttyrpld.magic.)
 	 */
-	HX_strlcpy(buf, "RPL", sizeof(buf)); /* STRING FIXED */
+	HX_strlcpy(buf, "RPL2_50", sizeof(buf)); /* STRING FIXED */
 	p.event = EVT_MAGIC;
 	s = p.size = strlen(buf) + 1; /* include '\0' in stream */
 	SWAB1(&p.size);

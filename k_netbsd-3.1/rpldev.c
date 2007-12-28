@@ -78,7 +78,7 @@ static inline size_t avail_W(void);
 static inline int circular_get(struct uio *, size_t);
 static inline void circular_put(const void *, size_t);
 static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
-static inline void fill_time(struct timeval *);
+static inline void fill_time(struct rpltime *);
 static inline unsigned int min_uint(unsigned int, unsigned int);
 static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
@@ -386,19 +386,20 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
 	return count;
 }
 
-static inline void fill_time(struct timeval *tv)
+static inline void fill_time(struct rpltime *x)
 {
-	microtime(tv);
+	struct timeval tv;
+	microtime(&tv);
 
-	if (sizeof(tv->tv_sec) == sizeof(uint32_t))
-		tv->tv_sec = htole32(tv->tv_sec);
-	else if (sizeof(tv->tv_sec) == sizeof(uint64_t))
-		tv->tv_sec = htole64(tv->tv_sec);
+	if (sizeof(tv.tv_sec) == sizeof(uint32_t))
+		x->tv_sec = htole32(tv.tv_sec);
+	else if (sizeof(tv.tv_sec) == sizeof(uint64_t))
+		x->tv_sec = htole64(tv.tv_sec);
 
-	if (sizeof(tv->tv_usec) == sizeof(uint32_t))
-		tv->tv_usec = htole32(tv->tv_usec);
-	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
-		tv->tv_usec = htole64(tv->tv_usec);
+	if (sizeof(tv.tv_usec) == sizeof(uint32_t))
+		x->tv_usec = htole32(tv.tv_usec);
+	else if (sizeof(tv.tv_usec) == sizeof(uint64_t))
+		x->tv_usec = htole64(tv.tv_usec);
 
 	return;
 }

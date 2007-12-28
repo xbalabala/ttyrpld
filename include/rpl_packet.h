@@ -30,17 +30,22 @@ enum {
 	MAGIC_SIG      = 0xEE,
 };
 
+struct rpltime {
+	uint64_t tv_sec;
+	uint32_t tv_usec;
+};
+
 struct rpldev_packet {
 	uint32_t dev;
 	uint16_t size;
 	uint8_t event, magic;
-	struct timeval time;
+	struct rpltime time;
 } __PACKED;
 
 struct rpldsk_packet {
 	uint16_t size;
 	uint8_t event, magic;
-	struct timeval time;
+	struct rpltime time;
 } __PACKED;
 
 #endif /* TTYRPLD_PACKET_H */

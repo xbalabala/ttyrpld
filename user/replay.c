@@ -65,7 +65,7 @@ struct {
 /* Functions */
 static int replay_file(int, const char *);
 static void e_proc(int, struct rpldsk_packet *, struct pctrl_info *, char *,
-	struct timeval *, long *);
+	struct rpltime *, long *);
 
 static unsigned long calc_ovcorr(unsigned long, int);
 static bool find_next_packet(int, const struct pctrl_info *);
@@ -78,7 +78,7 @@ static ssize_t read_through(int, int, size_t);
 static ssize_t read_waitfm(int, void *, size_t, const struct pctrl_info *);
 static bool seek_to_end(int, const struct pctrl_info *);
 static void usleep_ovcorr(struct timeval *, long *);
-static void tv_delta(const struct timeval *, const struct timeval *,
+static void tv_delta(const struct rpltime *, const struct rpltime *,
 	struct timeval *);
 static inline unsigned long long tv2usec(const struct timeval *);
 static inline void usec2tv(unsigned long long, struct timeval *);
@@ -158,10 +158,10 @@ static int replay_file(int fd, const char *name)
 {
 	struct rpldsk_packet packet;
 	struct pctrl_info ps;
-	struct timeval stamp;
+	struct rpltime stamp;
 	ssize_t ret;
 	long skew = 0;
-	char tick = 0;
+	char tick = false;
 
 	if (Opt.follow == FM_LIVE && !seek_to_end(fd, &ps))
 		return 0;
@@ -255,7 +255,7 @@ static int replay_file(int fd, const char *name)
 }
 
 static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
-    char *tick, struct timeval *stamp, long *skew)
+    char *tick, struct rpltime *stamp, long *skew)
 {
 	if (i->sktype == PCTRL_SKPACK && i->skval-- > 0) {
 		/* Just skip, do not update tick/stamp/skew/delta */
@@ -264,10 +264,10 @@ static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
 	}
 
 	if (!*tick) {
-		/* No delay after the first packet has been read... */
-		++*tick;
+		/* No delay before the first packet has been replayed */
+		*tick = true;
 		if (i->skval > 0) {
-			memcpy(stamp, &p->time, sizeof(struct timeval));
+			memcpy(stamp, &p->time, sizeof(*stamp));
 			read_through(fd, STDOUT_FILENO, p->size);
 			return;
 		}
@@ -283,7 +283,7 @@ static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
 
 		if (i->sktype == PCTRL_SKTIME &&
 		    (i->skval -= tv2usec(&delta) / 1000) > 0) {
-			memcpy(stamp, &p->time, sizeof(struct timeval));
+			memcpy(stamp, &p->time, sizeof(*stamp));
 			read_through(fd, STDOUT_FILENO, p->size);
 			return;
 		}
@@ -303,7 +303,7 @@ static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
 	while (i->paused)
 		usleep(100000);
 
-	memcpy(stamp, &p->time, sizeof(struct timeval));
+	memcpy(stamp, &p->time, sizeof(*stamp));
 	read_through(fd, STDOUT_FILENO, p->size);
 
 	if (Opt.showtime) {
@@ -744,7 +744,7 @@ static void usleep_ovcorr(struct timeval *req, long *skew)
  *  Calculates the time difference between @past and @now and stores the result
  *  in @dest. All parameters in µs.
  */
-static void tv_delta(const struct timeval *past, const struct timeval *now,
+static void tv_delta(const struct rpltime *past, const struct rpltime *now,
     struct timeval *dest)
 {
 	unsigned long sec = now->tv_sec - past->tv_sec;

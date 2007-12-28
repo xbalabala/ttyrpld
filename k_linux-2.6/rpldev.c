@@ -81,7 +81,7 @@ static inline int circular_get(char __user *, size_t);
 static inline void circular_put(const void __kernel *, size_t);
 static inline void circular_putU(const void __user *, size_t);
 static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
-static inline void fill_time(struct timeval *);
+static inline void fill_time(struct rpltime *);
 static inline unsigned int min_uint(unsigned int, unsigned int);
 static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
@@ -549,23 +549,20 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
 	return count;
 }
 
-static inline void fill_time(struct timeval *tv)
+static inline void fill_time(struct rpltime *x)
 {
-	do_gettimeofday(tv);
+	struct timeval tv;
+	do_gettimeofday(&tv);
 
-	/*
-	 * This function all gets optimized away on little-endian. On
-	 * big-endian, it is reduced by 50%.
-	 */
-	if (sizeof(tv->tv_sec) == sizeof(uint32_t))
-		tv->tv_sec = cpu_to_le32(tv->tv_sec);
-	else if (sizeof(tv->tv_sec) == sizeof(uint64_t))
-		tv->tv_sec = cpu_to_le64(tv->tv_sec);
+	if (sizeof(tv.tv_sec) == sizeof(uint32_t))
+		x->tv_sec = cpu_to_le32(tv.tv_sec);
+	else if (sizeof(tv.tv_sec) == sizeof(uint64_t))
+		x->tv_sec = cpu_to_le64(tv.tv_sec);
 
-	if (sizeof(tv->tv_usec) == sizeof(uint32_t))
-		tv->tv_usec = cpu_to_le32(tv->tv_usec);
-	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
-		tv->tv_usec = cpu_to_le64(tv->tv_usec);
+	if (sizeof(tv.tv_usec) == sizeof(uint32_t))
+		x->tv_usec = cpu_to_le32(tv.tv_usec);
+	else if (sizeof(tv.tv_usec) == sizeof(uint64_t))
+		x->tv_usec = cpu_to_le64(tv.tv_usec);
 
 	return;
 }

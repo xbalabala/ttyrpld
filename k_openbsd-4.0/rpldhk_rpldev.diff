@@ -285,7 +285,7 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 ===================================================================
 --- /dev/null
 +++ openbsd-sys-4.0/kern/rpldev.c
-@@ -0,0 +1,364 @@
+@@ -0,0 +1,365 @@
 +/*
 + *	ttyrpld/k_openbsd-4.0/rpldev.c
 + *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
@@ -356,7 +356,7 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +/* Local functions */
 +static inline size_t avail_R(void);
 +static inline size_t avail_W(void);
-+static inline void fill_time(struct timeval *);
++static inline void fill_time(struct rpltime *);
 +static inline unsigned int min_uint(unsigned int, unsigned int);
 +static inline uint32_t mkdev_26(unsigned long, unsigned long);
 +static inline int circular_get(struct uio *, size_t);
@@ -564,19 +564,20 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +	return BufRP - BufWP - 1;
 +}
 +
-+static inline void fill_time(struct timeval *tv)
++static inline void fill_time(struct rpltime *x)
 +{
-+	microtime(tv);
++	struct timeval tv;
++	microtime(&tv);
 +
-+	if (sizeof(tv->tv_sec) == sizeof(uint32_t))
-+		tv->tv_sec = htole32(tv->tv_sec);
-+	else if (sizeof(tv->tv_sec) == sizeof(uint64_t))
-+		tv->tv_sec = htole64(tv->tv_sec);
++	if (sizeof(tv.tv_sec) == sizeof(uint32_t))
++		x->tv_sec = htole32(tv.tv_sec);
++	else if (sizeof(tv.tv_sec) == sizeof(uint64_t))
++		x->tv_sec = htole64(tv.tv_sec);
 +
-+	if (sizeof(tv->tv_usec) == sizeof(uint32_t))
-+		tv->tv_usec = htole32(tv->tv_usec);
-+	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
-+		tv->tv_usec = htole64(tv->tv_usec);
++	if (sizeof(tv.tv_usec) == sizeof(uint32_t))
++		x->tv_usec = htole32(tv.tv_usec);
++	else if (sizeof(tv.tv_usec) == sizeof(uint64_t))
++		x->tv_usec = htole64(tv.tv_usec);
 +
 +	return;
 +}
