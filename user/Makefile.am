@@ -14,4 +14,4 @@ rpld_SOURCES      = infod.c lib.c rdsh.c rplctl.c rpld.c
 rpld_LDADD        = -lHX -lpthread $(rpld_LIBS)
 
 rplctl: rpld
-	[ ! -e rplctl ] && ln -s rpld rplctl;
+	if [ ! -e rplctl ]; then ln -s rpld rplctl; fi;
