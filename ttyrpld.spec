@@ -47,7 +47,7 @@ The rpldhk kernel module needs to be built into the kernel already.
 
 %debug_package
 %prep
-%setup
+%setup -q
 
 %build
 %configure
