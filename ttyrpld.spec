@@ -1,16 +1,16 @@
 
 Name:		ttyrpld
-Version:	2.19
-Release:	ccj0
+Version:	2.50
+Release:	0
 Group:		Productivity/Security
 Summary:	Kernel-based tty screen- and keylogger
 License:	LGPL/others
-URL:		http://%name.sourceforge.net/
+URL:		http://ttyrpld.sf.net/
 
 # Build KMP packages yes or no, 1 or 0
 %define kernel  1
 
-Source:		http://heanet.dl.sourceforge.net/sourceforge/%name/%name-%version.tar.bz2
+Source:		http://downloads.sf.net/ttyrpld/ttyrpld-%version.tar.bz2
 BuildRoot:	%_tmppath/%name-%version-build
 BuildRequires:	gettext-devel, libHX-devel >= 1.10, php5, perl >= 5.8.0, w3m
 %if 0%kernel
@@ -74,6 +74,9 @@ export INSTALL_MOD_PATH="$b";
 	done;
 %endif
 
+mkdir -p "$b/%_sbindir";
+ln -s "%_initrddir/rpld" "$b/%_sbindir/rcrpld";
+
 %preun
 %stop_on_removal rpld
 
@@ -91,5 +94,3 @@ export INSTALL_MOD_PATH="$b";
 
 %files doc
 %doc doc/*.css doc/*.html doc/*.txt doc/*.png
-
-%changelog -n ttyrpld
