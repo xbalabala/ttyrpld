@@ -707,7 +707,8 @@ static bool find_devnode_dive(uint32_t id, char *dest, size_t len,
 	}
 
 	while ((de = HXdir_read(dx)) != NULL) {
-		if (*de == '.')
+		if (*de == '.' || strcmp(de, "stdout") == 0 ||
+		    strcmp(de, "stderr") == 0 || strcmp(de, "stdin") == 0)
 			continue;
 		snprintf(buf, sizeof(buf), "%s/%s", dir, de);
 

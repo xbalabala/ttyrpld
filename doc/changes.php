@@ -41,6 +41,11 @@ releases.</p>
 		32-bit and 64-bit</li>
 	<li class="plus">added <i>rplcvt</i> utility for converting old
 		on-disk rpld files</li>
+	<li class="star">explicitly blacklist <code>/dev/stdout</code>,
+		<code>/dev/stderr</code> and <code>/dev/stderr</code> -
+		these have been popping up as tty names because there is such
+		a symlink in Linux's <code>/dev</code>. (But we need symlink
+		processing for Solaris, eww.)</li>
 </ul>
 
 <h1>v2.19 (2007-09-17)</h1>
