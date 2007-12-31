@@ -1,23 +1,16 @@
 
-AC_INIT(ttyrpld, 2.19)
-AC_CONFIG_HEADERS(config.h)
+AC_INIT(ttyrpld, 2.50)
+AC_CONFIG_HEADERS([config.h])
 AC_PROG_INSTALL
 AM_INIT_AUTOMAKE
 AC_PROG_CC
 AM_PROG_CC_C_O
 
-AC_HAVE_HEADERS(alloca.h)
+AC_HAVE_HEADERS([alloca.h])
 AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_LIBS="$ttyreplay_LIBS -lrt"])
 AC_CHECK_LIB([socket], [accept], [rpld_LIBS="$rpld_LIBS -lsocket -lnsl"])
 AC_CHECK_LIB([intl], [gettext], [regular_LIBS="$regular_LIBS -lintl"])
-AC_CHECK_HEADER([libHX.h], [],
-	AC_MSG_ERROR([Need at least libHX 1.10 (http://jengelh.hopto.org/p/libHX/)]),
-	[
-#include <libHX.h>
-#if !defined(_LIBHX_H) || _LIBHX_H < 20070701
-#	error You need a newer version of libHX (at least 1.10.0)
-#endif
-])
+PKG_CHECK_MODULES([libHX], [libHX >= 1.10])
 
 AC_PATH_PROG([MSGFMT], [gmsgfmt])
 if [[ -z "$MSGFMT" ]]; then
