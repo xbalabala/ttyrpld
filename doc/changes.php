@@ -14,27 +14,36 @@ releases.</p>
   </tr>
   <tr>
     <td class="t2">Linux</td>
-    <td class="t2">2.19</td>
-    <td class="t2">2.19</td>
+    <td class="t2">2.50</td>
+    <td class="t2">2.50</td>
   </tr>
   <tr>
     <td class="t1">FreeBSD</td>
-    <td class="t1">2.19</td>
-    <td class="t1">2.19</td>
+    <td class="t1">2.50</td>
+    <td class="t1">2.50</td>
   </tr>
   <tr>
     <td class="t2">OpenBSD</td>
-    <td class="t2">2.19</td>
+    <td class="t2">2.50</td>
     <td class="t2">modules not really supported</td>
   </tr>
   <tr>
     <td class="t1">NetBSD</td>
-    <td class="t1">2.19</td>
-    <td class="t1">2.19</td>
+    <td class="t1">2.50</td>
+    <td class="t1">2.50</td>
   </tr>
 </table>
 
-<h1>To 2.19 (released 2007-09-17)</h1>
+<h1>v2.50 (2008-01-01)</h1>
+
+<ul>
+	<li class="star">changed the packet format to be compatible between
+		32-bit and 64-bit</li>
+	<li class="plus">added <i>rplcvt</i> utility for converting old
+		on-disk rpld files</li>
+</ul>
+
+<h1>v2.19 (2007-09-17)</h1>
 
 <ul>
   <li class="star">The kernel interface has been reduced (hooks removed).
@@ -50,22 +59,23 @@ releases.</p>
   <li class="star">fix directory name of Persian translation</li>
   <li class="star">moved to autotools</li>
   <li class="star">build with new libHX 1.10</li>
+</ul>
 
-<h1>To 2.18 (released on 2006-07-01)</h1>
+<h1>v2.18 (2006-07-01)</h1>
 
 <ul>
   <li class="star">Fixed OpenBSD 3.9 kpatch</li>
   <li class="plus">Readded workaround for OpenBSD/NetBSD EINTR signal handling that got lost in 2.17</li>
 </ul>
 
-<h1>To 2.17 (released on 2006-06-19)</h1>
+<h1>v2.17 (2006-06-19)</h1>
 
 <ul>
   <li class="plus">Support for Linux 2.6.17, FreeBSD 6.1, OpenBSD 3.9</li>
   <li class="plus">added missing <code>-fprofile-arcs -ftest-coverage</code> to <code>LDFLAGS</code> for <code>PROF=1</code></li>
 </ul>
 
-<h1>To 2.16 (released on 2006-04-01)</h1>
+<h1>v2.16 (2006-04-01)</h1>
 
 <ul>
   <li class="minus"><code>user/rpld.c</code>: removed a superfluous variable</li>
@@ -76,7 +86,7 @@ releases.</p>
   <li class="plus">Added <code>share/ttyrpld.magic</code> for the <code>file(1)</code> utility</li>
 </ul>
 
-<h1>To 2.15 (released on 2006-03-11)</h1>
+<h1>v2.15 (2006-03-11)</h1>
 
 <p><b>General:</b></p>
 
@@ -105,7 +115,7 @@ releases.</p>
   <li class="star">[OpenBSD] loads at new device number (<code>228,0</code>), please re-mknod your <code>/dev/rpl</code> node</li>
 </ul>
 
-<h1>To 2.12 (released on 2006-01-21)</h1>
+<h1>v2.12 (2006-01-21)</h1>
 
 <ul class="clog">
   <li class="star">fixed: FreeBSD 6.0 hands <code>krpl_close()</code> a <code>NULL</code> pointer in some cases; handle it properly</li>
@@ -114,13 +124,13 @@ releases.</p>
   <li class="plus">added the '<code>[</code>' and '<code>]</code>' keys to <i>ttyreplay</i> (lower/raise speed by 0.10)</li>
 </ul>
 
-<h1>To 2.11 (released on 2006-01-06)</h1>
+<h1>v2.11 (2006-01-06)</h1>
 
 <p class="block">Added support back in for the latest releases of the previous
 generation of kernels. For Linux, that's 2.4.something (USE DISCOURAGED!), and
 for FreeBSD that's 5.3.</p>
 
-<h1>To 2.10 (released on 2005-12-04)</h1>
+<h1>v2.10 (2005-12-04)</h1>
 
 <p class="block">Support for OpenBSD 3.8 and FreeBSD 6.0 was added; permission
 denied, syslog spamming, cpu hog, ownership and symlink recursion bugs were
@@ -140,7 +150,7 @@ fixed. Docs were updated to reflect advances since the last seven releases.</p>
   <li class="star">using distribution-closer macros in specfile (e.g. <code>%_bindir</code> instead of <code>/usr/bin</code>)</li>
 </ul>
 
-<h1>To 2.06 (released on 2005-11-03)</h1>
+<h1>v2.06 (2005-11-03)</h1>
 
 <p class="block">This release was not publicly announced and rather served as a
 testbed, because new bugs were expected.</p>
@@ -152,13 +162,13 @@ testbed, because new bugs were expected.</p>
   <li class="star">ttyreplay: pctrl was not processed while waiting for more input data</li>
 </ul>
 
-<h1>To 2.03.5 (released on 2005-10-08)</h1>
+<h1>v2.03.5 (2005-10-08)</h1>
 
 <ul class="clog">
   <li class="star">update to libHX 1.6.2+</li>
 </ul>
 
-<h1>To 2.03.4 (released on 2005-09-22)</h1>
+<h1>v2.03.4 (2005-09-22)</h1>
 
 <ul class="clog">
   <li class="star"><code>check_gcc</code> macro gave a warning under *BSD because "<code>@gcc</code>" could not be found&nbsp;-- strange that it did not under Linux. Fixed anyway by reordering.</li>
@@ -166,7 +176,7 @@ testbed, because new bugs were expected.</p>
   <li class="star"><code>linux-2.6/rpldev.c</code>: proper error propagation to userspace in <code>mv_to_user()</code></li>
 </ul>
 
-<h1>To 2.03 (released on 2005-07-27)</h1>
+<h1>v2.03 (2005-07-27)</h1>
 
 <ul class="clog">
   <li class="plus">updated locales</li>
@@ -174,7 +184,7 @@ testbed, because new bugs were expected.</p>
   <li class="plus">Support for: OpenBSD 3.7, FreeBSD 5.4, FreeBSD 6.0-beta1, (PCBSD 0.7.8)</li>
 </ul>
 
-<h1>To 2.02 (released on 2005-07-07)</h1>
+<h1>v2.02 (2005-07-07)</h1>
 
 <ul class="clog">
   <li class="star">update to libHX 1.5.3</li>
@@ -188,14 +198,14 @@ testbed, because new bugs were expected.</p>
   <li class="plus">patch from Nguyen Anh Quynh to have the Makefiles find out whether <code>-funit-at-a-time</code> is supported</li>
 </ul>
 
-<h1>To 2.01 (released on 2005-05-31)</h1>
+<h1>v2.01 (2005-05-31)</h1>
 
 <ul class="clog">
   <li class="star">update to libHX 1.5.0 (<code>so.0.5</code>)</li>
   <li class="star">some translation updates (by far not complete)</li>
 </ul>
 
-<h1>To 2.00 (released on 2005-03-29)</h1>
+<h1>v2.00 (2005-03-29)</h1>
 
 <p><b>kpatch:</b></p>
 
@@ -242,7 +252,7 @@ testbed, because new bugs were expected.</p>
   <li class="plus">[FreeBSD] implemented <code>uio_ioctl()</code></li>
 </ul>
 
-<h1>To 1.44.2 (released on 2005-02-10)</h1>
+<h1>v1.44.2 (2005-02-10)</h1>
 
 <ul class="clog">
   <li class="star">update to libHX-0_3 (needs at least 20050206)</li>
@@ -255,7 +265,7 @@ testbed, because new bugs were expected.</p>
   <li class="plus">added <code>/usr/sbin/rcrpld</code> as a symlink to <code>/etc/init.d/rpld</code> (rpm only)</li>
 </ul>
 
-<h1>To 1.44 (released on 2005-01-20)</h1>
+<h1>v1.44 (2005-01-20)</h1>
 
 <p><b>linux-2.*/rpldev.c:</b></p>
 
@@ -278,7 +288,7 @@ testbed, because new bugs were expected.</p>
     overwritten</li>
 </ul>
 
-<h1>To 1.42 (released on 2005-01-11)</h1>
+<h1>v1.42 (2005-01-11)</h1>
 
 <p class="block">The long-awaited translations are in! Includes: ar_IQ
 (Persian-Farsi) [sic; fa_IR], de, es, fr, it, nb, nl and sv.</p>
@@ -303,14 +313,14 @@ testbed, because new bugs were expected.</p>
   <li class="plus">updated docs with more BSD-specific stuff</li>
 </ul>
 
-<h1>To 1.40 (released on 2004-12-24)</h1>
+<h1>v1.40 (2004-12-24)</h1>
 
 <ul class="clog">
   <li class="plus">added support for FreeBSD 5.3</li>
   <li class="plus">added support for I18N</li>
 </ul>
 
-<h1>To 1.31 (released on 2004-12-20)</h1>
+<h1>v1.31 (2004-12-20)</h1>
 
 <p><b>rpld:</b></p>
 
@@ -335,7 +345,7 @@ testbed, because new bugs were expected.</p>
   <li class="star"><code>etc-init.d-rpldev</code>: fixed typo</li>
 </ul>
 
-<h1>To 1.26 (released on 2004-11-23)</h1>
+<h1>v1.26 (2004-11-23)</h1>
 
 <p><b>rpld:</b></p>
 
@@ -373,7 +383,7 @@ testbed, because new bugs were expected.</p>
   <li class="plus"><code>make install</code> will not overwrite <code>/etc/rpld.conf</code> if it is modified</li>
 </ul>
 
-<h1>To 1.24 (released on 2004-11-18)</h1>
+<h1>v1.24 (2004-11-18)</h1>
 
 <p><b>rpld:</b></p>
 
@@ -411,7 +421,7 @@ Countless minor (sometimes major) adjustments.</p>
   <li class="star">support: largely rewritten to include the new things: FRS/SF, Patches and Feature Request Tracker, Mailing Lists</li>
 </ul>
 
-<h1>To 1.21 (released on 2004-11-13)</h1>
+<h1>v1.21 (2004-11-13)</h1>
 
 <p><b>rpld:</b></p>
 
@@ -470,7 +480,7 @@ Countless minor (sometimes major) adjustments.</p>
   <li class="star">"<code>kmod</code>" target will now <code>rmmod rpldev</code> before reloading it</li>
 </ul>
 
-<h1>To 1.13.1 (released on 2004-11-03)</h1>
+<h1>v1.13.1 (2004-11-03)</h1>
 
 <ul class="clog">
   <li class="minus">Removed stray <code>.orig</code> file in <code>kpatch/</code></li>
@@ -478,7 +488,7 @@ Countless minor (sometimes major) adjustments.</p>
   <li class="star">added a workaround for GCC &gt;= 3.4 which has problems with inline</li>
 </ul>
 
-<h1>To 1.13 (released on 2004-11-02)</h1>
+<h1>v1.13 (2004-11-02)</h1>
 
 <p class="block">Ttys still were not closed for some reasons, so that once
 opened ttys dev numbers would never be logged again, or at least &lt;...&gt;
@@ -515,7 +525,7 @@ the conclusion to redesign it a little bit.</p>
   <li class="plus">new patch against 2.6.9-rc2</li>
 </ul>
 
-<h1>To 1.01 (never actually released)</h1>
+<h1>v1.01 (never actually released)</h1>
 
 <p><b>infod:</b></p>
 
@@ -537,7 +547,7 @@ the conclusion to redesign it a little bit.</p>
   <li class="star">corrected the make <code>clean</code> target for "<code>kernel-2.6</code>" directory so that it continues to work when something changes in the kernel tree</li>
 </ul>
 
-<h1>To 1.00 (released on 2004-09-26)</h1>
+<h1>v1.00 (2004-09-26)</h1>
 
 <p class="block">New edict: if I don't explicitly say "you need to/should
 upgrade the rpldev kernel module" under "rpldev:" in this Changelog, then you
@@ -592,7 +602,7 @@ recompile without reboot.)</p>
   <li class="star">Kernel patches moved into their own folder "<code>kpatch</code>"</li>
 </ul>
 
-<h1>To 0.88 (released on 2004-09-09)</h1>
+<h1>v0.88 (2004-09-09)</h1>
 
 <p><b>rpld:</b></p>
 
@@ -618,7 +628,7 @@ recompile without reboot.)</p>
   <li class="plus">added the <code>-Z</code> switch to zero all stats counters</li>
 </ul>
 
-<h1>To 0.87 (released on 2004-09-06)</h1>
+<h1>v0.87 (2004-09-06)</h1>
 
 <p><b>rpld:</b></p>
 
@@ -668,7 +678,7 @@ recompile without reboot.)</p>
   <li class="plus">logging on-the-fly-over-network has been tested and works well the two minutes I tested it</li>
 </ul>
 
-<h1>To 0.85 (released on 2004-08-27)</h1>
+<h1>v0.85 (2004-08-27)</h1>
 
 <ul class="clog">
   <li class="star">trying to make the different situations work (read/seek on file/pipe/dev)</li>
@@ -724,7 +734,7 @@ recompile without reboot.)</p>
   <li class="plus">new doc outfit and manual pages</li>
 </ul>
 
-<h1>To 0.83 (released on 2004-08-05)</h1>
+<h1>v0.83 (2004-08-05)</h1>
 
 <p><b>rpld:</b></p>
 
@@ -748,7 +758,7 @@ recompile without reboot.)</p>
   <li class="plus">added an info upon module loading telling us what minor number the misc subsystem finally gave <i>rpldev</i></li>
 </ul>
 
-<h1>To 0.82 (released on 2004-08-03)</h1>
+<h1>v0.82 (2004-08-03)</h1>
 
 <p><b>rpld:</b></p>
 
@@ -781,7 +791,7 @@ recompile without reboot.)</p>
   <li class="star"><code>kernel-2.6/rpl-kernelpatch.diff</code>: the file has been replaced with patch which works for 2.6.5 and up</li>
 </ul>
 
-<h1>Initial Release 0.80 (released on 2004-07-19)</h1>
+<h1>Initial Release 0.80 (2004-07-19)</h1>
 
 <p>Initial release</p>
 
