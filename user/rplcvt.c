@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <libHX.h>
 #include "../include/rpl_packet.h"
+#include "lib.h"
 
 /* Definitions */
 struct rpldsk1_packet32 {
