@@ -1,6 +1,6 @@
 /*
  *	ttyrpld/user/lib.h
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
+ *	Copyright © CC Computer Consultants GmbH, 2004 - 2008
  *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
@@ -28,6 +28,7 @@
 struct pctrl_info;
 
 extern void load_locale(const char *);
+extern ssize_t read_through(int, int, size_t);
 extern ssize_t read_wait(int, void *, size_t, const struct pctrl_info *);
 extern off_t G_skip(int, off_t, int);
 extern void swab_be(void *, size_t);

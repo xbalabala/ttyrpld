@@ -1,6 +1,6 @@
 /*
  *	ttyrpld/user/replay.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
+ *	Copyright © CC Computer Consultants GmbH, 2004 - 2008
  *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
@@ -34,7 +34,6 @@
 	static_cast(void *, var - offsetof(type, member))
 #define MICROSECOND 1000000
 #define NANOSECOND  1000000000
-#define BUFSIZE     4096
 
 enum {
 	/* current follow mode state: */
@@ -74,7 +73,6 @@ static void getopt_jump(const struct HXoptcb *);
 static void getopt_msec(const struct HXoptcb *);
 static void getopt_skip(const struct HXoptcb *);
 static inline ssize_t read_nullfm(int, size_t);
-static ssize_t read_through(int, int, size_t);
 static ssize_t read_waitfm(int, void *, size_t, const struct pctrl_info *);
 static bool seek_to_end(int, const struct pctrl_info *);
 static void usleep_ovcorr(struct timeval *, long *);
@@ -540,28 +538,6 @@ static void getopt_skip(const struct HXoptcb *cbi)
 	return;
 }
 
-static ssize_t read_through(int in, int out, size_t count)
-{
-	/*
-	 * Read from @in and directly give it to @out. This is like splice().
-	 */
-	char buf[BUFSIZE];
-	size_t rem = count;
-
-	while (rem > 0) {
-		ssize_t ret = read(in, buf, min_uint(BUFSIZE, rem));
-		if (ret < 0)
-			return 0;
-		write(out, buf, ret);
-		if (ret == rem)
-			break;
-		rem -= ret;
-		usleep(10000);
-	}
-
-	return count;
-}
-
 static inline ssize_t read_nullfm(int fd, size_t count)
 {
 	return G_skip(fd, count, Opt.follow != FM_NONE &&
@@ -616,14 +592,14 @@ static bool seek_to_end(int fd, const struct pctrl_info *ps)
 		 * not suitable, since ... it's just not designed to do what is
 		 * below, i.e.  non-blocking-until-EOF-call-it-something.
 		 */
-		char buf[BUFSIZE];
+		char buf[4096];
 
 		fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 		fprintf(stderr, _("Reading from something that does not "
 		        "support seeking (a pipe?),\n"
 		        "skipping to a position where reading would block\n"));
 
-		while (read(fd, buf, BUFSIZE) > 0)
+		while (read(fd, buf, sizeof(buf)) > 0)
 			;
 		if (errno != EAGAIN) {
 			perror("read()");

@@ -1,6 +1,6 @@
 /*
  *	ttyrpld/user/lib.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
+ *	Copyright © CC Computer Consultants GmbH, 2004 - 2008
  *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
@@ -69,6 +69,28 @@ void load_locale(const char *exe)
 
 	textdomain("ttyrpld");
 	return;
+}
+
+ssize_t read_through(int in, int out, size_t count)
+{
+	/*
+	 * Read from @in and directly give it to @out. This is like splice().
+	 */
+	char buf[4096];
+	size_t rem = count;
+
+	while (rem > 0) {
+		ssize_t ret = read(in, buf, min_uint(sizeof(buf), rem));
+		if (ret < 0)
+			return 0;
+		write(out, buf, ret);
+		if (ret == rem)
+			break;
+		rem -= ret;
+		usleep(10000);
+	}
+
+	return count;
 }
 
 ssize_t read_wait(int fd, void *buf, size_t count,
