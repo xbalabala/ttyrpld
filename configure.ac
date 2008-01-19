@@ -18,11 +18,11 @@ if [[ -z "$MSGFMT" ]]; then
 fi;
 AC_PATH_PROG([PERL], [perl])
 if [[ -z "$PERL" ]]; then
-	AC_PATH_PROG([perl5])
+	AC_PATH_PROG([PERL], [perl5])
 fi;
 AC_PATH_PROG([PHP], [php5])
 if [[ -z "$PHP" ]]; then
-	AC_PATH_PROG([php])
+	AC_PATH_PROG([PHP], [php])
 fi;
 AC_PATH_PROG([W3M], [w3m])
 
