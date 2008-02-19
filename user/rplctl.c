@@ -48,14 +48,14 @@ static bool Got_arg = false;
 //-----------------------------------------------------------------------------
 int rplctl_main(int argc, const char **argv)
 {
-	if (get_options(&argc, &argv) <= 0)
-		return EXIT_FAILURE;
-
 	if ((Sockfd = unix_client(GOpt.infod_port)) < 0) {
 		fprintf(stderr, _("Connection to %s failed: %s\n"),
 		        GOpt.infod_port, strerror(errno));
 		return EXIT_FAILURE;
 	}
+
+	if (get_options(&argc, &argv) <= 0)
+		return EXIT_FAILURE;
 
 	if (!Got_arg) {
 		if (!Opt.parseable)
