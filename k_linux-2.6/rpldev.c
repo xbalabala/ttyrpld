@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/k_linux-2.6/rpldev.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -144,6 +143,16 @@ module_init(rpldev_init);
 module_exit(rpldev_exit);
 
 //-----------------------------------------------------------------------------
+static inline char *d_path0(const struct file *filp, char *dev,
+    unsigned int size)
+{
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 25)
+	return d_path(filp->f_dentry, filp->f_vfsmnt, dev, size);
+#else
+	return d_path((struct path *)&filp->f_path, dev, size);
+#endif
+}
+
 static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
 {
 	struct rpldev_packet p;
@@ -162,8 +171,7 @@ static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
 	 * that of a better node, e.g. /dev/tty1. Do not pass it to userspace.
 	 */
 	if (filp->f_dentry->d_inode->i_rdev == MKDEV(TTYAUX_MAJOR, 0) ||
-	    IS_ERR(full_dev = d_path(filp->f_dentry, filp->f_vfsmnt,
-	    dev, sizeof(dev)))) {
+	    IS_ERR(full_dev = d_path0(filp, dev, sizeof(dev))))	{
 		p.size = 0;
 		return circular_put_packet(&p, NULL, 0);
 	}
