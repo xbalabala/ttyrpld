@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/k_freebsd-6.2/rpldev.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
  *
  *	Redistribution and use in source and binary forms, with or without
  *	modification, are permitted provided that the following conditions
@@ -94,12 +93,12 @@ static inline uint32_t mkdev_26(unsigned long, unsigned long);
 /* Variables */
 static MALLOC_DEFINE(Buffer_malloc, "rpldev", "rpldev ring buffer");
 static struct mtx Buffer_lock, Open_lock;
-static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
+static char *Buffer, *BufRP, *BufWP;
 static size_t Bufsize = 32 * 1024;
-static unsigned int Open_count = 0;
+static unsigned int Open_count;
 
 /* Kernel module info stuff */
-static int kmi_usecount = 0;
+static int kmi_usecount;
 static struct cdev *kmi_node;
 static struct cdevsw kmi_fops = {
 	.d_version = D_VERSION,
