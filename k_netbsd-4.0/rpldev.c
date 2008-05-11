@@ -1,7 +1,6 @@
 /*
- *	ttyrpld/k_netbsd-3.1/rpldev.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	ttyrpld/k_netbsd-4.0/rpldev.c
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
  *
  *	Redistribution and use in source and binary forms, with or without
  *	modification, are permitted provided that the following conditions
@@ -66,11 +65,11 @@ static int rpldhc_write(const char *, size_t, const struct tty *);
 static int rpldhc_lclose(const struct tty *);
 
 /* Stage 3 functions */
-static int rpldev_open(dev_t, int, int, struct proc *);
+static int rpldev_open(dev_t, int, int, struct lwp *);
 static int rpldev_read(dev_t, struct uio *, int);
-static int rpldev_ioctl(dev_t, u_long, caddr_t, int, struct proc *);
-static int rpldev_poll(dev_t, int, struct proc *);
-static int rpldev_close(dev_t, int, int, struct proc *);
+static int rpldev_ioctl(dev_t, u_long, caddr_t, int, struct lwp *);
+static int rpldev_poll(dev_t, int, struct lwp *);
+static int rpldev_close(dev_t, int, int, struct lwp *);
 
 /* Functions */
 static inline size_t avail_R(void);
@@ -84,9 +83,9 @@ static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
 /* Variables */
 static struct lock Buffer_lock, Open_lock;
-static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
+static char *Buffer, *BufRP, *BufWP;
 static size_t Bufsize = 32 * 1024;
-static unsigned int Open_count = 0;
+static unsigned int Open_count;
 
 /* Module stuff */
 static int kmi_usecount = 0;
@@ -189,7 +188,7 @@ static int rpldhc_lclose(const struct tty *tty)
 }
 
 //-----------------------------------------------------------------------------
-static int rpldev_open(dev_t dev, int flag, int mode, struct proc *th)
+static int rpldev_open(dev_t dev, int flag, int mode, struct lwp *th)
 {
 	lockmgr(&Open_lock, LK_EXCLUSIVE, NULL);
 	if (Open_count) {
@@ -243,7 +242,7 @@ static int rpldev_read(dev_t dev, struct uio *uio, int flags)
 }
 
 static int rpldev_ioctl(dev_t dev, u_long cmd, caddr_t data, int flags,
-    struct proc *th)
+    struct lwp *th)
 {
 	size_t *ptr = (void *)data;
 	int ret = 0;
@@ -292,12 +291,12 @@ static int rpldev_ioctl(dev_t dev, u_long cmd, caddr_t data, int flags,
 	return ret;
 }
 
-static int rpldev_poll(dev_t dev, int events, struct proc *th)
+static int rpldev_poll(dev_t dev, int events, struct lwp *th)
 {
 	return (BufRP == BufWP) ? 0 : (POLLIN | POLLRDNORM);
 }
 
-static int rpldev_close(dev_t dev, int flag, int mode, struct proc *th)
+static int rpldev_close(dev_t dev, int flag, int mode, struct lwp *th)
 {
 	rpl_open   = NULL;
 	rpl_read   = NULL;
@@ -413,5 +412,3 @@ static inline uint32_t mkdev_26(unsigned long maj, unsigned long min)
 {
 	return (maj << 20) | (min & 0xFFFFF);
 }
-
-//=============================================================================
