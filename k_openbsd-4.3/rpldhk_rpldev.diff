@@ -1,40 +1,68 @@
-Index: openbsd-sys-4.0/arch/alpha/alpha/conf.c
+---
+ arch/alpha/alpha/conf.c     |    5 
+ arch/amd64/amd64/conf.c     |    5 
+ arch/arm/arm/conf.c         |    4 
+ arch/hp300/hp300/conf.c     |    5 
+ arch/hppa/hppa/conf.c       |    5 
+ arch/hppa64/hppa64/conf.c   |    6 
+ arch/i386/i386/conf.c       |    7 
+ arch/luna88k/luna88k/conf.c |    5 
+ arch/mac68k/mac68k/conf.c   |    5 
+ arch/macppc/macppc/conf.c   |    5 
+ arch/mvme68k/mvme68k/conf.c |    5 
+ arch/mvme88k/mvme88k/conf.c |    5 
+ arch/mvmeppc/mvmeppc/conf.c |    5 
+ arch/sgi/sgi/conf.c         |    5 
+ arch/sparc/sparc/conf.c     |    4 
+ arch/sparc64/sparc64/conf.c |    4 
+ arch/vax/vax/conf.c         |    5 
+ conf/files                  |    1 
+ kern/rpldev.c               |  363 ++++++++++++++++++++++++++++++++++++++++++++
+ kern/tty.c                  |   44 +++++
+ sys/conf.h                  |   16 +
+ sys/rpl_ioctl.h             |   31 +++
+ sys/rpl_packet.h            |   51 ++++++
+ sys/rpldev.h                |   19 ++
+ sys/rpldhk.h                |   17 ++
+ 25 files changed, 626 insertions(+), 1 deletion(-)
+
+Index: sys/arch/alpha/alpha/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/alpha/alpha/conf.c
-+++ openbsd-sys-4.0/arch/alpha/alpha/conf.c
-@@ -202,6 +202,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_crypto_init(NCRYPTO,crypto), /* 57: /dev/crypto */
+--- sys.orig/arch/alpha/alpha/conf.c
++++ sys/arch/alpha/alpha/conf.c
+@@ -205,6 +205,11 @@ struct cdevsw	cdevsw[] =
  	cdev_bktr_init(NBKTR,bktr),	/* 58: Bt848 video capture device */
  	cdev_radio_init(NRADIO,radio), /* 59: generic radio I/O */
+ 	cdev_mouse_init(NWSMUX, wsmux),	/* 60: ws multiplexor */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 60 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 61 .. 127 */
++	cdev_rpldev_init(),		/* 128: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof (cdevsw) / sizeof (cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/amd64/amd64/conf.c
+Index: sys/arch/amd64/amd64/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/amd64/amd64/conf.c
-+++ openbsd-sys-4.0/arch/amd64/amd64/conf.c
-@@ -290,6 +290,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_ptm_init(NPTY,ptm),	/* 81: pseudo-tty ptm device */
- 	cdev_hotplug_init(NHOTPLUG,hotplug), /* 82: devices hot plugging */
- 	cdev_acpi_init(NACPI,acpi),	/* 83: ACPI */
+--- sys.orig/arch/amd64/amd64/conf.c
++++ sys/arch/amd64/amd64/conf.c
+@@ -296,6 +296,11 @@ struct cdevsw	cdevsw[] =
+ 	cdev_bthub_init(NBTHUB,bthub),	/* 84: bthub */
+ 	cdev_nvram_init(NNVRAM,nvram),	/* 85: NVRAM interface */
+ 	cdev_agp_init(NAGP,agp),	/* 86: agp */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N /* 84 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
++N N N N /* 87 .. 127 */
++	cdev_rpldev_init(),		/* 128: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/arm/arm/conf.c
+Index: sys/arch/arm/arm/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/arm/arm/conf.c
-+++ openbsd-sys-4.0/arch/arm/arm/conf.c
-@@ -394,6 +394,10 @@ struct cdevsw cdevsw[] = {
+--- sys.orig/arch/arm/arm/conf.c
++++ sys/arch/arm/arm/conf.c
+@@ -395,6 +395,10 @@ struct cdevsw cdevsw[] = {
  	cdev_radio_init(NRADIO,radio),		/* 97: generic radio I/O */
  	cdev_ptm_init(NPTY,ptm),		/* 98: pseudo-tty ptm device */
  	cdev_spkr_init(NSPKR,spkr),		/* 99: PC speaker */
@@ -45,15 +73,14 @@ Index: openbsd-sys-4.0/arch/arm/arm/conf.c
  };
  
  int nblkdev = sizeof(bdevsw) / sizeof(bdevsw[0]);
-Index: openbsd-sys-4.0/arch/hp300/hp300/conf.c
+Index: sys/arch/hp300/hp300/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/hp300/hp300/conf.c
-+++ openbsd-sys-4.0/arch/hp300/hp300/conf.c
-@@ -172,7 +172,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_notdef(),			/* 51 */
+--- sys.orig/arch/hp300/hp300/conf.c
++++ sys/arch/hp300/hp300/conf.c
+@@ -174,6 +174,11 @@ struct cdevsw	cdevsw[] =
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
--
+ 
 +#define N cdev_notdef(),
 +N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
 +N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 53 .. 127 */
@@ -62,27 +89,27 @@ Index: openbsd-sys-4.0/arch/hp300/hp300/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/hppa/hppa/conf.c
+Index: sys/arch/hppa/hppa/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/hppa/hppa/conf.c
-+++ openbsd-sys-4.0/arch/hppa/hppa/conf.c
+--- sys.orig/arch/hppa/hppa/conf.c
++++ sys/arch/hppa/hppa/conf.c
 @@ -187,6 +187,11 @@ struct cdevsw   cdevsw[] =
- 	cdev_lkm_dummy(),
- 	cdev_lkm_dummy(),
- 	cdev_lkm_dummy(),
+ 	cdev_lkm_dummy(),		/* 51: */
+ 	cdev_lkm_dummy(),		/* 52: */
+ 	cdev_lkm_dummy(),		/* 53: */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 53 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 54 .. 127 */
++	cdev_rpldev_init(),		/* 128: rpldev */
 +#undef N
  };
  int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/hppa64/hppa64/conf.c
+Index: sys/arch/hppa64/hppa64/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/hppa64/hppa64/conf.c
-+++ openbsd-sys-4.0/arch/hppa64/hppa64/conf.c
-@@ -170,6 +170,12 @@ struct cdevsw   cdevsw[] =
+--- sys.orig/arch/hppa64/hppa64/conf.c
++++ sys/arch/hppa64/hppa64/conf.c
+@@ -171,6 +171,12 @@ struct cdevsw   cdevsw[] =
  	cdev_lkm_dummy(),
  	cdev_lkm_dummy(),
  	cdev_lkm_dummy(),
@@ -95,27 +122,29 @@ Index: openbsd-sys-4.0/arch/hppa64/hppa64/conf.c
  };
  int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/i386/i386/conf.c
+Index: sys/arch/i386/i386/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/i386/i386/conf.c
-+++ openbsd-sys-4.0/arch/i386/i386/conf.c
-@@ -317,6 +317,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_gpio_init(NGPIO,gpio),	/* 83: GPIO interface */
- 	cdev_nvram_init(NNVRAM,nvram),	/* 84: NVRAM interface */
- 	cdev_acpi_init(NACPI,acpi),	/* 85: ACPI */
+--- sys.orig/arch/i386/i386/conf.c
++++ sys/arch/i386/i386/conf.c
+@@ -312,7 +312,12 @@ struct cdevsw	cdevsw[] =
+ 	cdev_notdef(),			/* 85: ACPI (deprecated) */
+ 	cdev_bthub_init(NBTHUB,bthub),	/* 86: bthub */
+ 	cdev_agp_init(NAGP,agp),	/* 87: agp */
+-	cdev_drm_init(NDRMBASE,drm)	/* 88: drm */
++	cdev_drm_init(NDRMBASE,drm),	/* 88: drm */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N /* 86 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++/* 89 .. 127 */
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
++	cdev_rpldev_init(),		/* 128: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/luna88k/luna88k/conf.c
+Index: sys/arch/luna88k/luna88k/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/luna88k/luna88k/conf.c
-+++ openbsd-sys-4.0/arch/luna88k/luna88k/conf.c
-@@ -154,6 +154,11 @@ struct cdevsw	cdevsw[] =
+--- sys.orig/arch/luna88k/luna88k/conf.c
++++ sys/arch/luna88k/luna88k/conf.c
+@@ -156,6 +156,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 51 */
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
@@ -127,11 +156,11 @@ Index: openbsd-sys-4.0/arch/luna88k/luna88k/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/mac68k/mac68k/conf.c
+Index: sys/arch/mac68k/mac68k/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/mac68k/mac68k/conf.c
-+++ openbsd-sys-4.0/arch/mac68k/mac68k/conf.c
-@@ -164,6 +164,11 @@ struct cdevsw	cdevsw[] =
+--- sys.orig/arch/mac68k/mac68k/conf.c
++++ sys/arch/mac68k/mac68k/conf.c
+@@ -165,6 +165,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 51 */
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
@@ -143,27 +172,27 @@ Index: openbsd-sys-4.0/arch/mac68k/mac68k/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/macppc/macppc/conf.c
+Index: sys/arch/macppc/macppc/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/macppc/macppc/conf.c
-+++ openbsd-sys-4.0/arch/macppc/macppc/conf.c
-@@ -243,6 +243,11 @@ struct cdevsw cdevsw[] = {
- 	cdev_ptm_init(NPTY,ptm),	/* 77: pseudo-tty ptm device */
- 	cdev_hotplug_init(NHOTPLUG,hotplug), /* 78: devices hot plugging */
- 	cdev_gpio_init(NGPIO,gpio),	/* 79: GPIO interface */
+--- sys.orig/arch/macppc/macppc/conf.c
++++ sys/arch/macppc/macppc/conf.c
+@@ -238,6 +238,11 @@ struct cdevsw cdevsw[] = {
+ 	cdev_bio_init(NBIO,bio),	/* 80: ioctl tunnel */
+ 	cdev_bthub_init(NBTHUB,bthub),	/* 81: bthub */
+ 	cdev_openprom_init(1,openprom),	/* 82: /dev/openprom */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N /* 80 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
++N N N N N N N N /* 83 .. 127 */
++	cdev_rpldev_init(),		/* 128: rpldev */
 +#undef N
  };
  int nchrdev = sizeof cdevsw / sizeof cdevsw[0];
  
-Index: openbsd-sys-4.0/arch/mvme68k/mvme68k/conf.c
+Index: sys/arch/mvme68k/mvme68k/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/mvme68k/mvme68k/conf.c
-+++ openbsd-sys-4.0/arch/mvme68k/mvme68k/conf.c
-@@ -214,6 +214,11 @@ struct cdevsw	cdevsw[] =
+--- sys.orig/arch/mvme68k/mvme68k/conf.c
++++ sys/arch/mvme68k/mvme68k/conf.c
+@@ -215,6 +215,11 @@ struct cdevsw	cdevsw[] =
  	cdev_lkm_dummy(),		/* 51 */
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
@@ -175,11 +204,11 @@ Index: openbsd-sys-4.0/arch/mvme68k/mvme68k/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/mvme88k/mvme88k/conf.c
+Index: sys/arch/mvme88k/mvme88k/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/mvme88k/mvme88k/conf.c
-+++ openbsd-sys-4.0/arch/mvme88k/mvme88k/conf.c
-@@ -200,6 +200,11 @@ struct cdevsw	cdevsw[] =
+--- sys.orig/arch/mvme88k/mvme88k/conf.c
++++ sys/arch/mvme88k/mvme88k/conf.c
+@@ -201,6 +201,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 51 */
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
@@ -191,12 +220,12 @@ Index: openbsd-sys-4.0/arch/mvme88k/mvme88k/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/mvmeppc/mvmeppc/conf.c
+Index: sys/arch/mvmeppc/mvmeppc/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/mvmeppc/mvmeppc/conf.c
-+++ openbsd-sys-4.0/arch/mvmeppc/mvmeppc/conf.c
-@@ -181,6 +181,11 @@ struct cdevsw cdevsw[] = {
-         cdev_notdef(),                  /* 53 */ 
+--- sys.orig/arch/mvmeppc/mvmeppc/conf.c
++++ sys/arch/mvmeppc/mvmeppc/conf.c
+@@ -178,6 +178,11 @@ struct cdevsw cdevsw[] = {
+ 	cdev_bio_init(NBIO,bio),	/* 53: ioctl tunnel */
  	cdev_disk_init(NRAID,raid),	/* 54: RAIDframe disk driver */
  	cdev_ptm_init(NPTY,ptm),	/* 55: pseudo-tty ptm device */
 +#define N cdev_notdef(),
@@ -207,11 +236,11 @@ Index: openbsd-sys-4.0/arch/mvmeppc/mvmeppc/conf.c
  };
  int nchrdev = sizeof cdevsw / sizeof cdevsw[0];
  
-Index: openbsd-sys-4.0/arch/sgi/sgi/conf.c
+Index: sys/arch/sgi/sgi/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/sgi/sgi/conf.c
-+++ openbsd-sys-4.0/arch/sgi/sgi/conf.c
-@@ -188,6 +188,11 @@ cdev_wsdisplay_init(NWSDISPLAY, wsdispla
+--- sys.orig/arch/sgi/sgi/conf.c
++++ sys/arch/sgi/sgi/conf.c
+@@ -189,6 +189,11 @@ cdev_wsdisplay_init(NWSDISPLAY, wsdispla
  	cdev_notdef(),			/* 51: */
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
@@ -223,13 +252,13 @@ Index: openbsd-sys-4.0/arch/sgi/sgi/conf.c
  };
  
  int	nchrdev = sizeof (cdevsw) / sizeof (cdevsw[0]);
-Index: openbsd-sys-4.0/arch/sparc/sparc/conf.c
+Index: sys/arch/sparc/sparc/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/sparc/sparc/conf.c
-+++ openbsd-sys-4.0/arch/sparc/sparc/conf.c
-@@ -265,6 +265,10 @@ struct cdevsw	cdevsw[] =
+--- sys.orig/arch/sparc/sparc/conf.c
++++ sys/arch/sparc/sparc/conf.c
+@@ -266,6 +266,10 @@ struct cdevsw	cdevsw[] =
  	cdev_disk_init(NRAID,raid),     /* 123: RAIDframe disk driver */
- 	cdev_notdef(),			/* 124 */
+ 	cdev_bio_init(NBIO,bio),	/* 124: ioctl tunnel */
  	cdev_ptm_init(NPTY,ptm),	/* 125: pseudo-tty ptm device */
 +#define N cdev_notdef(),
 +N N /* 126 .. 127 */
@@ -238,11 +267,11 @@ Index: openbsd-sys-4.0/arch/sparc/sparc/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/sparc64/sparc64/conf.c
+Index: sys/arch/sparc64/sparc64/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/sparc64/sparc64/conf.c
-+++ openbsd-sys-4.0/arch/sparc64/sparc64/conf.c
-@@ -289,6 +289,10 @@ struct cdevsw	cdevsw[] =
+--- sys.orig/arch/sparc64/sparc64/conf.c
++++ sys/arch/sparc64/sparc64/conf.c
+@@ -282,6 +282,10 @@ struct cdevsw	cdevsw[] =
  	cdev_tty_init(NPCONS,pcons),	/* 122: PROM console */
  	cdev_ptm_init(NPTY,ptm),	/* 123: pseudo-tty ptm device */
  	cdev_hotplug_init(NHOTPLUG,hotplug), /* 124: devices hot plugging */
@@ -253,11 +282,11 @@ Index: openbsd-sys-4.0/arch/sparc64/sparc64/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/arch/vax/vax/conf.c
+Index: sys/arch/vax/vax/conf.c
 ===================================================================
---- openbsd-sys-4.0.orig/arch/vax/vax/conf.c
-+++ openbsd-sys-4.0/arch/vax/vax/conf.c
-@@ -436,6 +436,11 @@ struct cdevsw	cdevsw[] =
+--- sys.orig/arch/vax/vax/conf.c
++++ sys/arch/vax/vax/conf.c
+@@ -437,6 +437,11 @@ struct cdevsw	cdevsw[] =
  	cdev_notdef(),			/* 74 */
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 75: pseudo-tty ptm device */
@@ -269,27 +298,26 @@ Index: openbsd-sys-4.0/arch/vax/vax/conf.c
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
  
-Index: openbsd-sys-4.0/conf/files
+Index: sys/conf/files
 ===================================================================
---- openbsd-sys-4.0.orig/conf/files
-+++ openbsd-sys-4.0/conf/files
-@@ -661,6 +661,7 @@ file kern/tty_conf.c
- file kern/tty_pty.c			pty			needs-count
+--- sys.orig/conf/files
++++ sys/conf/files
+@@ -693,6 +693,7 @@ file kern/tty_nmea.c			nmea			needs-flag
+ file kern/tty_msts.c			msts			needs-flag
  file kern/tty_subr.c
  file kern/tty_tty.c
 +file kern/rpldev.c
  file kern/uipc_domain.c
  file kern/uipc_mbuf.c
  file kern/uipc_mbuf2.c
-Index: openbsd-sys-4.0/kern/rpldev.c
+Index: sys/kern/rpldev.c
 ===================================================================
 --- /dev/null
-+++ openbsd-sys-4.0/kern/rpldev.c
-@@ -0,0 +1,365 @@
++++ sys/kern/rpldev.c
+@@ -0,0 +1,362 @@
 +/*
-+ *	ttyrpld/k_openbsd-4.0/rpldev.c
-+ *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
-+ *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
++ *	ttyrpld/k_openbsd-4.3/rpldev.c
++ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
 + *
 + *	Redistribution and use in source and binary forms, with or without
 + *	modification, are permitted provided that the following conditions
@@ -365,10 +393,10 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +
 +/* Variables */
 +static struct mutex Buffer_lock, Open_lock;
-+static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
++static char *Buffer, *BufRP, *BufWP;
 +static size_t Bufsize = 32 * 1024;
-+static unsigned int Open_count = 0;
-+static int kmi_usecount = 0;
++static unsigned int Open_count;
++static int kmi_usecount;
 +
 +//-----------------------------------------------------------------------------
 +static int rpldhc_open(const struct tty *tty)
@@ -649,22 +677,20 @@ Index: openbsd-sys-4.0/kern/rpldev.c
 +	wakeup_n(&Buffer, 1);
 +	return count;
 +}
-+
-+//=============================================================================
-Index: openbsd-sys-4.0/kern/tty.c
+Index: sys/kern/tty.c
 ===================================================================
---- openbsd-sys-4.0.orig/kern/tty.c
-+++ openbsd-sys-4.0/kern/tty.c
+--- sys.orig/kern/tty.c
++++ sys/kern/tty.c
 @@ -65,6 +65,13 @@
  
  #include "pty.h"
  
 +#include <sys/rpldhk.h>
 +#include <sys/types.h>
-+int (*rpl_open)(const struct tty *)                        = NULL;
-+int (*rpl_read)(const char *, size_t, const struct tty *)  = NULL;
-+int (*rpl_write)(const char *, size_t, const struct tty *) = NULL;
-+int (*rpl_lclose)(const struct tty *)                      = NULL;
++int (*rpl_open)(const struct tty *);
++int (*rpl_read)(const char *, size_t, const struct tty *);
++int (*rpl_write)(const char *, size_t, const struct tty *);
++int (*rpl_lclose)(const struct tty *);
 +
  static int ttnread(struct tty *);
  static void ttyblock(struct tty *);
@@ -741,10 +767,10 @@ Index: openbsd-sys-4.0/kern/tty.c
  		}
  		/*
  		 * If nothing fancy need be done, grab those characters we
-Index: openbsd-sys-4.0/sys/conf.h
+Index: sys/sys/conf.h
 ===================================================================
---- openbsd-sys-4.0.orig/sys/conf.h
-+++ openbsd-sys-4.0/sys/conf.h
+--- sys.orig/sys/conf.h
++++ sys/sys/conf.h
 @@ -284,6 +284,22 @@ extern struct cdevsw cdevsw[];
  	dev_init(c,n,write), dev_init(c,n,ioctl), (dev_type_stop((*))) enodev, \
  	0, (dev_type_poll((*))) enodev, (dev_type_mmap((*))) enodev }
@@ -768,10 +794,10 @@ Index: openbsd-sys-4.0/sys/conf.h
  /* open, close, read, ioctl, poll, kqfilter XXX should be a generic device */
  #define cdev_log_init(c,n) { \
  	dev_init(c,n,open), dev_init(c,n,close), dev_init(c,n,read), \
-Index: openbsd-sys-4.0/sys/rpl_ioctl.h
+Index: sys/sys/rpl_ioctl.h
 ===================================================================
 --- /dev/null
-+++ openbsd-sys-4.0/sys/rpl_ioctl.h
++++ sys/sys/rpl_ioctl.h
 @@ -0,0 +1,31 @@
 +#ifndef TTYRPLD_IOCTL_H
 +#define TTYRPLD_IOCTL_H 1
@@ -804,11 +830,11 @@ Index: openbsd-sys-4.0/sys/rpl_ioctl.h
 +};
 +
 +#endif /* TTYRPLD_IOCTL_H */
-Index: openbsd-sys-4.0/sys/rpl_packet.h
+Index: sys/sys/rpl_packet.h
 ===================================================================
 --- /dev/null
-+++ openbsd-sys-4.0/sys/rpl_packet.h
-@@ -0,0 +1,46 @@
++++ sys/sys/rpl_packet.h
+@@ -0,0 +1,51 @@
 +#ifndef TTYRPLD_PACKET_H
 +#define TTYRPLD_PACKET_H 1
 +
@@ -841,24 +867,29 @@ Index: openbsd-sys-4.0/sys/rpl_packet.h
 +	MAGIC_SIG      = 0xEE,
 +};
 +
++struct rpltime {
++	uint64_t tv_sec;
++	uint32_t tv_usec;
++};
++
 +struct rpldev_packet {
 +	uint32_t dev;
 +	uint16_t size;
 +	uint8_t event, magic;
-+	struct timeval time;
++	struct rpltime time;
 +} __PACKED;
 +
 +struct rpldsk_packet {
 +	uint16_t size;
 +	uint8_t event, magic;
-+	struct timeval time;
++	struct rpltime time;
 +} __PACKED;
 +
 +#endif /* TTYRPLD_PACKET_H */
-Index: openbsd-sys-4.0/sys/rpldev.h
+Index: sys/sys/rpldev.h
 ===================================================================
 --- /dev/null
-+++ openbsd-sys-4.0/sys/rpldev.h
++++ sys/sys/rpldev.h
 @@ -0,0 +1,19 @@
 +#ifndef _SYS_RPLDEV_H
 +#define _SYS_RPLDEV_H
@@ -879,10 +910,10 @@ Index: openbsd-sys-4.0/sys/rpldev.h
 +#endif /* _KERNEL */
 +
 +#endif /* _SYS_RPLDEV_H */
-Index: openbsd-sys-4.0/sys/rpldhk.h
+Index: sys/sys/rpldhk.h
 ===================================================================
 --- /dev/null
-+++ openbsd-sys-4.0/sys/rpldhk.h
++++ sys/sys/rpldhk.h
 @@ -0,0 +1,17 @@
 +#ifndef _SYS_RPLDHK_H
 +#define _SYS_RPLDHK_H 1
