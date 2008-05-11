@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/user/infod.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -83,7 +82,7 @@ void *infod_main(void *arg)
 			continue;
 
 		pthread_create(&id, NULL, client_thread,
-		               reinterpret_cast(void *, clfd));
+		               reinterpret_cast(void *, static_cast(long, clfd)));
 		pthread_detach(id);
 	}
 
@@ -92,7 +91,7 @@ void *infod_main(void *arg)
 
 static void *client_thread(void *arg)
 {
-	int fd = reinterpret_cast(int, arg);
+	int fd = reinterpret_cast(long, arg);
 
 	while (true) {
 		static const uint32_t zero = 0;

@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/user/rdsh.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -53,7 +52,7 @@ struct tty *get_tty(uint32_t dev, bool create)
 	const struct HXbtree_node *ts;
 	struct tty *ret = NULL, *tty;
 
-	ret = HXbtree_get(Ttys, reinterpret_cast(const void *, dev));
+	ret = HXbtree_get(Ttys, reinterpret_cast(const void *, static_cast(long, dev)));
 	if (ret != NULL)
 		return ret;
 	if (!create || (tty = malloc(sizeof(struct tty))) == NULL)
@@ -68,7 +67,7 @@ struct tty *get_tty(uint32_t dev, bool create)
 	tty->sdev     = NULL;
 	tty->full_dev = NULL;
 
-	ts = HXbtree_add(Ttys, reinterpret_cast(const void *, dev), tty);
+	ts = HXbtree_add(Ttys, reinterpret_cast(const void *, static_cast(long, dev)), tty);
 	if (ts == NULL) {
 		free(tty);
 		notify(LOG_ERR, _("%s: Memory allocation failure\n"), __func__);
@@ -100,7 +99,7 @@ void log_close(struct tty *tty)
 		 * IFP_ACTIVATED, as per definition. So we only need the data
 		 * structure if IFP_DEACTIVATED is on.
 		 */
-		HXbtree_del(Ttys, reinterpret_cast(const void *, tty->dev));
+		HXbtree_del(Ttys, reinterpret_cast(const void *, static_cast(long, tty->dev)));
 		free(tty);
 	}
 	return;
