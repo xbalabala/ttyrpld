@@ -1,6 +1,6 @@
 
 Name:		ttyrpld
-Version:	2.50
+Version:	2.51
 Release:	0
 Group:		Productivity/Security
 Summary:	Kernel-based tty screen- and keylogger

@@ -21,11 +21,3 @@ surprised if some chars, such as "micro", the
 copyright/left sign but especially localization
 translations seem screwed. In that case, you need
 to flip some settings.
-
-
-Short hint
-~~~~~~~~~~
-In case you are updating from an earlier version,
-the "CHANGES.txt" file tells you whether you need
-to recompile the Kernel (e.g. new kpatch).
-
