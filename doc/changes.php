@@ -611,7 +611,7 @@ recompile without reboot.)</p>
   <li class="star"><code>START_INFOD</code> in the default distribution is now "<code>yes</code>"</li>
   <li class="star">(all): big endian was never selected due to a typo in <code>__BYTE_ORER</code></li>
   <li class="plus">supporting Kernel 2.6.8-14 (SUSE) and 2.6.8 (vanilla)</li>
-  <li class="star">Kernel patches moved into their own folder "<code>kpatch</code>"</li>
+  <li class="star">Kernel patches moved into their own directory "<code>kpatch</code>"</li>
 </ul>
 
 <h1>v0.88 (2004-09-09)</h1>

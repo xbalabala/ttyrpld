@@ -11,12 +11,12 @@
   <tr>
     <td class="t2"><a
       href="http://jengelh.hopto.org/coding/libHX.php">libHX</a></td>
-    <td class="t2">1.10.0</li>
-    <td class="t2">1.10.1</li>
+    <td class="t2">1.15</li>
+    <td class="t2">1.17</li>
   </tr>
   <tr>
     <td class="t1">GNU C Compiler</td>
-    <td class="t1">3.3</li>
+    <td class="t1">3.3?</li>
     <td class="t1">4.x</li>
   </tr>
   <tr>
@@ -39,7 +39,7 @@
   <tr>
     <td class="t1">perl (for doc)</td>
     <td class="t1">-</td>
-    <td class="t1">5.8.0</td>
+    <td class="t1">5.6+</td>
   </tr>
   <tr>
     <td class="t2">php (for doc)</td>
@@ -82,12 +82,12 @@ the <i>kpatch</i>es change (which is rare). That way, you can upgrade
 reboot.</p>
 
 <p class="block">You can find different kernel patches in the
-<code>kpatch</code> folder, each targeting a different series and/or version. 
-You can patch your kernel source tree by issuing these commands:</p>
+<code>kpatch</code> directory, each targeting a different series and/or
+version.  You can patch your kernel source tree by issuing these commands:</p>
 
 <p class="code"><code>
-<b>$</b> cd /usr/src/linux-2.6.21-rc5/;<br />
-<b>$</b> patch -p1 -i /usr/src/ttyrpld/kpatch/linux-2.6.21-rc5.diff;<br />
+<b>$</b> cd ~/src/linux-2.6.25/;<br />
+<b>$</b> patch -p1 -i ~/src/ttyrpld/k_linux-2.6/rpldhk-2.6.25.diff;<br />
 <b>$</b> make menuconfig;
 </code></p>
 
@@ -104,7 +104,7 @@ all of the exotic tty devices might be supported under FreeBSD.</p>
 
 <p class="code"><code>
 <b>$</b> cd /usr/src/sys/;<br />
-<b>$</b> patch -p1 -i /usr/src/ttyrpld/kpatch/freebsd-6.2.diff;
+<b>$</b> patch -p1 -i ~/src/ttyrpld/k_freebsd-7.0/rpldhk.diff;
 </code></p>
 
 <p class="block">... and rebuild the kernel image. No option needs to be
@@ -123,7 +123,7 @@ the <code>src</code> packages, and use:</p>
 
 <p class="code"><code>
 <b>$</b> cd /usr/src/sys/;<br />
-<b>$</b> patch -p1 -i /usr/src/ttyrpld/kpatch/openbsd-4.0.diff;
+<b>$</b> patch -p1 -i ~/src/ttyrpld/k_openbsd-4.3/rpldhk_rpldev.diff;
 </code></p>
 
 <p class="block">Rebuild as described in <code>afterboot(8)</code>:</p>
