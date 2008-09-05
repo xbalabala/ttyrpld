@@ -20,7 +20,7 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include <libHX.h>
+#include <libHX/arbtree.h>
 #include "dev.h"
 #include "lib.h"
 #include "rdsh.h"

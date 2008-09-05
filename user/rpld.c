@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/user/rpld.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -31,7 +30,10 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <libHX.h>
+#include <libHX/arbtree.h>
+#include <libHX/misc.h>
+#include <libHX/option.h>
+#include <libHX/string.h>
 #include "compat.h"
 #include "dev.h"
 #include "rpl_endian.h"
@@ -842,5 +844,3 @@ static bool read_config_bp(const char *app_path, const char *file)
 	free(fpath);
 	return read_config(construct);
 }
-
-//=============================================================================

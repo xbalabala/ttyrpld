@@ -21,7 +21,8 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include <libHX.h>
+#include <libHX/arbtree.h>
+#include <libHX/string.h>
 #include "rpl_stdint.h"
 #include "dev.h"
 #include "lib.h"
