@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include <libHX.h>
 #include "dev.h"
