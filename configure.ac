@@ -1,5 +1,5 @@
 
-AC_INIT([ttyrpld], [2.51])
+AC_INIT([ttyrpld], [2.52])
 AC_CONFIG_HEADERS([config.h])
 AC_PROG_INSTALL
 AM_INIT_AUTOMAKE
@@ -31,15 +31,15 @@ AM_CONDITIONAL([GOT_TOOLS_FOR_DOC],
 AM_CONDITIONAL([GOT_TOOLS_FOR_LOCALE],
 	[$am_make -v | grep -q GNU && test -n "$MSGFMT"])
 
-m4_sinclude(m4lib/getpwuid.m4)
+m4_sinclude([m4lib/getpwuid.m4])
 
 regular_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
 	-Wformat=2 -pipe"
-AC_SUBST(regular_CFLAGS)
-AC_SUBST(regular_LIBS)
-AC_SUBST(ttyreplay_LIBS)
-AC_SUBST(rpld_LIBS)
+AC_SUBST([regular_CFLAGS])
+AC_SUBST([regular_LIBS])
+AC_SUBST([ttyreplay_LIBS])
+AC_SUBST([rpld_LIBS])
 AC_OUTPUT([Makefile etc/Makefile etc/rpld user/Makefile
 	doc/GNUmakefile locale/GNUmakefile])
