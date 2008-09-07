@@ -37,6 +37,7 @@ releases.</p>
 <h1>v2.52 (2008-09-07)</h1>
 
 <ul>
+	<li class="star">Updated kernel components for Linux 2.6.27</li>
 	<li class="star">Updated userspace code for libHX 1.25</li>
 </ul>
 

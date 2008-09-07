@@ -7,9 +7,6 @@
  *	Lesser General Public License as published by the Free Software
  *	Foundation; either version 2 or 3 of the License.
  */
-#include <asm/byteorder.h>
-#include <asm/semaphore.h>
-#include <asm/uaccess.h>
 #include <linux/compiler.h>
 #include <linux/fs.h>
 #include <linux/init.h>
@@ -27,6 +24,13 @@
 #include <linux/version.h>
 #include <linux/vmalloc.h>
 #include <linux/rpldhk.h>
+#include <asm/byteorder.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)
+#	include <linux/semaphore.h>
+#else
+#	include <asm/semaphore.h>
+#endif
+#include <asm/uaccess.h>
 #include "../include/rpl_ioctl.h"
 #include "../include/rpl_packet.h"
 
