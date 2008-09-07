@@ -34,10 +34,16 @@ releases.</p>
   </tr>
 </table>
 
+<h1>v2.52 (2008-09-07)</h1>
+
+<ul>
+	<li class="star">Updated userspace code for libHX 1.25</li>
+</ul>
+
 <h1>v2.51 (2008-05-15)</h1>
 
 <ul>
-	<li class="start">Updated rpldhk and rpldev for Linux 2.6.25,
+	<li class="star">Updated rpldhk and rpldev for Linux 2.6.25,
 		OpenBSD 4.3, FreeBSD 7.0, NetBSD 4.0</li>
 </ul>
 

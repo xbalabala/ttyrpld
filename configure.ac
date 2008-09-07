@@ -10,7 +10,7 @@ AC_HAVE_HEADERS([alloca.h])
 AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_LIBS="$ttyreplay_LIBS -lrt"])
 AC_CHECK_LIB([socket], [accept], [rpld_LIBS="$rpld_LIBS -lsocket -lnsl"])
 AC_CHECK_LIB([intl], [gettext], [regular_LIBS="$regular_LIBS -lintl"])
-PKG_CHECK_MODULES([libHX], [libHX >= 1.23])
+PKG_CHECK_MODULES([libHX], [libHX >= 1.25])
 
 AC_PATH_PROG([MSGFMT], [gmsgfmt])
 if [[ -z "$MSGFMT" ]]; then
@@ -36,7 +36,7 @@ m4_sinclude(m4lib/getpwuid.m4)
 regular_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
-	-Winline -Wformat=2 -pipe"
+	-Wformat=2 -pipe"
 AC_SUBST(regular_CFLAGS)
 AC_SUBST(regular_LIBS)
 AC_SUBST(ttyreplay_LIBS)

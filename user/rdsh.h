@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/user/rdsh.h
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2007
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -15,15 +14,12 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include "rpl_stdint.h"
-#include <libHX.h>
+#include <libHX/defs.h>
+#include <libHX/string.h>
 
 /* Definitions */
 #define RECEIVE_FULL(fd, ptr, sz) \
 	(recv((fd), (ptr), (sz), MSG_WAITALL) == (sz))
-
-/* Code annotations */
-#define reinterpret_cast(type, expr) ((type)(expr))
-#define static_cast(type, expr)      ((type)(expr))
 
 struct GOptmap_t {
 	long user_id;
@@ -42,7 +38,7 @@ struct tty {
 	int fd;
 	unsigned int status;
 	unsigned long in, out;
-	hmc_t *log;
+	hxmc_t *log;
 	char *sdev, *full_dev;
 };
 

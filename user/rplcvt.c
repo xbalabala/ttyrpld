@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/user/rplcvt.c
- *	Copyright © CC Computer Consultants GmbH, 2007 - 2008
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2007 - 2008
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -18,7 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <libHX.h>
+#include <libHX/option.h>
 #include "../include/rpl_packet.h"
 #include "lib.h"
 

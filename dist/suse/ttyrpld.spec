@@ -12,7 +12,7 @@ URL:		http://ttyrpld.sf.net/
 
 Source:		http://downloads.sf.net/ttyrpld/ttyrpld-%version.tar.bz2
 BuildRoot:	%_tmppath/%name-%version-build
-BuildRequires:	gettext-devel, libHX-devel >= 1.10, php5, perl >= 5.8.0
+BuildRequires:	gettext-devel, libHX-devel >= 1.25, php5, perl >= 5.8.0
 BuildRequires:	pkg-config, w3m
 %if 0%kernel
 BuildRequires:	kernel-source, kernel-syms

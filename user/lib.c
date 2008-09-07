@@ -45,17 +45,17 @@ void load_locale(const char *exe)
 	setlocale(LC_ALL, "");
 
 	if (strchr(exe, '/') != NULL) {
-		hmc_t *base = hmc_sinit(exe), *de;
-		hmc_trunc(&base, HX_strrcspn(base, "/"));
-		hmc_strcat(&base, "/locale");
-		de = hmc_dup(base);
-		hmc_strcat(&de, "/de/LC_MESSAGES/ttyrpld.mo");
+		hxmc_t *base = HXmc_strinit(exe), *de;
+		HXmc_trunc(&base, HX_strrcspn(base, "/"));
+		HXmc_strcat(&base, "/locale");
+		de = HXmc_dup(base);
+		HXmc_strcat(&de, "/de/LC_MESSAGES/ttyrpld.mo");
 		if (stat(de, &sb) == 0) {
 			bindtextdomain("ttyrpld", base);
 			++ok;
 		}
-		hmc_free(base);
-		hmc_free(de);
+		HXmc_free(base);
+		HXmc_free(de);
 	}
 
 	if (!ok) {

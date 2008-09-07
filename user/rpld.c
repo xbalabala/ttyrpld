@@ -61,7 +61,7 @@ static void evt_open(struct rpldev_packet *, struct tty *, int);
 static void log_open(struct tty *);
 static void log_write(struct rpldev_packet *, struct tty *, int);
 
-static int check_parent_directory(const hmc_t *);
+static int check_parent_directory(const hxmc_t *);
 static void fill_info(struct tty *, const char *);
 
 static int init_device(const char *);
@@ -444,7 +444,7 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 }
 
 //-----------------------------------------------------------------------------
-static int check_parent_directory(const hmc_t *s)
+static int check_parent_directory(const hxmc_t *s)
 {
 	char *path = alloca(strlen(s) + 1), *p;
 
@@ -545,7 +545,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 		strftime(fmtime, sizeof(fmtime), "%H%M%S", &now_tm);
 	}
 
-	hmc_free(tty->log);
+	HXmc_free(tty->log);
 	catalog  = HXformat_init();
 	HXformat_add(catalog, "DATE", fmday,  HXTYPE_STRING);
 	HXformat_add(catalog, "TIME", fmtime, HXTYPE_STRING);

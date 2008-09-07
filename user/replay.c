@@ -19,6 +19,7 @@
 #include <time.h> /* nsec def, nanosleep() */
 #include <unistd.h>
 
+#include <libHX/defs.h>
 #include <libHX/option.h>
 #include <libHX/string.h>
 #include "dev.h"
@@ -28,10 +29,6 @@
 #include "rdsh.h"
 
 /* Definitions */
-#define offsetof(type, member) \
-	static_cast(size_t, &(static_cast(type *, NULL))->member)
-#define containerof(var, type, member) \
-	static_cast(void *, var - offsetof(type, member))
 #define MICROSECOND 1000000
 #define NANOSECOND  1000000000
 
@@ -378,7 +375,8 @@ static bool find_next_packet(int fd, const struct pctrl_info *ps)
 			 * A magic byte has been found and the packet start is
 			 * complete
 			 */
-			char *ctx = containerof(ptr, struct rpldsk_packet, magic);
+			char *ctx = reinterpret_cast(char *,
+			            containerof(ptr, struct rpldsk_packet, magic));
 			if (ctx != buf) {
 				size_t cnt = buf + BZ - ctx;
 				ctx = memmove(buf, ctx, cnt);
