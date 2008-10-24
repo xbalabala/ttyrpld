@@ -180,7 +180,7 @@ static void getinfo_text_all(int fd)
 {
 	/* No device given, send info about RPLD and all ttys */
 	const struct HXbtree_node *node;
-	struct HXbtrav *trav;
+	void *trav;
 
 	skprintf(fd,
 	"=========================================================="
@@ -236,7 +236,7 @@ static void getinfo_bin_all(int fd)
 {
 	/* No device given, send info about RPLD and all ttys */
 	const struct HXbtree_node *node;
-	struct HXbtrav *trav;
+	void *trav;
 
 	skprintf(fd, "ttyrpld " TTYRPLD_VERSION "\n" "format 4\n"
 	         "%lu %lu %lu %lu %llu %llu %lu\n",
@@ -283,7 +283,7 @@ static void zero_counters(uint32_t dev)
 {
 	pthread_mutex_lock(&Ttys_lock);
 	if (dev == 0) {
-		struct HXbtrav *trav = HXbtrav_init(Ttys);
+		void *trav = HXbtrav_init(Ttys);
 		const struct HXbtree_node *node;
 
 		while ((node = HXbtraverse(trav)) != NULL) {
