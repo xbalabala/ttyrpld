@@ -2,11 +2,11 @@
 AC_INIT([ttyrpld], [2.52])
 AC_CONFIG_HEADERS([config.h])
 AC_PROG_INSTALL
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([-Wall])
 AC_PROG_CC
 AM_PROG_CC_C_O
 
-AC_HAVE_HEADERS([alloca.h])
+AC_CHECK_HEADERS([alloca.h])
 AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_LIBS="$ttyreplay_LIBS -lrt"])
 AC_CHECK_LIB([socket], [accept], [rpld_LIBS="$rpld_LIBS -lsocket -lnsl"])
 AC_CHECK_LIB([intl], [gettext], [regular_LIBS="$regular_LIBS -lintl"])
@@ -31,7 +31,7 @@ AM_CONDITIONAL([GOT_TOOLS_FOR_DOC],
 AM_CONDITIONAL([GOT_TOOLS_FOR_LOCALE],
 	[$am_make -v | grep -q GNU && test -n "$MSGFMT"])
 
-m4_sinclude([m4lib/getpwuid.m4])
+m4_include([m4/getpwuid.m4])
 
 regular_CFLAGS="-D_LARGEFILE_SOURCE=1 -D_LARGE_FILES -D_FILE_OFFSET_BITS=64 \
 	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
@@ -41,5 +41,6 @@ AC_SUBST([regular_CFLAGS])
 AC_SUBST([regular_LIBS])
 AC_SUBST([ttyreplay_LIBS])
 AC_SUBST([rpld_LIBS])
-AC_OUTPUT([Makefile etc/Makefile etc/rpld user/Makefile
+AC_CONFIG_FILES([Makefile etc/Makefile etc/rpld user/Makefile
 	doc/GNUmakefile locale/GNUmakefile])
+AC_OUTPUT

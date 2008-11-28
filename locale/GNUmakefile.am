@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 
-LOCALES := $(patsubst ${srcdir}/%.po,%,$(wildcard ${srcdir}/*.po))
-TARGETS := $(addsuffix .mo,${LOCALES})
+LOCALES = $(patsubst ${srcdir}/%.po,%,$(wildcard ${srcdir}/*.po))
+TARGETS = $(addsuffix .mo,${LOCALES})
 CLEANFILES = ${TARGETS}
 
 .PHONY: all install uninstall clean distclean
@@ -12,12 +12,12 @@ all: ${TARGETS}
 	@echo -en "  MSGFMT    $*: ";
 	@${MSGFMT} --statistics -o $@ $<;
 
-install: all
+install-data-hook: all
 	@echo "Installing locale files to ${localedir}";
 	for i in ${LOCALES}; do \
 		${INSTALL} -dm0755 "${DESTDIR}${localedir}/$$i/LC_MESSAGES"; \
 		${INSTALL} -m0644 "$$i.mo" "${DESTDIR}${localedir}/$$i/LC_MESSAGES/ttyrpld.mo"; \
 	done;
 
-uninstall:
+uninstall-local:
 	rm -f ${DESTDIR}${localedir}/*/LC_MESSAGES/ttyrpld.mo;

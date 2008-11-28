@@ -2,10 +2,11 @@
 
 AM_CFLAGS         = ${regular_CFLAGS} -I${top_srcdir}/include ${libHX_CFLAGS}
 LDADD             = ${regular_LIBS}
-CLEANFILES        = rplctl
+CLEANFILES        = rplctl${EXEEXT}
 
 bin_PROGRAMS      = rplcvt ttyreplay
-sbin_PROGRAMS     = rplctl rpld
+sbin_PROGRAMS     = rpld
+sbin_SCRIPTS      = rplctl${EXEEXT}
 EXTRA_PROGRAMS    = ptmx
 ttyreplay_SOURCES = lib.c replay.c pctrl.c
 ttyreplay_LDADD   = ${libHX_LIBS} -lpthread ${ttyreplay_LIBS}
@@ -15,5 +16,5 @@ rplcvt_LDADD      = ${libHX_LIBS}
 rpld_SOURCES      = infod.c lib.c rdsh.c rplctl.c rpld.c
 rpld_LDADD        = ${libHX_LIBS} -lpthread ${rpld_LIBS}
 
-rplctl: rpld
-	if [ ! -e rplctl ]; then ln -s rpld rplctl; fi;
+rplctl${EXEEXT}: rpld${EXEEXT}
+	if [ ! -e rplctl${EXEEXT} ]; then ln -s rpld${EXEEXT} rplctl${EXEEXT}; fi;
