@@ -179,7 +179,7 @@ static int unix_client(const char *port)
 	HX_strlcpy(sk.sun_path, port, sizeof(sk.sun_path));
 
 	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0 ||
-	    connect(fd, reinterpret_cast(void *, &sk),
+	    connect(fd, static_cast(void *, &sk),
 	    sizeof(struct sockaddr_un)) < 0)
 		return -1;
 

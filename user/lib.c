@@ -48,7 +48,7 @@ void load_locale(const char *exe)
 		hxmc_t *base = HXmc_strinit(exe), *de;
 		HXmc_trunc(&base, HX_strrcspn(base, "/"));
 		HXmc_strcat(&base, "/locale");
-		de = HXmc_dup(base);
+		de = HXmc_meminit(base, HXmc_length(base));
 		HXmc_strcat(&de, "/de/LC_MESSAGES/ttyrpld.mo");
 		if (stat(de, &sb) == 0) {
 			bindtextdomain("ttyrpld", base);

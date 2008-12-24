@@ -11,8 +11,8 @@
   <tr>
     <td class="t2"><a
       href="http://jengelh.hopto.org/coding/libHX.php">libHX</a></td>
-    <td class="t2">1.25</li>
-    <td class="t2">1.25</li>
+    <td class="t2">2.0</li>
+    <td class="t2">2.0</li>
   </tr>
   <tr>
     <td class="t1">GNU C Compiler</td>
