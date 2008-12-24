@@ -103,7 +103,6 @@ void log_close(struct tty *tty)
 		HXbtree_del(Ttys, reinterpret_cast(const void *, static_cast(long, tty->dev)));
 		free(tty);
 	}
-	return;
 }
 
 void notify(int lv, const char *fmt, ...)
@@ -124,7 +123,6 @@ void notify(int lv, const char *fmt, ...)
 		va_end(argp);
 		return;
 	}
-	return;
 }
 
 ssize_t send_wait(int fd, const void *buf, size_t count)
@@ -163,7 +161,4 @@ static void setup_kversion(void)
 		return;
 	fclose(fp);
 	k_version_data = KERNEL_VERSION(x, y, z);
-	return;
 }
-
-//=============================================================================

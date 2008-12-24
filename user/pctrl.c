@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/user/pctrl.c
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -138,7 +137,6 @@ void pctrl_exit(void)
 		return;
 	pctrl_deactivate(0);
 	close(ctty);
-	return;
 }
 
 void pctrl_activate(struct pctrl_info *i)
@@ -149,7 +147,6 @@ void pctrl_activate(struct pctrl_info *i)
 	memcpy(&tio_pad, &tio_default, sizeof(struct termios));
 	tio_pad.c_lflag &= ~(ECHO | ICANON);
 	tcsetattr(ctty, TCSANOW, &tio_pad);
-	return;
 }
 
 void pctrl_deactivate(int sig)
@@ -162,7 +159,4 @@ void pctrl_deactivate(int sig)
 	tcsetattr(ctty, TCSANOW, &tio_default);
 	if (sig > 0)
 		raise(sig);
-	return;
 }
-
-//=============================================================================

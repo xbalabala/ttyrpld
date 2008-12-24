@@ -158,7 +158,6 @@ static void read_reply(int fd)
 			}
 		}
 	}
-	return;
 }
 
 static void send_int(int fd, unsigned char req, uint32_t dev)
@@ -167,7 +166,6 @@ static void send_int(int fd, unsigned char req, uint32_t dev)
 	SWAB1(&dev);
 	send_wait(fd, &dev, sizeof(uint32_t));
 	read_reply(fd);
-	return;
 }
 
 static int unix_client(const char *port)
@@ -248,7 +246,4 @@ static void getopt_proc(const struct HXoptcb *cbi)
 		break;
 	}
 	} /* switch */
-	return;
 }
-
-//=============================================================================

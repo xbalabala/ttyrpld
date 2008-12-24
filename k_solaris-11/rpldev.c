@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/k_solaris-11/rpldev.c
- *	Copyright © CC Computer Consultants GmbH, 2006 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2006 - 2008
  *
  *	The contents of this file are subject to the terms of the Common
  *	Development and Distribution License, Version 1.0 only (the "License").
@@ -458,8 +457,6 @@ static inline void circular_put(const void *src, size_t count)
 		memcpy(Buffer, src + x, count - x);
 		BufWP = Buffer + count - x;
 	}
-
-	return;
 }
 
 static int circular_put_packet(struct rpldev_packet *p, const void *buf,
@@ -499,8 +496,6 @@ static void fill_time(struct timeval *tv)
 		tv->tv_usec = LE_32(tv->tv_usec);
 	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
 		tv->tv_usec = LE_64(tv->tv_usec);
-
-	return;
 }
 
 static inline unsigned int min_uint(unsigned int a, unsigned int b)

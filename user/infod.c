@@ -64,7 +64,6 @@ void infod_init(void)
 	 */
 	chown(GOpt.infod_port, GOpt.user_id, 0);
 	chmod(GOpt.infod_port, S_IWUSR);
-	return;
 }
 
 void *infod_main(void *arg)
@@ -172,7 +171,6 @@ static void getinfo_text(uint32_t dev, int fd)
 	}
 
 	pthread_mutex_unlock(&Ttys_lock);
-	return;
 }
 
 static void getinfo_text_all(int fd)
@@ -197,7 +195,6 @@ static void getinfo_text_all(int fd)
 	skprintf(fd, "-----------------------------------------------"
 	"---------------------------\n");
 	HXbtrav_free(trav);
-	return;
 }
 
 static void getinfo_text_one(int fd, struct tty *tty)
@@ -210,7 +207,6 @@ static void getinfo_text_one(int fd, struct tty *tty)
 	}
 	skprintf(fd, "%c %-11s %9lu %9lu %s\n", status, tty->sdev, tty->in,
 	         tty->out, basename_pp(tty->log, GOpt.ofmt));
-	return;
 }
 
 static void getinfo_bin(uint32_t dev, int fd)
@@ -228,7 +224,6 @@ static void getinfo_bin(uint32_t dev, int fd)
 	}
 
 	pthread_mutex_unlock(&Ttys_lock);
-	return;
 }
 
 static void getinfo_bin_all(int fd)
@@ -247,7 +242,6 @@ static void getinfo_bin_all(int fd)
 		getinfo_bin_one(fd, node->data);
 
 	HXbtrav_free(trav);
-	return;
 }
 
 static void getinfo_bin_one(int fd, struct tty *tty)
@@ -260,7 +254,6 @@ static void getinfo_bin_one(int fd, struct tty *tty)
 	}
 	skprintf(fd, "%c %ld %ld %s %lu %lu %s\n", status,
 	         KD26_PARTS(tty->dev), tty->sdev, tty->in, tty->out, tty->log);
-	return;
 }
 
 static void set_session_status(uint32_t dev, int req)
@@ -275,7 +268,6 @@ static void set_session_status(uint32_t dev, int req)
 
 	tty->status = req;
 	pthread_mutex_unlock(&Ttys_lock);
-	return;
 }
 
 static void zero_counters(uint32_t dev)
@@ -301,7 +293,6 @@ static void zero_counters(uint32_t dev)
 		tty->in = tty->out = 0;
 	}
 	pthread_mutex_unlock(&Ttys_lock);
-	return;
 }
 
 //-----------------------------------------------------------------------------
@@ -325,7 +316,6 @@ static void block_signals(void)
 	sigset_t set;
 	sigfillset(&set);
 	pthread_sigmask(SIG_BLOCK, &set, NULL);
-	return;
 }
 
 static int skprintf(int fd, const char *fmt, ...)
@@ -364,5 +354,3 @@ static int unix_server(const char *port)
 
 	return fd;
 }
-
-//=============================================================================

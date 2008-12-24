@@ -358,8 +358,6 @@ static inline void circular_put(const void *src, size_t count)
 		memcpy(Buffer, src + x, count - x);
 		BufWP = Buffer + count - x;
 	}
-
-	return;
 }
 
 static int circular_put_packet(struct rpldev_packet *p, const void *buf,
@@ -399,8 +397,6 @@ static inline void fill_time(struct rpltime *x)
 		x->tv_usec = htole32(tv.tv_usec);
 	else if (sizeof(tv.tv_usec) == sizeof(uint64_t))
 		x->tv_usec = htole64(tv.tv_usec);
-
-	return;
 }
 
 static inline unsigned int min_uint(unsigned int a, unsigned int b)

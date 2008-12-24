@@ -227,8 +227,6 @@ static void mainloop(int fd)
 
 	pthread_mutex_unlock(&Ttys_lock);
     }
-
-    return;
 }
 
 //-----------------------------------------------------------------------------
@@ -348,8 +346,6 @@ static void evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 		fill_info(tty, sdev);
 	if (owner_changed)
 		log_open(tty);
-
-	return;
 }
 
 static void log_open(struct tty *tty)
@@ -419,8 +415,6 @@ static void log_open(struct tty *tty)
 	SWAB1(&p.size);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
 	write(tty->fd, buf, s);
-
-	return;
 }
 
 static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
@@ -440,7 +434,6 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 	SWAB1(&packet->time.tv_usec);
 	write(tty->fd, &packet->size, sizeof(struct rpldsk_packet));
 	write(tty->fd, buffer, have);
-	return;
 }
 
 //-----------------------------------------------------------------------------
@@ -553,7 +546,6 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	HXformat_add(catalog, "USER", user,   HXTYPE_STRING);
 	HXformat_aprintf(catalog, &tty->log, GOpt.ofmt);
 	HXformat_free(catalog);
-	return;
 }
 
 //-----------------------------------------------------------------------------
@@ -603,7 +595,6 @@ static void init_fdtable(rlim_t nfd)
 	if (setrlimit(RLIMIT_NOFILE, &rl) != 0)
 		fprintf(stderr, _("Warning: Could not increase fd table size "
 		        "to %d: %s\n"), (int)nfd, strerror(errno));
-	return;
 }
 
 static int init_sighandler(void)
@@ -644,7 +635,6 @@ static void sighandler_int(int s)
 	if (GOpt.verbose)
 		printf(_("\n" "Received SIGINT/SIGTERM, shutting down.\n"));
 	Opt._running = 0;
-	return;
 }
 
 static void sighandler_alrm(int s)
@@ -654,14 +644,12 @@ static void sighandler_alrm(int s)
 	fflush(stdout);
 	if (GOpt.verbose)
 		alarm(1);
-	return;
 }
 
 static void sighandler_pipe(int s)
 {
 	fprintf(stderr, _("\n" "[%d] Received SIGPIPE\n"),
 	        static_cast(int, getpid()));
-	return;
 }
 
 //-----------------------------------------------------------------------------
@@ -791,7 +779,6 @@ static bool get_options(int *argc, const char ***argv)
 static void getopt_config(const struct HXoptcb *cbi)
 {
 	read_config(cbi->data);
-	return;
 }
 
 static void getopt_username(const struct HXoptcb *cbi)
@@ -800,7 +787,6 @@ static void getopt_username(const struct HXoptcb *cbi)
 		fprintf(stderr, _("No such user: %s\n"), cbi->data);
 		exit(EXIT_FAILURE);
 	}
-	return;
 }
 	
 static bool rate_limit(int counter, time_t delta)

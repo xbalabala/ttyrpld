@@ -140,7 +140,6 @@ static __init int rpldev_init(void)
 static __exit void rpldev_exit(void)
 {
 	misc_deregister(&kmi_miscinfo);
-	return;
 }
 
 module_init(rpldev_init);
@@ -502,8 +501,6 @@ static inline void circular_put(const void __kernel *src, size_t count)
 		memcpy(Buffer, src + x, count - x);
 		BufWP = Buffer + count - x;
 	}
-
-	return;
 }
 
 static inline void circular_putU(const void __user *src, size_t count)
@@ -518,8 +515,6 @@ static inline void circular_putU(const void __user *src, size_t count)
 		    copy_from_user(Buffer, src + x, count - x) == 0)
 			BufWP = Buffer + count - x;
 	}
-
-	return;
 }
 
 /*
@@ -575,8 +570,6 @@ static inline void fill_time(struct rpltime *x)
 		x->tv_usec = cpu_to_le32(tv.tv_usec);
 	else if (sizeof(tv.tv_usec) == sizeof(uint64_t))
 		x->tv_usec = cpu_to_le64(tv.tv_usec);
-
-	return;
 }
 
 static inline unsigned int min_uint(unsigned int a, unsigned int b)

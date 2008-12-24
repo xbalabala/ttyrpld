@@ -319,7 +319,6 @@ static void e_proc(int fd, struct rpldsk_packet *p, struct pctrl_info *i,
 
 		write(STDOUT_FILENO, buf, strlen(buf));
 	}
-	return;
 }
 
 //-----------------------------------------------------------------------------
@@ -521,19 +520,16 @@ static void getopt_jump(const struct HXoptcb *cbi)
 	Opt.skval = (strtol(sec, NULL, 0) + 60 * strtol(min, NULL, 0) +
 	            3600 * strtol(hr, NULL, 0)) * 1000;
 	free(origtmp);
-	return;
 }
 
 static void getopt_msec(const struct HXoptcb *cbi)
 {
 	Opt.maxdelay = cbi->data_long * 1000;
-	return;
 }
 
 static void getopt_skip(const struct HXoptcb *cbi)
 {
 	Opt.sktype = PCTRL_SKPACK;
-	return;
 }
 
 static inline ssize_t read_nullfm(int fd, size_t count)
@@ -706,7 +702,6 @@ static void usleep_ovcorr(struct timeval *req, long *skew)
 	         (stop.tv_usec - start.tv_usec);
 	over   = dur - req_usec;
 	*skew += over;
-	return;
 }
 
 /*
@@ -731,8 +726,6 @@ static void tv_delta(const struct rpltime *past, const struct rpltime *now,
 		dest->tv_sec  = sec;
 		dest->tv_usec = acc;
 	}
-
-	return;
 }
 
 static inline unsigned long long tv2usec(const struct timeval *req)
@@ -744,7 +737,4 @@ static inline void usec2tv(unsigned long long usec, struct timeval *req)
 {
 	req->tv_sec  = usec / MICROSECOND;
 	req->tv_usec = usec % MICROSECOND;
-	return;
 }
-
-//=============================================================================

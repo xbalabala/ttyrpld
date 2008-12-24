@@ -68,7 +68,6 @@ void load_locale(const char *exe)
 	}
 
 	textdomain("ttyrpld");
-	return;
 }
 
 ssize_t read_through(int in, int out, size_t count)
@@ -182,8 +181,4 @@ void swab_be(void *srcp, size_t count)
 		*++movp = x;
 		count -= 2;
 	}
-
-	return;
 }
-
-//=============================================================================

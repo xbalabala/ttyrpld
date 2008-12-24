@@ -1,7 +1,6 @@
 /*
  *	ttyrpld/k_solaris-11/rpldhk.c
- *	Copyright © CC Computer Consultants GmbH, 2006 - 2007
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2006 - 2008
  *
  *	The contents of this file are subject to the terms of the Common
  *	Development and Distribution License, Version 1.0 only (the "License").
@@ -173,5 +172,4 @@ static void rpldhk_packet(struct queue *q, struct msgb *mp, int wr)
 		else if (!wr && tmpr != NULL)
 			tmpr(mblk->b_rptr, mblk->b_wptr - mblk->b_rptr, q);
 	}
-	return;
 }

@@ -68,7 +68,6 @@ static void spawn_ptmx(void)
 		        ret2, ret, strerror(errno));
 
 	/* FDs are _not_ closed */
-	return;
 }
 
 static void *ptmx_runner(void *arg)
