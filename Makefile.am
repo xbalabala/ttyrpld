@@ -11,7 +11,7 @@ if GOT_TOOLS_FOR_LOCALE
 locale_subdir    = locale
 endif
 
-SUBDIRS          = etc user $(doc_subdir) $(locale_subdir)
+SUBDIRS          = dist/suse etc user $(doc_subdir) $(locale_subdir)
 
 tmpdir := $(shell mktemp -dtu)
 packer  = bzip2
