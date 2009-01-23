@@ -42,7 +42,8 @@ AC_SUBST([regular_CFLAGS])
 AC_SUBST([regular_LIBS])
 AC_SUBST([ttyreplay_LIBS])
 AC_SUBST([rpld_LIBS])
-AC_CONFIG_FILES([Makefile dist/suse/Makefile dist/suse/rpld
+AC_CONFIG_FILES([Makefile dist/debian/rpld
+	dist/suse/Makefile dist/suse/rpld
 	etc/Makefile user/Makefile
 	doc/GNUmakefile locale/GNUmakefile])
 AC_OUTPUT
