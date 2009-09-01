@@ -21,7 +21,7 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include <libHX/arbtree.h>
+#include <libHX/map.h>
 #include <libHX/string.h>
 #include "rpl_stdint.h"
 #include "dev.h"
@@ -176,8 +176,8 @@ static void getinfo_text(uint32_t dev, int fd)
 static void getinfo_text_all(int fd)
 {
 	/* No device given, send info about RPLD and all ttys */
-	const struct HXbtree_node *node;
-	void *trav;
+	const struct HXmap_node *node;
+	struct HXmap_trav *trav;
 
 	skprintf(fd,
 	"=========================================================="
@@ -188,13 +188,13 @@ static void getinfo_text_all(int fd)
 	"----------------\n",
 	Stats.in, Stats.out, Stats.read, Stats.write);
 
-	trav = HXbtrav_init(Ttys);
-	while ((node = HXbtraverse(trav)) != NULL)
+	trav = HXmap_travinit(Ttys, HXMAP_DTRAV);
+	while ((node = HXmap_traverse(trav)) != NULL)
 		getinfo_text_one(fd, node->data);
 
 	skprintf(fd, "-----------------------------------------------"
 	"---------------------------\n");
-	HXbtrav_free(trav);
+	HXmap_travfree(trav);
 }
 
 static void getinfo_text_one(int fd, struct tty *tty)
@@ -229,19 +229,19 @@ static void getinfo_bin(uint32_t dev, int fd)
 static void getinfo_bin_all(int fd)
 {
 	/* No device given, send info about RPLD and all ttys */
-	const struct HXbtree_node *node;
-	void *trav;
+	const struct HXmap_node *node;
+	struct HXmap_trav *trav;
 
 	skprintf(fd, "ttyrpld " TTYRPLD_VERSION "\n" "format 4\n"
 	         "%lu %lu %lu %lu %llu %llu %lu\n",
 	         Stats.open, Stats.lclose, Stats.read, Stats.write,
 	         Stats.in, Stats.out, Stats.badpack);
 
-	trav = HXbtrav_init(Ttys);
-	while ((node = HXbtraverse(trav)) != NULL)
+	trav = HXmap_travinit(Ttys, HXMAP_DTRAV);
+	while ((node = HXmap_traverse(trav)) != NULL)
 		getinfo_bin_one(fd, node->data);
 
-	HXbtrav_free(trav);
+	HXmap_travfree(trav);
 }
 
 static void getinfo_bin_one(int fd, struct tty *tty)
@@ -274,16 +274,16 @@ static void zero_counters(uint32_t dev)
 {
 	pthread_mutex_lock(&Ttys_lock);
 	if (dev == 0) {
-		void *trav = HXbtrav_init(Ttys);
-		const struct HXbtree_node *node;
+		struct HXmap_trav *trav = HXmap_travinit(Ttys, HXMAP_DTRAV);
+		const struct HXmap_node *node;
 
-		while ((node = HXbtraverse(trav)) != NULL) {
+		while ((node = HXmap_traverse(trav)) != NULL) {
 			struct tty *tty = node->data;
 			tty->in = tty->out = 0;
 		}
 
 		memset(&Stats, 0, sizeof(Stats));
-		HXbtrav_free(trav);
+		HXmap_travfree(trav);
 	} else {
 		struct tty *tty;
 		if ((tty = get_tty(dev, false)) == NULL) {

@@ -70,7 +70,7 @@ extern int rplctl_main(int, const char **);
  */
 extern pthread_mutex_t Ttys_lock;
 extern const char *Device_dirs[];
-extern struct HXbtree *Ttys;
+extern struct HXmap *Ttys;
 extern struct Statmap_t Stats;
 extern struct GOptmap_t GOpt;
 

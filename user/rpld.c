@@ -30,7 +30,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <libHX/arbtree.h>
+#include <libHX/map.h>
 #include <libHX/misc.h>
 #include <libHX/option.h>
 #include <libHX/string.h>
@@ -138,7 +138,7 @@ int main(int argc, const char **argv)
 		printf("\n");
 	}
 
-	if ((Ttys = HXbtree_init(HXBT_MAP | HXBT_ICMP)) == NULL) {
+	if ((Ttys = HXmap_init(HXMAPT_ORDERED, 0)) == NULL) {
 		perror("Ttys = HXbtree_init()");
 		return EXIT_FAILURE;
 	}
@@ -452,7 +452,7 @@ static int check_parent_directory(const hxmc_t *s)
 
 static void fill_info(struct tty *tty, const char *aux_sdev)
 {
-	struct HXbtree *catalog;
+	struct HXformat_map *catalog;
 	char full_dev[MAXFNLEN], sdev[MAXFNLEN],
 		fmday[16], fmtime[16], user[64];
 	const char *pbase = NULL;
@@ -539,7 +539,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	}
 
 	HXmc_free(tty->log);
-	catalog  = HXformat_init();
+	catalog = HXformat_init();
 	HXformat_add(catalog, "DATE", fmday,  HXTYPE_STRING);
 	HXformat_add(catalog, "TIME", fmtime, HXTYPE_STRING);
 	HXformat_add(catalog, "TTY",  sdev,   HXTYPE_STRING);

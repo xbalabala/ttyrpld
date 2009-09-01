@@ -20,7 +20,7 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include <libHX/arbtree.h>
+#include <libHX/map.h>
 #include "dev.h"
 #include "lib.h"
 #include "rdsh.h"
@@ -33,7 +33,7 @@ static void setup_kversion(void);
 /* External Variables */
 pthread_mutex_t Ttys_lock = PTHREAD_MUTEX_INITIALIZER;
 const char *Device_dirs[] = {"/dev", "/devices", NULL};
-struct HXbtree *Ttys = NULL;
+struct HXmap *Ttys = NULL;
 struct Statmap_t Stats;
 struct GOptmap_t GOpt = {
 	.user_id    = -1,
@@ -50,12 +50,14 @@ static pthread_mutex_t k_version_lock = PTHREAD_MUTEX_INITIALIZER;
 //-----------------------------------------------------------------------------
 struct tty *get_tty(uint32_t dev, bool create)
 {
-	const struct HXbtree_node *ts;
-	struct tty *ret = NULL, *tty;
+	const void *id;
+	struct tty *tty;
+	int ret;
 
-	ret = HXbtree_get(Ttys, reinterpret_cast(const void *, static_cast(long, dev)));
-	if (ret != NULL)
-		return ret;
+	id = reinterpret_cast(const void *, static_cast(long, dev));
+	tty = HXmap_get(Ttys, id);
+	if (tty != NULL)
+		return tty;
 	if (!create || (tty = malloc(sizeof(struct tty))) == NULL)
 		return NULL;
 
@@ -68,14 +70,14 @@ struct tty *get_tty(uint32_t dev, bool create)
 	tty->sdev     = NULL;
 	tty->full_dev = NULL;
 
-	ts = HXbtree_add(Ttys, reinterpret_cast(const void *, static_cast(long, dev)), tty);
-	if (ts == NULL) {
+	ret = HXmap_add(Ttys, id, tty);
+	if (ret < 0) {
 		free(tty);
 		notify(LOG_ERR, _("%s: Memory allocation failure\n"), __func__);
 		return NULL;
 	}
 
-	return ts->data;
+	return tty;
 }
 
 /*
@@ -100,7 +102,7 @@ void log_close(struct tty *tty)
 		 * IFP_ACTIVATED, as per definition. So we only need the data
 		 * structure if IFP_DEACTIVATED is on.
 		 */
-		HXbtree_del(Ttys, reinterpret_cast(const void *, static_cast(long, tty->dev)));
+		HXmap_del(Ttys, reinterpret_cast(const void *, static_cast(long, tty->dev)));
 		free(tty);
 	}
 }
