@@ -47,6 +47,16 @@ enum {
 	C_MAX,
 };
 
+/**
+ * @string:	initial escape code to match
+ * @striplen:	function to determine exact length to strip
+ */
+struct filter {
+	const char *string;
+	unsigned int (*striplen)(const char *, unsigned int);
+	unsigned int length;
+};
+
 /* Functions */
 static void mainloop(int);
 
@@ -55,7 +65,7 @@ static bool packet_process(struct rpldev_packet *, struct tty *, int);
 
 static void evt_open(struct rpldev_packet *, struct tty *, int);
 static void log_open(struct tty *);
-static void log_write(struct rpldev_packet *, struct tty *, int);
+static void log_write(struct rpldev_packet *, struct tty *, int, unsigned int);
 
 static int check_parent_directory(const hxmc_t *);
 static void fill_info(struct tty *, const char *);
@@ -83,7 +93,7 @@ static struct {
 	char *device;
 	long bsize;
 	int max_fd;
-	unsigned int dolog, infod_start;
+	unsigned int dolog, infod_start, filter_esc;
 	bool _running;
 } Opt = {
 	._running    = true,
@@ -92,6 +102,7 @@ static struct {
 	.dolog       = true,
 	.infod_start = false,
 	.max_fd      = -1, /* use system default */
+	.filter_esc  = true, /* filter deadly escapes */
 };
 
 //-----------------------------------------------------------------------------
@@ -293,11 +304,11 @@ static bool packet_process(struct rpldev_packet *packet,
 			return true;
 		case RPLEVT_READ:
 			tty->in += packet->size;
-			log_write(packet, tty, fd);
+			log_write(packet, tty, fd, packet->evmagic.n);
 			return true;
 		case RPLEVT_WRITE:
 			tty->out += packet->size;
-			log_write(packet, tty, fd);
+			log_write(packet, tty, fd, packet->evmagic.n);
 			return true;
 		case RPLEVT_LCLOSE:
 			log_close(tty);
@@ -417,8 +428,67 @@ static void log_open(struct tty *tty)
 	write(tty->fd, buf, s);
 }
 
-static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
+static inline unsigned int min2(unsigned int a, unsigned int b)
 {
+	return (a < b) ? a : b;
+}
+
+static unsigned int rpld_filter(char *buffer, unsigned int bufsize,
+    const struct filter *f)
+{
+	unsigned int len, size;
+	char *p;
+
+	for (; f->string != NULL; ++f) {
+		size = bufsize;
+		p = buffer;
+		while ((p = memchr(p, *f->string, size)) != NULL) {
+			size = buffer + bufsize - p;
+			if (f->length > size ||
+			    memcmp(p, f->string, f->length) != 0) {
+				++p;
+				size = buffer + bufsize - p;
+				continue;
+			}
+			len = (f->striplen == NULL) ? f->length :
+			      f->striplen(p, size);
+			if (len > size)
+				abort();
+			memmove(p, p + len, size - len);
+			bufsize -= len;
+			size -= len;
+		}
+	}
+
+	return bufsize;
+}
+
+static unsigned int xterm_mouse_filter(const char *buffer, unsigned int size)
+{
+	return min2(size, 6);
+}
+
+static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd,
+    unsigned int event)
+{
+	static const struct filter write_filters[] = {
+		/* VT100 identification request */
+		{"\033Z", NULL, 2},
+		/* X10 mouse reporting request */
+		{"\033[?9h", NULL, 5}, // ]
+		/* X11 mouse reporting request */
+		{"\033[?1000h", NULL, 8}, // ]
+		{NULL},
+	};
+	static const struct filter read_filters[] = {
+		/* Linux ident response */
+		{"\033[?6c", NULL, 5}, // ]
+		/* VT100 ident response */
+		{"\033[?1;2c", NULL, 7}, // ]
+		/* Xterm mouse codes */
+		{"\033[M", xterm_mouse_filter, 3}, // ]
+		{NULL},
+	};
 	char *buffer;
 	ssize_t have;
 
@@ -431,6 +501,7 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 		goto out;
 	if (have != packet->size)
 		packet->size = have;
+	buffer[have] = '\0';
 
 	/* flip it back */
 	packet->evmagic.n = cpu_to_be32(packet->evmagic.n);
@@ -439,6 +510,12 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 	packet->time.tv_sec  = cpu_to_le64(packet->time.tv_sec);
 	packet->time.tv_usec = cpu_to_le32(packet->time.tv_usec);
 	write(tty->fd, packet, sizeof(struct rpldsk_packet));
+	if (Opt.filter_esc) {
+		if (event == RPLEVT_WRITE)
+			have = rpld_filter(buffer, have, write_filters);
+		else if (event == RPLEVT_READ)
+			have = rpld_filter(buffer, have, read_filters);
+	}
 	write(tty->fd, buffer, have);
  out:
 	free(buffer);
@@ -762,6 +839,8 @@ static bool get_options(int *argc, const char ***argv)
 	struct HXoption options_table[] = {
 	        {.sh = 'D', .type = HXTYPE_STRING, .ptr = &Opt.device,
 	         .help = _("Path to the RPL device"), .htyp = _("file")},
+	        {.sh = 'E', .type = HXTYPE_VAL, .ptr = &Opt.filter_esc,
+	         .val = false, .help = _("Do not filter escape codes")},
 	        {.sh = 'I', .type = HXTYPE_VAL, .ptr = &Opt.infod_start,
 		 .val = true, .help = _("Make statistics available through socket")},
 	        {.sh = 'i', .type = HXTYPE_VAL, .ptr = &Opt.infod_start,

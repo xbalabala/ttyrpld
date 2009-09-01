@@ -27,6 +27,7 @@ Changes:
 - rpldev: FreeBSD 8.0 support
 - packet: increase the "size" field to 32 bits
 - packet: combine "magic" and "event" fields, and move to front
+- rpld: filter certain interruptive escape
 
 
 v2.52 (2008-09-07)
