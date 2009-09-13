@@ -90,7 +90,7 @@ static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
 /* Variables */
 static DECLARE_WAIT_QUEUE_HEAD(Pull_queue);
-static DECLARE_MUTEX(Buffer_lock);
+static struct semaphore Buffer_lock;
 static spinlock_t Open_lock;
 static char *Buffer = NULL, *BufRP = NULL, *BufWP = NULL;
 static unsigned int Bufsize = 32 * 1024;
@@ -127,6 +127,7 @@ static __init int rpldev_init(void)
 {
 	int ret;
 
+	sema_init(&Buffer_lock, 1);
 	spin_lock_init(&Open_lock);
 	kmi_miscinfo.minor = Minor_nr;
 	if ((ret = misc_register(&kmi_miscinfo)) != 0)
