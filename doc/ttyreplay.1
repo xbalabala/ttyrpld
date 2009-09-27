@@ -1,0 +1,112 @@
+.TH "ttyreplay" "1" "2009-09-28" "ttyrpld" "tty logging daemon suite"
+.SH "Name"
+.PP
+ttyreplay \(em realtime log file player
+.SH "Syntax"
+.PP
+\fBttyreplay\fP [\fB\-\-no\-pctrl\fP] [\fB\-Fft\fP] [\fB\-J\fP
+\fItime\fP|\fB\-j\fP \fIpackets\fP] [\fB\-S\fP \fIfactor\fP] [\fB\-T\fP]
+[\fB\-m\fP \fImsec\fP]
+.SH "Description"
+.PP
+ttyreplay is the tool to see \(em to replay \(em what has been captured by (the
+kernel module and) rpld. Give it any number of files you want to see again.
+Options apply to all files.
+.PP
+Without any arguments, ttyreplay will try to play STDIN if it is not a tty. The
+special file "-" (standalone dash) can be used to indicate STDIN, if STDIN is
+not the only file to play.
+.SH "Options"
+.TP
+\fB\-\-no\-pctrl\fP
+Disable play control. When play control is enabled, you can pause replaying,
+skip forwards, raise/lower speed. See below for more.
+.TP
+\fB\-F\fP
+Live feed follow mode. Seek to the end of the file and tail-follow any new
+contents that are written to it. This does the same as `tail -f` does with
+normal text logfiles.
+.TP
+\fB\-J\fP \fItime\fP
+Skim to time position before starting to play.
+.TP
+\fB\-S\fP \fIfactor\fP
+Plays the file back with a time warp of factor. 1.0 is normal time, 2.0 is
+twice as fast, 0.5 half speed, etc.
+.TP
+\fB\-T\fP
+Shows (replays) the log without any delays. This can be used to generate a
+screen log like script or screen (rpl logfile without any packet headers,
+basically) for easy grepping.
+.TP
+\fB\-f\fP
+Catch-up follow mode. Plays the file back from the start as usual and switches
+into \-F mode when EOF is reached.
+.TP
+\fB\-j\fP \fIcount\fP
+Skim \fIcount\fP packets before starting to play.
+.TP
+\fB\-m\fP \fImsec\fP
+Set the maximum delay in milliseconds that will be executed between packets.
+This check is done after the \-S option, so \-m1000 \-S2 will first crunch a
+delay request (from the logfile) by factor 2, and then see if it is more than 1
+second.
+.TP
+\fB\-t\fP
+Shows the timestamp at the top right corner. Note that this might not work with
+all terminals, because for one, not all support it, and second, the escape code
+is currently hardcoded (no terminfo use), so it may break on some strange
+terminal types.
+.TP
+\fB\-t \-t\fP
+\fB-t\fP will use "%H:%M:%S" as the format, while \fB\-tt\fP (or \fB\-t \-t\fP)
+uses "%d.%m %H:%M". The latter is useful for users on a tty which have been
+logged in across a day boundary.
+.SH "Player control"
+.PP
+While ttyreplay is running, you can use the following keys to interactively
+instruct ttyreplay to do something:
+.TP
+(spacebar)
+Toggle pause
+.TP
+< (less than)
+Move to the previous file. Note that this might not work if
+the previous one was a pipe, STDIN or similar, because such
+have been emptied already.
+.TP
+> (greater than)
+Move to the next file
+.TP
+y or z
+Multiply playing speed by factor 0.75
+.TP
+x
+Normal playing speed
+.TP
+c
+Multiply playing speed by factor 1.33
+.TP
+[
+Decrease playing speed by 0.10
+.TP
+]
+Increase playing speed by 0.10
+.TP
+(keypad) 6
+Skip forward 10 seconds
+.TP
+(keypad) 9
+Skip forward 60 seconds
+.TP
+q or Ctrl+C
+Quit
+.TP
+e
+Toggle ECHO mode, i.e. show EVT_READ packets (keypresses) as well, rather than
+just screen output. This is useful for echo-less (mostly password) prompts.
+.PP
+Skipping backwards is not implemented and is even impossible on pipes.
+.SH "See also"
+.PP
+\fBrpl\fP(5), \fBrpld\fP(8)

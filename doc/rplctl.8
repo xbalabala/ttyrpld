@@ -1,0 +1,126 @@
+.TH "rplctl" "8" "2009-09-28" "ttyrpld" "tty logging daemon suite"
+.SH "Name"
+.PP
+rplctl \(em control rpld
+.SH Syntax
+.PP
+\fBrplctl\fP [\fB\-t\fP] [\fB\-A\fP \fItty\fP] [\fB\-D\fP \fItty\fP] [\fB\-L\fP
+[\fItty\fP]] [\fB\-S\fP \fItty\fP] [\fB\-X\fP \fItty\fP] [\fB\-Z\fP
+[\fItty\fP]] [\fB\-f\fP \fIsocket\fP]
+.SH Description
+.PP
+The \fBrplctl\fP utility is used to query and control rpld (and its infod
+subcomponent). It will print info about the requested ttys, or all ttys
+currently monitored or optionized if no arguments are given.
+.PP
+rplctl will read the INFOD_PORT variable from rpld.conf by default, if not
+overriden by the \fB\-f\fP option.
+.SH Options
+.PP
+.TP
+\fB\-A\fP {\fItty\fP|\fB=\fP\fIMAJOR\fP\fB,\fP\fIMINOR\fP}
+Activate logging for the given tty. It can be a filename (which must exist) or
+a device number using "=MAJOR,MINOR".
+.TP
+\fB\-D\fP \fItty\fP
+Deactivate logging for the given tty.
+.TP
+\fB\-L\fP [\fItty\fP]
+Explicitly request a listing of all ttys currently active or have options set.
+If a tty is given, only display info for that particular one.
+.TP
+\fB\-S\fP \fItty\fP
+Deactivate logging for the given tty.
+.TP
+\fB\-X\fP \fItty\fP
+Close the tty's log file. rpld will open up a new one whenever new activity is
+detected (and logging this terminal is not deactivated) on that terminal.
+.TP
+\fB\-Z\fP [\fItty\fP]
+Zero all packet and byte counters, both of rpld and every single tty. If a tty
+is given, only zeroes the stats of that tty.
+.TP
+\fB\-f\fP \fIsocket\fP
+Path to the infod socket to connect to. The default is /var/run/.rplinfo_socket
+or INFOD_PORT in the rpld.conf configuration file.
+.TP
+\fB\-t\fP
+Generate output suitable for sscanf(), split() or anything that deals best with
+simple text strings. See below for details on the output format.
+.SH "Example output"
+.PP
+rplctl without arguments could print:
+.PP
+.nf
+A TTY      BYTES IN     OUT FILENAME
+========================================================
+  (bytes)      2159   81129 ttyrpld 2.52/Linux
+  (packets)      14     250
+--------------------------------------------------------
+D tty7          937       0 root/20050328.224208.tty7
+D pts-1           0     586 boinc/20050328.224219.pts-1
+D pts-2           0    5812 root/20050328.224208.pts-2
+D pts-3         358   22113 root/20050328.224208.pts-3
+D pts-4         864   52618 root/20050328.224341.pts-4
+--------------------------------------------------------
+.fi
+.PP
+The status field (A) can be one of \fBA\fP, \fBD\fP or \fBS\fP: Activated,
+Deactivated, Deactived for this Session.
+.SS "sscanf format"
+.PP
+On the other hand, `rplctl -t` could produce this:
+.PP
+.nf
+ttyrpld 2.52
+format 4
+0 144 143 0 3347 2496 3756 122881 0 0
+D 4 7 tty7 1507 0 /var/log/rpl/root/20050328.224208.tty7
+D 136 1 pts-1 0 1241 /var/log/rpl/boinc/20050328.224219.pts-1
+D 136 2 pts-2 0 7585 /var/log/rpl/root/20050328.224208.pts-2
+D 136 3 pts-3 365 22798 /var/log/rpl/root/20050328.224208.pts-3
+D 136 4 pts-4 1884 91257 /var/log/rpl/root/20050328.224341.pts-4
+.fi
+.PP
+The first line of the "parseable" output (-t) is the program used. It can (and
+should) be ignored by programs querying infod. The second is the status line
+about rpld. The sscanf formula is "%lu %lu %lu %lu %llu %llu %lu %lu". The
+fields are (in this order):
+.IP \(bu 4
+EVT_OPEN \(em number of open() operation on any tty
+.IP \(bu 4
+EVT_LCLOSE \(em final tty closes
+.IP \(bu 4
+EVT_READ \(em payload bytecount
+.IP \(bu 4
+EVT_WRITE \(em payload bytecount
+.IP \(bu 4
+EVT_READ \(em packets read from rpldev
+.IP \(bu 4
+EVT_WRITE \(em packets read from rpldev
+.IP \(bu 4
+packets considered bad (i.e. bad magic) \(em might be more than there are
+actually damaged, because the algorithm needs to find something that looks
+good.
+.PP
+All other lines are tty information lines, whose formula is "%c %ld %ld %s %llu
+%llu %s", and the fields are:
+.IP \(bu 4
+status \(em 'A' for activated, 'D' is deactivated and 'S' means deactivated
+until session ends.
+.IP \(bu 4
+major number
+.IP \(bu 4
+minor number
+.IP \(bu 4
+mnemonic string for the major/minor number
+.IP \(bu 4
+EVT_READ payload bytecount
+.IP \(bu 4
+EVT_WRITE payload bytecount
+.IP \(bu 4
+full filename being written to (this is different from the human-readable
+output which only shows it in part)
+.SH "See also"
+.PP
+\fBrpld\fP(8)

@@ -3,15 +3,11 @@
 ACLOCAL_AMFLAGS  = -I m4
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-if GOT_TOOLS_FOR_DOC
-doc_subdir       = doc
-endif
-
 if GOT_TOOLS_FOR_LOCALE
 locale_subdir    = locale
 endif
 
-SUBDIRS          = dist/suse etc user $(doc_subdir) $(locale_subdir)
+SUBDIRS          = doc dist/suse etc user $(locale_subdir)
 
 tmpdir := $(shell mktemp -dtu)
 packer  = bzip2

@@ -1,0 +1,137 @@
+.TH "rpld" "8" "2009-09-27" "ttyrpld" "tty logging daemon suite"
+.SH "Name"
+.PP
+rpld \(em tty logging daemon
+.SH Syntax
+.PP
+\fBrpld\fP [\fB\-IQsv\fP] [\fB\-D\fP \fIdevice\fP] [\fB\-O\fP \fIofmt\fP]
+[\fB\-U\fP \fIuser\fP] [\fB\-c\fP \fIconfigfile\fP]
+.SH Description
+.PP
+rpld is the user-space daemon that reads /dev/rpl and plexes the data to
+different files depending on which tty they were logged. It also adds a
+timestamp so that replaying can be done in real-time.
+.SH Options
+.PP
+.TP
+\fB\-D\fP \fIdevice\fP
+Path to the rpl device, e.g. \fB/dev/rpl\fP.
+.TP
+\fB\-I\fP
+Start the infod component if it is not automatically started when the
+INFOD_START configuration variable is set.
+.TP
+\fB\-O\fP \fIofmt\fP
+Overrides the hardcoded and configuration file values (processed so far) for
+the log file naming scheme. You can use the printf-like placeholders explained
+below. Subsequent \fB\-c\fP options may override this, if an OFMT variable is
+found in further configuration files. Make sure the user can create files
+according to \fIofmt\fP.
+.TP
+\fB\-Q\fP
+All ttys start in deactivated mode (rather than activated). They can then be
+activated when needed. Byte-counting is done in either case.
+.TP
+\fB\-U\fP \fIuser\fP
+Drop all privilegues and change to \fIuser\fP after initialization (memory lock,
+creating and opening RPL device). This can be either a username or a numeric
+UID.
+.TP
+\fB\-c\fP \fIfile\fP
+Load configuration variables from \fIfile\fP. The in-memory copies of the
+variables are not changed if no such var name is found in the file. Unknown var
+names in the configuration file are also ignored.
+.TP
+\fB\-s\fP
+Print warnings and error messages to syslog rather than stderr.
+.TP
+\fB\-v\fP
+Print statistics about recorded packets on stdout while rpld is running. This
+option overrides \fB-s\fP.
+.SH "Privilege separation"
+.PP
+rpld offers the possibility to change to another user's identity after the
+initialization phase is complete. The default package (from ttyrpld.sf.net)
+uses the daemon user. You can change this in the configuration file.
+.SH "Logging"
+.PP
+\fBrpld\fP does not detach itself to help debugging, but using the
+\fBstartproc\fP(8), \fBsetsid\fP(1) starter tools or bash's disown builtin can
+help bringing it in the background, if you need to. The only time when the
+daemon will output something is either during initialization or when there is
+really trouble, like memory allocation failure. In either case, error messages
+are rare and you would not need to worry about redirecting stderr.
+.PP
+You can run rpld with the \-v option to enable printing statistics on stdout.
+Even if you do not have \-v specified, you can send rpld a SIGALRM signal to
+make it print the current statistics. That of course only makes sense when
+stdout is connected to something but /dev/null or /dev/zero. You can send it
+multiple SIGALRMs, of course, but you should consider using \-v then, maybe.
+The statistics are printed with the move-to-beginning-of-line character (\r),
+which is not that suitable for logging, though.
+.PP
+Basically, every tty is monitored, but certain kinds are excluded, like the
+master sides of BSD (major number 2 (Linux), 6 on BSD) and Unix98 ptys (major
+number 128), because they are just a mirror of their slave sides with things
+turned around and are rarely useful. (On BSD, they are not explicitly excluded
+because they do not seem to generate any data.)
+.PP
+rpld will divert logging of a tty to a new file when the tty inode is opened
+the next time and if the owner of it has changed. This will make logins on
+/dev/ttyN go to the right file. Note that \fBsu\fP(8) does not change the
+ownership, so both sessions (normal and su'ed) will go into the same file. (And
+that is good, because it then logs by "real person" rather than login name.)
+The byte count statistics are zeroed upon change detection.
+.SH "Configuration file".
+.PP
+rpld starts with its hardcoded defaults, then tries to read
+\fB/etc/rpld.conf\fP and finally \fBrpld.conf\fP in the directory where the
+rpld binary is in.
+.PP
+Configuration files have a simple KEY=VALUE syntax. Empty lines, lines
+beginning with a hash mark (#) or unrecognized keys are ignored.
+.TP
+\fBDEVICE=\fP\fIdevice\fP
+List of possible rpl devices, separated by space. The default is "/dev/misc/rpl
+/dev/rpl".
+.TP
+\fBOFMT=\fP\fIformat\fP
+OFMT combines the directory to write the tty recordings into (relative to the
+working directory of rpld) and the name of the log files. Note that the working
+directory of rpld depends on where it was started from, e.g. with startproc,
+the CWD is mostly the root path (/). It is wise to use absolute paths here. The
+available printf-style tags are below.\(em Directories will be created as
+needed (if permission allows). Thus, you can have /var/log/rpl/%u/%d.%t.%l, and
+it will automatically create %u, provided that /var/log/rpl is writable for the
+user running rpld.
+.TP
+\fBUSER=\fP\fIuser\fP
+User to change to after all initialization. Make sure that the user can create
+files according to OFMT.
+.TP
+\fBSTART_INFOD=\fP\fIyes\fP|\fIno\fP
+Starts the infod component which makes statistics available to \fBrplctl\fP(8).
+.TP
+\fBINFOD_PROT=\fP\fIpath\fP
+Specify the path of the socket which infod provides for clients. The default
+value is /var/run/.rplinfod_socket.
+.SS "OFMT tags"
+.PP
+.TP
+\fB%d\fP
+Time when tty was opened (usually when someone logs in or an xterm was opened).
+In "YYYYMMDD" format.
+.TP
+\fB%l\fP
+Terminal (line) the user logged on. The string is taken from a string database.
+Typical strings are tty* for virtual consoles, pts-* for pseudo-terminals,
+ttyS* for serial lines. If there is no matching string entry, the device number
+is used in square brackets, e.g. [240:0].
+.TP
+\fB%u\fP
+User who owned the tty when it was opened. If the device could not be
+stat(2)'ed, %u will be substituted by "NONE". If the UID could not be
+translated into a name, the UID is spit out instead.
+.SH "See also"
+.PP
+\fBttyreplay\fP(1), \fBrplctl\fP(8)

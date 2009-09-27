@@ -17,18 +17,7 @@ AC_PATH_PROG([MSGFMT], [gmsgfmt])
 if [[ -z "$MSGFMT" ]]; then
 	AC_PATH_PROG([MSGFMT], [msgfmt])
 fi;
-AC_PATH_PROG([PERL], [perl])
-if [[ -z "$PERL" ]]; then
-	AC_PATH_PROG([PERL], [perl5])
-fi;
-AC_PATH_PROG([PHP], [php5])
-if [[ -z "$PHP" ]]; then
-	AC_PATH_PROG([PHP], [php])
-fi;
-AC_PATH_PROG([W3M], [w3m])
 
-AM_CONDITIONAL([GOT_TOOLS_FOR_DOC],
-	[$am_make -v | grep -q GNU && test -n "$PERL" -a -n "$PHP" -a -n "$W3M"])
 AM_CONDITIONAL([GOT_TOOLS_FOR_LOCALE],
 	[$am_make -v | grep -q GNU && test -n "$MSGFMT"])
 
@@ -45,5 +34,5 @@ AC_SUBST([rpld_LIBS])
 AC_CONFIG_FILES([Makefile dist/debian/rpld
 	dist/suse/Makefile dist/suse/rpld
 	etc/Makefile user/Makefile
-	doc/GNUmakefile locale/GNUmakefile])
+	doc/Makefile locale/GNUmakefile])
 AC_OUTPUT

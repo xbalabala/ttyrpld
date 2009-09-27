@@ -1,0 +1,108 @@
+.TH "rpldev" "4" "2009-09-27" "ttyrpld" "tty logging daemon suite"
+.SH "Name"
+.PP
+rpldev \(em tty logger kernel module
+.SH Description
+.PP
+\fB/dev/rpl\fP is a character device file which returns the data
+captured from ttys through the rpldev kernel module. It has no fixed
+device number, since it asks for a dynamic major/minor number. The
+Kernel module will emit a notice where it actually landed. The kernel
+hotplug framework and udev will then create a device node in /dev.
+.PP
+On FreeBSD, devfs takes care of all this, so when the module is
+loaded, a working /dev/rpl is also present. For OpenBSD and NetBSD,
+it always loads at char(228,0). Use `\fBmknod /dev/rpl c 228 0\fP` to
+create the node. It should be made mode 0400 and owned by the
+low-privileged user that is set in rpld.conf.
+.SH "Module parameters (Linux)"
+.PP
+The rpldev module has the following options. Some of them may be
+changed dynamically at run-time via /sys/module/rpldev/.
+.TP
+Bufsize
+Size of the ring buffer in bytes. Default is 32K.
+.TP
+Minor_nr
+Force a minor number rather than automatically deciding for one. Passing 255
+here will use auto-selection, and is the default.
+.PP
+These options can be provided to modprobe like this:
+.PP
+.nf
+	# modprobe rpldev Minor_nr=37
+.fi
+.PP
+You can put the options into /etc/modprobe.conf.local, to be
+automatically sourced when modprobe is called:
+.PP
+.nf
+	options rpldev Minor_nr=37
+.fi
+.PP
+I have not found any way for passing or modifying options under BSD,
+so unless you are willing to recompile the kernel, you are stuck with
+a fixed 32K buffer.
+.SH "Data structures"
+.PP
+Everytime the kernel functions for reading/writing from/to a terminal
+are executed, the call chain is extened into the rpldev hooks, i.e.
+an external function in the rpldev kernel module is called, which
+transfers the tty buffer into so-called packets, which are then
+returned as /dev/rpl is read.
+.PP
+A packet consists of a device number, magic byte (always 0xEE), size
+of the data, timestamp, and of course, the data itself. All fields
+are little-endian and packed, i.e. there are no alignment gaps. It
+can be represented in this C struct:
+.PP
+.nf
+struct rpltime {
+	uint64_t tv_sec;
+	uint32_t tv_usec;
+};
+
+struct rpldev_packet {
+	uint32_t dev;
+	uint16_t size;
+	uint8_t event, magic;
+	struct rpltime time;
+} __attribute__((packed));
+.fi
+.PP
+The data itself is actually not included in the struct, since it is of dynamic
+length. For further reference, the struct alone will be called packet header,
+whereas packet header plus data (or payload) equals packet. There are no
+byte-aligning gaps between the members, i.e. it is a so-called packed
+structure.
+.PP
+The \fIdev\fP member contains the device number on which the event occurred.
+Since both the master and the slave side of a pty pair can generate events, and
+we usually do not need the master side events, packets from the master sides
+are already dropped at the kernel level.
+.PP
+The device field is made up of 12 bits for the major number and 20 bits for the
+minor number, in little-endian, and has this very same layout on all rpldev
+architectures. (For reference, this 12/20 split comes from Linux 2.6.) BSD
+rpldev will convert device numbers to this scheme. As a result, a truncation is
+involved, since BSD uses an 8/24 split, so minors greater than 1048575 will be
+truncated. This should not pose a problem, as one million devices is already
+more than a system could ever have in a meaningful way.
+.PP
+The following event types exist:
+.IP \(bu 4
+EVT_OPEN = 0x01
+.IP \(bu 4
+EVT_READ = 0x02,
+.IP \(bu 4
+EVT_WRITE = 0x03,
+.IP \(bu 4
+EVT_LCLOSE = 0x64,
+.PP
+EVT_OPEN, EVT_READ and EVT_WRITE are generated whenever an open(), read() or
+write() is done, respectively. EVT_LCLOSE is generated when the last file
+descriptor to the tty is closed.
+.PP
+During an open() on a tty line (Linux only), the filename of the accessed
+dentry is extracted and passed to rpld within the payload, for convenience, so
+that \fBrpld\fP(8) does not need to do a time-consuming search for it in /dev.
