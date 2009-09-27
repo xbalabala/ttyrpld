@@ -1,0 +1,719 @@
+
+Notes
+=====
+
+You do not need to repatch your kernel or recompile rpldev if they have not
+changed significantly between ttyrpld releases.
+
+│                │last time kpatch│                            │
+│Operating system│(rpldhk) changed│last time rpldev changed:   │
+├────────────────┼────────────────┼────────────────────────────┤
+│Linux           │2.50            │2.50                        │
+│FreeBSD         │2.50            │2.50                        │
+│OpenBSD         │2.50            │modules not really supported│
+│NetBSD          │2.50            │2.50                        │
+
+
+Changelog
+=========
+
+HEAD
+
+Changes:
+- doc: move changelog to text/plain
+
+
+v2.52 (2008-09-07)
+
+  • Updated kernel components for Linux 2.6.27
+  • Updated userspace code for libHX 1.25
+
+v2.51 (2008-05-15)
+
+  • Updated rpldhk and rpldev for Linux 2.6.25, OpenBSD 4.3, FreeBSD 7.0,
+    NetBSD 4.0
+
+v2.50 (2008-01-01)
+
+  • changed the packet format to be compatible between 32-bit and 64-bit
+  • added rplcvt utility for converting old on-disk rpld files
+  • explicitly blacklist /dev/stdout, /dev/stderr and /dev/stderr - these have
+    been popping up as tty names because there is such a symlink in Linux's /
+    dev. (But we need symlink processing for Solaris, eww.)
+
+v2.19 (2007-09-17)
+
+  • The kernel interface has been reduced (hooks removed). The 2.19 userspace
+    is still compatible (throws warnings though) with 2.18 kernel components
+    however. The 2.19 kernel patch is for 2.6.22.
+  • an experimental Solaris kernel driver has been added - tested with Solaris
+    11.snv only, but may work with older ones.
+  • fix a file descriptor leak in rpld (thanks J.Eller)
+  • fix a symlink recursion when walking /dev (J.Eller)
+  • raise maximum number of open files (J.Eller)
+  • handle permission restrictions on /dev nodes
+  • fix directory name of Persian translation
+  • moved to autotools
+  • build with new libHX 1.10
+
+v2.18 (2006-07-01)
+
+  • Fixed OpenBSD 3.9 kpatch
+  • Readded workaround for OpenBSD/NetBSD EINTR signal handling that got lost
+    in 2.17
+
+v2.17 (2006-06-19)
+
+  • Support for Linux 2.6.17, FreeBSD 6.1, OpenBSD 3.9
+  • added missing -fprofile-arcs -ftest-coverage to LDFLAGS for PROF=1
+
+v2.16 (2006-04-01)
+
+  • user/rpld.c: removed a superfluous variable
+  • Added polling functions to the BSD rpldevs. This fixes the high CPU usage
+    (which is due to the implementation of pthreads on OpenBSD) observed with
+    rpld/OpenBSD.
+  • OpenBSD part is again just a patch since modules are said to be unsupported
+    on non-i386
+  • Due to popular request, the docs now come with a black-on-white ("paper
+    color") color scheme and no fixed font size. The old gray-on-black
+    ("console color") is available as an alternate stylesheet and can be used
+    in Firefox using View > Page Style > Black background.
+  • Added the EVT_MAGIC pseudo event type
+  • Added share/ttyrpld.magic for the file(1) utility
+
+v2.15 (2006-03-11)
+
+General:
+
+  • added support for NetBSD 3.0
+  • shifts for majors>255 and minors>255 were broken in include/dev.h
+
+kpatch:
+
+  • [All] fixed some SMP race conditions
+  • [OpenBSD] fixed: rpl_deinit() was not called in ttyclose()
+
+rpldev:
+
+  • [All] rename functions to make function more clear (mv_to_user ->
+    circular_get, mv_buffer -> circular_put_packet, mv_buffer2 -> circular_put)
+  • [All] make avail_R() and avail_W() return size_t instead of ssize_t,
+    addressing some potential overflow problems
+  • [Linux] document circulary calculation of avail_*(), please report errors
+  • [FreeBSD] merged freebsd-*/rpldev.c into one file
+  • [FreeBSD/OpenBSD] removed SKIP_PTM, since master ptys do not generate any
+    noise (that's a kpatch feature)
+  • [OpenBSD] rpldev is now a module (rpldev_mod.o)
+  • [OpenBSD] loads at new device number (228,0), please re-mknod your /dev/rpl
+    node
+
+v2.12 (2006-01-21)
+
+  • fixed: FreeBSD 6.0 hands krpl_close() a NULL pointer in some cases; handle
+    it properly
+  • some doc updates
+  • GNUmakefile: "all" target does not include "doc" anymore, because BSDs
+    (standard installation) often ship without php, w3m and perl.
+  • added the '[' and ']' keys to ttyreplay (lower/raise speed by 0.10)
+
+v2.11 (2006-01-06)
+
+Added support back in for the latest releases of the previous generation of
+kernels. For Linux, that's 2.4.something (USE DISCOURAGED!), and for FreeBSD
+that's 5.3.
+
+v2.10 (2005-12-04)
+
+Support for OpenBSD 3.8 and FreeBSD 6.0 was added; permission denied, syslog
+spamming, cpu hog, ownership and symlink recursion bugs were fixed. Docs were
+updated to reflect advances since the last seven releases.
+
+  • Support for OpenBSD 3.8 and FreeBSD 6.0
+  • Documentation has been updated to reflect advances since the last seven
+    releases.
+  • user/replay.c: fixed a color bug when -t was active (spotted whilst under
+    FreeBSD)
+  • user/*.c: use usleep(10000) instead of sched_yield() to reduce idle cpu hog
+  • user/rpld.c: umask was set wrong, so 1.) logging did not take place 2.)
+    syslog was spammed with permission denied warnings
+  • user/rpld.c: added a rate limiter for syslog messages
+  • user/rpld.c: find_devnode_dive() forgot to check for symlinks so that we
+    dived into /dev/fd, which is not wanted, because /dev/fd/* itself includes
+    /dev again, which lead to unwanted results.
+  • user/rpld.c: fixed a filedescriptor leak in fill_info()
+  • user/rpld.c: another try at getting ownerships right; rpld still had a case
+    where the recorded owner differed from the owner of the /dev node (with
+    respect to the design decision). See one below:
+  • linux-2.6/rpldev.c: /dev/tty is a special case with respect to ownerships,
+    so it must be filtered out in krpl_init() and krpl_open().
+  • using distribution-closer macros in specfile (e.g. %_bindir instead of /usr
+    /bin)
+
+v2.06 (2005-11-03)
+
+This release was not publicly announced and rather served as a testbed, because
+new bugs were expected.
+
+  • update to libHX 1.7.x
+  • rpld: added EVT_ID_STAMP containing the user and date the log was recorded
+  • fixed: ttyreplay: argv[0] -- the program name, was also tried being
+    replayed
+  • ttyreplay: pctrl was not processed while waiting for more input data
+
+v2.03.5 (2005-10-08)
+
+  • update to libHX 1.6.2+
+
+v2.03.4 (2005-09-22)
+
+  • check_gcc macro gave a warning under *BSD because "@gcc" could not be
+    found -- strange that it did not under Linux. Fixed anyway by reordering.
+  • upstream upgrade: libHX 1.6.1
+  • linux-2.6/rpldev.c: proper error propagation to userspace in mv_to_user()
+
+v2.03 (2005-07-27)
+
+  • updated locales
+  • new postal FSF address
+  • Support for: OpenBSD 3.7, FreeBSD 5.4, FreeBSD 6.0-beta1, (PCBSD 0.7.8)
+
+v2.02 (2005-07-07)
+
+  • update to libHX 1.5.3
+  • the correct locale name for the Persian translation is fa_IR, not ar_IQ
+  • compilation: simpler dependency generation model
+  • ripped popt out, and replaced it by HX_getopt
+  • support for OpenBSD 3.7
+  • fixed: printf("It won't be possible ...") was given an uninitialized string
+  • corrected: OpenBSD: ptc data was only discarded on i386
+  • corrected: OpenBSD: tty data was enqueued into the ring buffer even if /dev
+    /rpl was not open
+  • patch from Nguyen Anh Quynh to have the Makefiles find out whether
+    -funit-at-a-time is supported
+
+v2.01 (2005-05-31)
+
+  • update to libHX 1.5.0 (so.0.5)
+  • some translation updates (by far not complete)
+
+v2.00 (2005-03-29)
+
+kpatch:
+
+  • support for Linux 2.4.29, 2.4.30-rc3
+  • support for 2.6.11, 2.6.11.*, 2.6.12-rc1 and 2.6.11.4-SUSE_9.3
+  • support for OpenBSD 3.6
+
+rpld:
+
+  • support for OpenBSD 3.6
+  • support for dynamic major/minor device numbers of the ttys
+  • supports "-" as an alias for /dev/stdin for -D option
+  • device path is now recorded into logfiles
+  • ttys will now also show up in rplctl if they have just been touched, i.e.
+    open()ed. There was a misconception where a /dev/pts/ entry existed, but
+    were not listed -- it was not a bug, but kwrite (kde "talk") that just
+    opened it without using it.
+  • -Q now sets all tty channels to IFP_DEACTIVATE, which means that they can
+    be activated on a per-tty basis. (Before, the logfile always was /dev/null
+    which did not leave much room for activation.)
+  • byte counters continue to count even if tty is in IFP_DEACTIVE or
+    IFP_DEACTIVSES
+  • infod: now uses 'A', 'D' and 'S' for both text and parseable formats;
+    format number bumped to 3
+  • fixed: include/dev.h did not handle *BSD device numbering
+
+rplctl:
+
+  • fixed a "Broken pipe" which only showed up on *BSD -- it was not critical,
+    but now the cosmetics fit again
+
+rpldev:
+
+  • timestamping is now done within kernelspace, it is more efficient there
+    than it is in userspace
+  • added ioctls RPL_IOC_IDENTIFY, RPL_IOC_SEEK, RPL_IOC_FLUSH (because *BSD
+    lack seek handling on char devs), so it must be synthesized
+
+  • [Linux 2.4] fixed: could not compile because of tty->driver->major in
+    PTY_MASTER; tty->driver.major is correct
+  • [Linux] send filename on kio_init()/kio_open()
+
+  • [FreeBSD] fixed: device could not be reopened when malloc failed
+  • [FreeBSD] implemented uio_ioctl()
+
+v1.44.2 (2005-02-10)
+
+  • update to libHX-0_3 (needs at least 20050206)
+  • fixed: kpatch/freebsd-5.3.diff patched sys/conf.h in a way that could have
+    possibly led to a memory corruption within the kernel
+  • fixed: LDFLAGS was missing -pg in profiling mode
+  • fixed: CFLAGS was missing -fno-omit-frame-pointer in profiling mode, being
+    unable to compile (gcc exits with an error-warning)
+  • works with Linux 2.4.28 (vanilla) and 2.6.10 (vanilla)
+  • added ROOT and PREFIX makefile vars
+  • providing RPM packages for the userspace parts now. (kmod sources in /usr/
+    src/ttyrpld-x.yy-kd/)
+  • added /usr/sbin/rcrpld as a symlink to /etc/init.d/rpld (rpm only)
+
+v1.44 (2005-01-20)
+
+linux-2.*/rpldev.c:
+
+  • fixed a one-off bug, where lseek() allowed to jump to e.g. 0x10000 (when
+    Bufsize is 64K) -- that's invalid, 0x0ffff is the last valid position. this
+    had caused rpld to exit without an apparent reason.
+
+FreeBSD is not affected.
+
+other:
+
+  • minor changes to the docs
+  • --chkconf option removed, md5 checking does not work like it was thought:
+  • if /etc/rpld.conf already exists, it is not overwritten
+
+v1.42 (2005-01-11)
+
+The long-awaited translations are in! Includes: ar_IQ (Persian-Farsi) [sic;
+fa_IR], de, es, fr, it, nb, nl and sv.
+
+linux-2.*/rpldev.c:
+
+  • changed Open_lock scheme so that no mutex is held upon return to userspace
+  • lseek() on the device will now change atime -- because we really slurp data
+    rather than skipping it; it is lost after skip
+
+freebsd-5.3/rpldev.c:
+
+  • kio_ioctl() has been implemented
+
+misc:
+
+  • fixed USER= in rpld.conf which became "root" by accident, also, START_INFOD
+    = is now "yes" again
+  • updated docs with more BSD-specific stuff
+
+v1.40 (2004-12-24)
+
+  • added support for FreeBSD 5.3
+  • added support for I18N
+
+v1.31 (2004-12-20)
+
+rpld:
+
+  • fixed crash when /sys/module/rpldev/Minor_nr does not exist and /proc/misc
+    is being tried to read
+
+rpldev:
+
+  • kio_{init,open,read,write,ioctl}() now prepare data even more; they skip
+    pty master data and transform the weird logic (as with EVT_DEINIT) to
+    normal. This might reduce the CPU usage of rpld.
+  • kio_{read,write}(): do not write zero-length data into ring buffer
+  • fixed a NULL pointer dereference Oops which occurred when misc_register()
+    failed
+  • fixed kernel memory corruption in mv_buffer2() and mv_to_user() when count=
+    =x
+  • added missing Buffer_lock locks in uio_{open,close}()
+  • struct {rpld,mem}_packet.dev2 member has been obsoleted again
+
+other:
+
+  • etc-init.d-rpldev: fixed typo
+
+v1.26 (2004-11-23)
+
+rpld:
+
+  • pty master sides were also counted, which lead to correct but weird big
+    numbers in the totale "BYTES IN" field in rplctl
+
+infod:
+
+  • fixed: doing rplctl -L on a tty which did not have a logfile associated
+    crashed rpld (this was due to basename_pp(), introduced in 1.24)
+  • fixed: not all stats were zeroed
+  • added per-tty zeroing
+
+rplctl:
+
+  • fixed: COMPAT_MAJOR and COMPAT_MINOR macros were broken
+  • -L and -Z can now optionally accept a single tty
+  • removed -F option (infod code and doc part was removed long ago)
+
+rpldev:
+
+  • now compiles with GCC 3.4
+  • removed overrun warning
+
+other:
+
+  • fixed: etc-init.d-rpld was copied to /etc/init.d/etc-init.d-rpld rather
+    than /etc/init.d/rpld
+  • make install will not overwrite /etc/rpld.conf if it is modified
+
+v1.24 (2004-11-18)
+
+rpld:
+
+  • internal: device number fixup has been moved to rpldev
+  • support for /sys/module/rpldev has been added
+  • added compat-style dev_t support (COMPAT_* in include/dev.h)
+  • better device number differentiation for different kernel versions (i.e.
+    only minor 128 for 2.6, while 128...143 for 2.4 (for ptms))
+  • unlink() before mknod()
+
+rpldev:
+
+  • its Makefile has been changed to also take a variable KERNEL_DIR and
+    MODULES_DIR
+  • using new module_param() for 2.6 environment
+  • added check for endianesses which are neither little nor big
+  • added the WOverrun flag controlling warning messages about buffer overrun
+
+kpatch:
+
+  • added kpatch/2.0.40.diff and kpatch/2.2.26.diff, maybe it is not useful but
+    it is there for completeness
+
+doc:
+Countless minor (sometimes major) adjustments.
+
+  • desc: Staying in sync with the short desc and trove cat'gz. set on SF
+  • desc: Listing the four core components
+  • install: building notes for 2.4 and before
+  • rpldev(4): mentioning /sys things
+  • support: largely rewritten to include the new things: FRS/SF, Patches and
+    Feature Request Tracker, Mailing Lists
+
+v1.21 (2004-11-13)
+
+rpld:
+
+  • corrected condition inversion in G_skip()
+  • redesigned the locking scheme (which is needed between rpld<->infod) down
+    to one big lock (which is also taken less in certain places).
+  • log_write() now uses a one-shot read
+  • will now automatically create parent directories if needed (like mkdir -p)
+  • sets umask so that the maximum permissions are -wx------
+  • added -i option (counter -I)
+
+infod:
+
+  • FLUSH request has been dropped, entries are automatically flushed by rpld
+  • display of file descriptor has been removed
+
+rplctl:
+
+  • option change: -D => -S (close until session ends / tty is deinitialized),
+    -J => -D (deactivate total)
+
+rpldev:
+
+  • (big-endian only) fixed my_swab() [had count=={16,32,64} instead of
+    {2,4,8}]
+
+ttyreplay:
+
+  • outsourced the EVT_WRITE branch from replay_file() into e_proc()
+  • added the echo key to also show EVT_READ packets
+  • fixed a possible loss of precision in the "i->factor != 1.0" branch (added
+    (double) explicit conversion)
+  • replaced "packet skipping" with read_through() because otherwise screen
+    initializations might be missing
+
+doc:
+
+  • rpl(4) moved to rpl(5) -- now it's in the appropriate category
+  • fixed some spellings, constructs and etc.
+  • took out some old paragraphs and
+  • removed doc/design.txt, it was already in ttyrpld(7)
+  • updated docs with new stuff, check it out!
+  • new design
+
+Makefile:
+
+  • MARCH and MCPU variables have been taken out, superseded by EXT_CFLAGS
+  • "kmod" target will now rmmod rpldev before reloading it
+
+v1.13.1 (2004-11-03)
+
+  • Removed stray .orig file in kpatch/
+  • added kpatch/2.6.9-vanilla
+  • added a workaround for GCC >= 3.4 which has problems with inline
+
+v1.13 (2004-11-02)
+
+Ttys still were not closed for some reasons, so that once opened ttys dev
+numbers would never be logged again, or at least <...> anyway something was
+wrong. And it was due some bad code in UML... I relied on, sigh.
+
+Anyway, it's corrected now. And it was painstaking to find the right spots
+myself, because actually UML placed a CLOSE where an OPEN should have been.
+OTOH, UML already had a OPEN, so I had two of them. Which lead me to the
+conclusion to redesign it a little bit.
+
+rpld/rpldev:
+
+  • changed the EV_ constants to EVT_ to avoid clashes with ELF code
+  • new EVT_{INIT,OPEN,CLOSE,DEINIT} event types
+  • the event type and magic bytes have not been touched since the on-disk
+    format (as generated by rpld) remains the same, it's just a change between
+    the "protocol" used between rpldev and rpld.
+  • .dev2 member has been added to the struct rpld_packet
+  • struct {rpld,mem,disk}_packet are now overall tagged with PACKED
+
+rpldev:
+
+  • new krn_{init,deinit}()
+  • tagged certain vars as __user
+  • properly including <linux/compiler.h> or defining __user to nothing
+  • removed unnecessary byteswap operations (only relevant for big-endian)
+
+kpatch:
+
+  • new patch against 2.6.9-rc2
+
+v1.01 (never actually released)
+
+infod:
+
+  • changed the protocol to allow requests with "void", "int" and "string"
+    parameters
+
+rplctl:
+
+  • option parser behavior changed: -tL (-t -L) is now different from -Lt (-L
+    -t) in that the order is significant... in -Lt, -L is executed before -t so
+    it would still show readable text rather than parseable.
+
+other:
+
+  • added one more block to the legal statement
+  • added ETCINITD_QUIET to rpld.conf
+  • corrected the make clean target for "kernel-2.6" directory so that it
+    continues to work when something changes in the kernel tree
+
+v1.00 (2004-09-26)
+
+New edict: if I don't explicitly say "you need to/should upgrade the rpldev
+kernel module" under "rpldev:" in this Changelog, then you don't need to!
+(Though, you always can. It's just a module and a cheap recompile without
+reboot.)
+
+rpld:
+
+  • will continue starting rpld even if config file could not be read
+  • warning message if the RPL device returns EBUSY
+  • fixed: /var/run/.rpldev was not unlinked if it could not be opened
+
+infod:
+
+  • the parsetext (rplctl -t) "status field" has been changed: from (A, D, S)
+    to (A, J, D) to reflect the rplctl switches
+  • will now print a '?' as status character if something got us corrupted
+
+ttyreplay:
+
+  • will now assume to play STDIN if no filenames are given and STDIN really is
+    a pipe/file/etc. (anything but terminal)
+  • jumping to a given position (-J and -j) will now print the packets'
+    contents to properly display e.g. graphical applications
+  • added play controls (forward 10/60 sec, pause, slower/faster playback, prev
+    /next file, see DOCS!)
+  • displays the timestamp during replay (-t option)
+
+rpldev:
+
+  • worked around: the device driver could not be opened with 2.6.8 due to
+    2.6.8's new seeking design
+  • removed the debugging messages "RPL device opened" and .."closed"
+
+etc-init.d-ttyrpld:
+
+  • now uses the "install paths", i.e. /usr/local/sbin/ rather than /usr/lib/
+    ttyrpld
+  • can work independent of /etc/rc.status (sometimes only to be found on SUSE
+    Linux)
+
+other:
+
+  • added "install" and "uninstall" targets to Makefile
+  • START_INFOD in the default distribution is now "yes"
+  • (all): big endian was never selected due to a typo in __BYTE_ORER
+  • supporting Kernel 2.6.8-14 (SUSE) and 2.6.8 (vanilla)
+  • Kernel patches moved into their own directory "kpatch"
+
+v0.88 (2004-09-09)
+
+rpld:
+
+  • fixed a race condition in log_close(), where everything above
+    pthread_mutex_lock() should have been while the lock is held
+  • user changes on tty device (such as on vc-*) will be detected and now
+    correctly put into separate files. (See doc/rpld.html for details.)
+  • fixed: a REMOVE request (rplctl -X) also triggered FLUSH (-F)
+
+infod:
+
+  • changed IFP_GETINFO into IFP_GETINFO_T (readable text output) and
+  • added IFP_GETINFO (parseable text output, e.g. sscanf())
+
+rplctl:
+
+  • added the -L switch to make rplctl ask a IFP_GETINFO/_T even if there are
+    other arguments like -ADFJX
+  • added the -t switch to use IFP_GETINFO instead of IFP_GETINFO_T
+  • fixed: rplctl -X tty1 tty2 actually did not show info for tty2 (normal
+    arguments ignored if any option switches were found)
+  • added the -Z switch to zero all stats counters
+
+v0.87 (2004-09-06)
+
+rpld:
+
+  • notify() will now print to stderr and syslog if both of -s and -v are given
+    (before, -v overrode -s)
+  • fixed: /proc/misc was not closed
+  • temporary device node path is now /var/run/.rpldev (was ./.rpldev)
+
+  • added a subcomponent infod (socket is /var/run/.rplinfod_socket)
+  • added the respective gather tool "rplctl"
+
+  • fixed: ttys were not removed from the tree in log_close()
+
+rpldev:
+
+  • added RPL_IOC_GET[RW]AVAIL ioctl calls
+  • fixed: a deadlock would occur if kmalloc() returned NULL and you tried to
+    reload the module
+
+  • using vmalloc() to be able to allocate more than 64KB (GI_bufsize)
+
+ttyreplay:
+
+  • added the -m option to specify a maximum delay
+  • added the -j (skip packet count) and -J (skip time) options to start
+    playing at a given position in the logfile
+
+etc-init.d-ttyrpld:
+
+  • rpld will now be detached from the current session (but keep the current
+    stdout/err to report errors).
+
+other:
+
+  • stepped once more through in theory and checked for necessary swab()s, both
+    rpldev (added a lot) and rpld (more thought)
+  • logging on-the-fly-over-network has been tested and works well the two
+    minutes I tested it
+
+v0.85 (2004-08-27)
+
+  • trying to make the different situations work (read/seek on file/pipe/dev)
+
+rpld:
+
+  • the on-disk packet format has been changed in that the device field has
+    been removed; rpld was designed to analyze this field and write the buffer
+    to a given file, which makes the .dev field a space waster.
+  • see above: now saving up to 10%
+
+  • will now generate an EV_IDENT packet for log files
+  • implemented the "text-only" output of logfiles (strip headers), option is
+    -T
+
+  • superfluous: removed the BSIZE, FBSIZE options. The device hands out its
+    buffer size through an ioctl.
+  • include/rpl_packet.h: added an EV_IGNORE type
+
+  • fixed: EV_CLOSE events only happen on pty master sides, so log files did
+    not get closed for ptys
+  • added a debug option -Q to suppress creating files
+  • added a check to stop reading from non-rpldev when EOF is reached
+  • some endianess fixes, untested though
+  • fixed: exclusion of pty masters only worked for major 128
+
+  • BSD pty master fixup as it just went with Unix98 pty master (i.e. to catch
+    the fact that the close is reported on the master side)
+
+ttyreplay:
+
+  • --std option has been removed, Overhead Correction is also needed on 2.6
+    when using high values with -S
+
+rpldev kernel module:
+
+  • uif_llseek() will now not lock if it is not actually seeking
+
+other:
+
+  • etc-init.d-ttyrpld: added missing "kick" help to (*) case
+  • include/rpl_packet.h: new event type: EV_IDENT
+  • include/rpl_packet.h: struct log_packet has been renamed to struct
+    disk_packet to remove ambiguity
+  • new doc outfit and manual pages
+
+v0.83 (2004-08-05)
+
+rpld:
+
+  • automatically determines what minor number the rpl device is bound to and
+    dynamically create a node
+
+ttyreplay:
+
+  • added follow modes (-F, -f options)
+    -F: live feed (directly see what a user is typing), à la tail -f
+    -f: play file as normal and switch into -F when EOF is reached
+  • added error recovery
+
+rpldev:
+
+  • the default minor number is now MISC_DYNAMIC_MINOR (see automatic minor
+    number detection below for rpld)
+  • added an info upon module loading telling us what minor number the misc
+    subsystem finally gave rpldev
+
+v0.82 (2004-08-03)
+
+rpld:
+
+  • a one-time variable was not freed (minimal impact)
+  • added -v option to interactively show statistics
+  • a new option "OFMT" has been added which combines (and thus obsoletes) the
+    LOGDIR and SBTTY variables
+  • added "%t" (time in "%H%M%S" format) as a specifier for OFMT
+  • "%d" has been degraded to only provide the date ("%Y%M%d") rather than
+    date-and-time
+
+ttyreplay:
+
+  • finally implemented the "time warp" function (e.g. replay the log twice as
+    fast as the original user on typed), it's the -S option ("speed"). It takes
+    a multiplication factor (2.0 = double, 0.5 = half speed, etc.)
+  • the time correction algorithm has been redone (the one before still had a
+    time skew); the main calculation unit is now µsec
+
+rpldev:
+
+  • the user may now choose the minor number upon module loading
+
+other:
+
+  • more precise error control in etc-init.d-ttyrpld
+  • user/shared.c: added defintions for BSD pty slaves, changed pty-% into
+    proper ptyp%%
+  • kernel-2.6/rpl-kernelpatch.diff: the file has been replaced with patch
+    which works for 2.6.5 and up
+
+Initial Release 0.80 (2004-07-19)
+
+Initial release
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                                                         http://ttyrpld.sf.net/
+
