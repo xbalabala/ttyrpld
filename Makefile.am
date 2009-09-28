@@ -1,7 +1,6 @@
 # -*- Makefile -*-
 
 ACLOCAL_AMFLAGS  = -I m4
-AUTOMAKE_OPTIONS = foreign subdir-objects
 
 if GOT_TOOLS_FOR_LOCALE
 locale_subdir    = locale

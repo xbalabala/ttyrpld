@@ -3,7 +3,7 @@ AC_INIT([ttyrpld], [2.52])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_INSTALL
-AM_INIT_AUTOMAKE([-Wall])
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects])
 AC_PROG_CC
 AM_PROG_CC_C_O
 
