@@ -1,5 +1,4 @@
 /*
- *	ttyrpld/k_netbsd-4.0/rpldev.c
  *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
  *
  *	Redistribution and use in source and binary forms, with or without
@@ -36,10 +35,10 @@
 #include <sys/endian.h>
 #include <sys/errno.h>
 #include <sys/ioccom.h>
-#include <sys/lock.h>
 #include <sys/malloc.h>
 #include <sys/poll.h>
 #include <sys/proc.h>
+#include <sys/rwlock.h>
 #include <sys/syslog.h>
 #include <sys/systm.h>
 #include <sys/time.h>
@@ -67,7 +66,7 @@ static int rpldhc_lclose(const struct tty *);
 /* Stage 3 functions */
 static int rpldev_open(dev_t, int, int, struct lwp *);
 static int rpldev_read(dev_t, struct uio *, int);
-static int rpldev_ioctl(dev_t, u_long, caddr_t, int, struct lwp *);
+static int rpldev_ioctl(dev_t, u_long, void *, int, struct lwp *);
 static int rpldev_poll(dev_t, int, struct lwp *);
 static int rpldev_close(dev_t, int, int, struct lwp *);
 
@@ -82,7 +81,7 @@ static inline unsigned int min_uint(unsigned int, unsigned int);
 static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
 /* Variables */
-static struct lock Buffer_lock, Open_lock;
+static krwlock_t Buffer_lock, Open_lock;
 static char *Buffer, *BufRP, *BufWP;
 static size_t Bufsize = 32 * 1024;
 static unsigned int Open_count;
@@ -100,7 +99,6 @@ static struct cdevsw kmi_fops = {
 	.d_poll     = rpldev_poll,
 	.d_mmap     = nommap,
 	.d_kqfilter = nokqfilter,
-	.d_type     = 0,
 };
 
 MOD_DEV("rpldev", "rpl", NULL, -1, &kmi_fops, 228);
@@ -117,8 +115,8 @@ static int kmd_event(struct lkm_table *table, int cmd)
 		case LKM_E_LOAD:
 			if (lkmexists(table))
 				return EEXIST;
-			lockinit(&Buffer_lock, PLOCK, "rpldev", 0, 0);
-			lockinit(&Open_lock, PLOCK, "rpldev", 0, 0);
+			rw_init(&Buffer_lock);
+			rw_init(&Open_lock);
 			break;
 		case LKM_E_UNLOAD:
 			if (kmi_usecount || Open_count > 0)
@@ -190,14 +188,14 @@ static int rpldhc_lclose(const struct tty *tty)
 //-----------------------------------------------------------------------------
 static int rpldev_open(dev_t dev, int flag, int mode, struct lwp *th)
 {
-	lockmgr(&Open_lock, LK_EXCLUSIVE, NULL);
+	rw_enter(&Open_lock, RW_WRITER);
 	if (Open_count) {
-		lockmgr(&Open_lock, LK_RELEASE, NULL);
+		rw_exit(&Open_lock);
 		return EBUSY;
 	}
 	++kmi_usecount;
 	++Open_count;
-	lockmgr(&Open_lock, LK_RELEASE, NULL);
+	rw_exit(&Open_lock);
 
 	if ((Buffer = malloc(Bufsize, M_TTYS, M_WAITOK | M_CANFAIL)) == NULL) {
 		--kmi_usecount;
@@ -218,18 +216,18 @@ static int rpldev_read(dev_t dev, struct uio *uio, int flags)
 	size_t count;
 	int ret = 0;
 
-	lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
+	rw_enter(&Buffer_lock, RW_WRITER);
 	if (Buffer == NULL)
 		goto out;
 
 	while (BufRP == BufWP) {
-		lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+		rw_exit(&Buffer_lock);
 		if (flags & IO_NDELAY)
 			return EWOULDBLOCK;
 		if ((ret = tsleep(&Buffer, PCATCH, "rpldev", 0)) != 0)
 			return ret;
 		ret = 0;
-		lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
+		rw_enter(&Buffer_lock, RW_WRITER);
 		if (Buffer == NULL)
 			goto out;
 	}
@@ -237,11 +235,11 @@ static int rpldev_read(dev_t dev, struct uio *uio, int flags)
 	count = min_uint(uio->uio_resid, avail_R());
 	ret   = circular_get(uio, count);
  out:
-	lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+	rw_exit(&Buffer_lock);
 	return ret;
 }
 
-static int rpldev_ioctl(dev_t dev, u_long cmd, caddr_t data, int flags,
+static int rpldev_ioctl(dev_t dev, u_long cmd, void *data, int flags,
     struct lwp *th)
 {
 	size_t *ptr = (void *)data;
@@ -257,32 +255,32 @@ static int rpldev_ioctl(dev_t dev, u_long cmd, caddr_t data, int flags,
 			*ptr = Bufsize;
 			return 0;
 		case RPL_IOC_GETRAVAIL:
-			lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
+			rw_enter(&Buffer_lock, RW_WRITER);
 			if (Buffer == NULL)
 				goto out;
 			*ptr = avail_R();
-			lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+			rw_exit(&Buffer_lock);
 			return 0;
 		case RPL_IOC_GETWAVAIL:
-			lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
+			rw_enter(&Buffer_lock, RW_WRITER);
 			if (Buffer == NULL)
 				goto out;
 			*ptr = avail_W();
-			lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+			rw_exit(&Buffer_lock);
 			return 0;
 		case RPL_IOC_IDENTIFY:
 			*ptr = 0xC0FFEE;
 			return 0;
 		case RPL_IOC_SEEK:
-			lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
+			rw_enter(&Buffer_lock, RW_WRITER);
 			BufRP = Buffer + (BufRP - Buffer +
 			        min_uint(*ptr, avail_R())) % Bufsize;
-			lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+			rw_exit(&Buffer_lock);
 			return 0;
 		case RPL_IOC_FLUSH:
-			lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
+			rw_enter(&Buffer_lock, RW_WRITER);
 			BufRP = BufWP;
-			lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+			rw_exit(&Buffer_lock);
 			return 0;
 	}
 
@@ -303,10 +301,10 @@ static int rpldev_close(dev_t dev, int flag, int mode, struct lwp *th)
 	rpl_write  = NULL;
 	rpl_lclose = NULL;
 
-	lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
+	rw_enter(&Buffer_lock, RW_WRITER);
 	free(Buffer, M_TTYS);
 	Buffer = NULL;
-	lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+	rw_exit(&Buffer_lock);
 	--kmi_usecount;
 	--Open_count;
 	return 0;
@@ -365,20 +363,20 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
 {
 	if (count > (size_t)(-sizeof(struct rpldev_packet) - 1))
 		return ENOSPC;
-	lockmgr(&Buffer_lock, LK_EXCLUSIVE, NULL);
+	rw_enter(&Buffer_lock, RW_WRITER);
 	if (Buffer == NULL) {
-		lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+		rw_exit(&Buffer_lock);
 		return 0;
 	}
 	if (avail_W() < sizeof(struct rpldev_packet) + count) {
-		lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+		rw_exit(&Buffer_lock);
 		return ENOSPC;
 	}
 
 	circular_put(p, sizeof(struct rpldev_packet));
 	if (count > 0)
 		circular_put(buf, count);
-	lockmgr(&Buffer_lock, LK_RELEASE, NULL);
+	rw_exit(&Buffer_lock);
 	wakeup(&Buffer);
 	return count;
 }
