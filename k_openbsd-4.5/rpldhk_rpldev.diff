@@ -1,43 +1,58 @@
 ---
- arch/alpha/alpha/conf.c     |    5 
- arch/amd64/amd64/conf.c     |    5 
- arch/arm/arm/conf.c         |    4 
+ arch/alpha/alpha/conf.c     |   20 ++
+ arch/amd64/amd64/conf.c     |   18 ++
+ arch/arm/arm/conf.c         |   16 +
  arch/hp300/hp300/conf.c     |    5 
- arch/hppa/hppa/conf.c       |    5 
- arch/hppa64/hppa64/conf.c   |    6 
- arch/i386/i386/conf.c       |    7 
- arch/luna88k/luna88k/conf.c |    5 
- arch/mac68k/mac68k/conf.c   |    5 
- arch/macppc/macppc/conf.c   |    5 
- arch/mvme68k/mvme68k/conf.c |    5 
- arch/mvme88k/mvme88k/conf.c |    5 
- arch/mvmeppc/mvmeppc/conf.c |    5 
- arch/sgi/sgi/conf.c         |    5 
- arch/sparc/sparc/conf.c     |    4 
- arch/sparc64/sparc64/conf.c |    4 
- arch/vax/vax/conf.c         |    5 
+ arch/hppa/hppa/conf.c       |   21 ++
+ arch/hppa64/hppa64/conf.c   |   22 ++
+ arch/i386/i386/conf.c       |   17 ++
+ arch/luna88k/luna88k/conf.c |   21 ++
+ arch/mac68k/mac68k/conf.c   |   21 ++
+ arch/macppc/macppc/conf.c   |   18 ++
+ arch/mvme68k/mvme68k/conf.c |   21 ++
+ arch/mvme88k/mvme88k/conf.c |   21 ++
+ arch/mvmeppc/mvmeppc/conf.c |   21 ++
+ arch/sgi/sgi/conf.c         |   20 ++
+ arch/sparc/sparc/conf.c     |   14 +
+ arch/sparc64/sparc64/conf.c |   14 +
+ arch/vax/vax/conf.c         |   19 ++
  conf/files                  |    1 
- kern/rpldev.c               |  363 ++++++++++++++++++++++++++++++++++++++++++++
- kern/tty.c                  |   44 +++++
+ kern/rpldev.c               |  362 ++++++++++++++++++++++++++++++++++++++++++++
+ kern/tty.c                  |   40 ++++
  sys/conf.h                  |   16 +
  sys/rpl_ioctl.h             |   31 +++
  sys/rpl_packet.h            |   51 ++++++
  sys/rpldev.h                |   19 ++
  sys/rpldhk.h                |   17 ++
- 25 files changed, 626 insertions(+), 1 deletion(-)
+ 25 files changed, 846 insertions(+)
 
 Index: sys/arch/alpha/alpha/conf.c
 ===================================================================
 --- sys.orig/arch/alpha/alpha/conf.c
 +++ sys/arch/alpha/alpha/conf.c
-@@ -205,6 +205,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_bktr_init(NBKTR,bktr),	/* 58: Bt848 video capture device */
+@@ -208,6 +208,26 @@ struct cdevsw	cdevsw[] =
  	cdev_radio_init(NRADIO,radio), /* 59: generic radio I/O */
  	cdev_mouse_init(NWSMUX, wsmux),	/* 60: ws multiplexor */
+ 	cdev_vscsi_init(NVSCSI, vscsi),	/* 61: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 61 .. 127 */
-+	cdev_rpldev_init(),		/* 128: rpldev */
++  N N N N N N N N N /* 62-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof (cdevsw) / sizeof (cdevsw[0]);
@@ -46,14 +61,27 @@ Index: sys/arch/amd64/amd64/conf.c
 ===================================================================
 --- sys.orig/arch/amd64/amd64/conf.c
 +++ sys/arch/amd64/amd64/conf.c
-@@ -296,6 +296,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_bthub_init(NBTHUB,bthub),	/* 84: bthub */
- 	cdev_nvram_init(NNVRAM,nvram),	/* 85: NVRAM interface */
- 	cdev_agp_init(NAGP,agp),	/* 86: agp */
+@@ -304,6 +304,24 @@ struct cdevsw	cdevsw[] =
+ 	cdev_drm_init(NDRM,drm),	/* 87: drm */
+ 	cdev_gpio_init(NGPIO,gpio),	/* 88: gpio */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 89: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N /* 87 .. 127 */
-+	cdev_rpldev_init(),		/* 128: rpldev */
++                  N /* 90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -62,13 +90,25 @@ Index: sys/arch/arm/arm/conf.c
 ===================================================================
 --- sys.orig/arch/arm/arm/conf.c
 +++ sys/arch/arm/arm/conf.c
-@@ -395,6 +395,10 @@ struct cdevsw cdevsw[] = {
- 	cdev_radio_init(NRADIO,radio),		/* 97: generic radio I/O */
+@@ -404,6 +404,22 @@ struct cdevsw cdevsw[] = {
  	cdev_ptm_init(NPTY,ptm),		/* 98: pseudo-tty ptm device */
  	cdev_spkr_init(NSPKR,spkr),		/* 99: PC speaker */
+ 	cdev_vscsi_init(NVSCSI,vscsi),		/* 100: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 100 .. 127 */
-+        cdev_rpldev_init(),                     /* 128: rpldev */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  
@@ -77,9 +117,9 @@ Index: sys/arch/hp300/hp300/conf.c
 ===================================================================
 --- sys.orig/arch/hp300/hp300/conf.c
 +++ sys/arch/hp300/hp300/conf.c
-@@ -174,6 +174,11 @@ struct cdevsw	cdevsw[] =
- #endif
+@@ -176,6 +176,11 @@ struct cdevsw	cdevsw[] =
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 53: vscsi */
  
 +#define N cdev_notdef(),
 +N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
@@ -93,14 +133,30 @@ Index: sys/arch/hppa/hppa/conf.c
 ===================================================================
 --- sys.orig/arch/hppa/hppa/conf.c
 +++ sys/arch/hppa/hppa/conf.c
-@@ -187,6 +187,11 @@ struct cdevsw   cdevsw[] =
- 	cdev_lkm_dummy(),		/* 51: */
+@@ -190,6 +190,27 @@ struct cdevsw   cdevsw[] =
  	cdev_lkm_dummy(),		/* 52: */
  	cdev_lkm_dummy(),		/* 53: */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 54: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 54 .. 127 */
-+	cdev_rpldev_init(),		/* 128: rpldev */
++        N N N N N N /* 55-60 */
++N N N N N N N N N N /* 61-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -109,15 +165,31 @@ Index: sys/arch/hppa64/hppa64/conf.c
 ===================================================================
 --- sys.orig/arch/hppa64/hppa64/conf.c
 +++ sys/arch/hppa64/hppa64/conf.c
-@@ -171,6 +171,12 @@ struct cdevsw   cdevsw[] =
- 	cdev_lkm_dummy(),
- 	cdev_lkm_dummy(),
- 	cdev_lkm_dummy(),
+@@ -176,6 +176,28 @@ struct cdevsw   cdevsw[] =
+ 	cdev_lkm_dummy(),		/* 45 */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 46: vscsi */
+ 	
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N /* 46 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++          N N N N N /* 47-50 */
++N N N N N N N N N N /* 51-60 */
++N N N N N N N N N N /* 61-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -126,16 +198,26 @@ Index: sys/arch/i386/i386/conf.c
 ===================================================================
 --- sys.orig/arch/i386/i386/conf.c
 +++ sys/arch/i386/i386/conf.c
-@@ -312,7 +312,12 @@ struct cdevsw	cdevsw[] =
- 	cdev_notdef(),			/* 85: ACPI (deprecated) */
- 	cdev_bthub_init(NBTHUB,bthub),	/* 86: bthub */
- 	cdev_agp_init(NAGP,agp),	/* 87: agp */
--	cdev_drm_init(NDRMBASE,drm)	/* 88: drm */
-+	cdev_drm_init(NDRMBASE,drm),	/* 88: drm */
+@@ -308,6 +308,23 @@ struct cdevsw	cdevsw[] =
+ 	cdev_drm_init(NDRM,drm),	/* 88: drm */
+ 	cdev_amdmsr_init(NAMDMSR,amdmsr),	/* 89: amdmsr */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 90: vscsi */
 +#define N cdev_notdef(),
-+/* 89 .. 127 */
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+	cdev_rpldev_init(),		/* 128: rpldev */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -144,14 +226,30 @@ Index: sys/arch/luna88k/luna88k/conf.c
 ===================================================================
 --- sys.orig/arch/luna88k/luna88k/conf.c
 +++ sys/arch/luna88k/luna88k/conf.c
-@@ -156,6 +156,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_notdef(),			/* 51 */
+@@ -158,6 +158,27 @@ struct cdevsw	cdevsw[] =
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 53: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 53 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++      N N N N N N N /* 54-60 */
++N N N N N N N N N N /* 61-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -160,14 +258,30 @@ Index: sys/arch/mac68k/mac68k/conf.c
 ===================================================================
 --- sys.orig/arch/mac68k/mac68k/conf.c
 +++ sys/arch/mac68k/mac68k/conf.c
-@@ -165,6 +165,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_notdef(),			/* 51 */
+@@ -168,6 +168,27 @@ struct cdevsw	cdevsw[] =
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 53: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 53 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++      N N N N N N N /* 54-60 */
++N N N N N N N N N N /* 61-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -176,14 +290,27 @@ Index: sys/arch/macppc/macppc/conf.c
 ===================================================================
 --- sys.orig/arch/macppc/macppc/conf.c
 +++ sys/arch/macppc/macppc/conf.c
-@@ -238,6 +238,11 @@ struct cdevsw cdevsw[] = {
- 	cdev_bio_init(NBIO,bio),	/* 80: ioctl tunnel */
+@@ -241,6 +241,24 @@ struct cdevsw cdevsw[] = {
  	cdev_bthub_init(NBTHUB,bthub),	/* 81: bthub */
  	cdev_openprom_init(1,openprom),	/* 82: /dev/openprom */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 83: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N /* 83 .. 127 */
-+	cdev_rpldev_init(),		/* 128: rpldev */
++      N N N N N N N /* 84-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int nchrdev = sizeof cdevsw / sizeof cdevsw[0];
@@ -192,14 +319,30 @@ Index: sys/arch/mvme68k/mvme68k/conf.c
 ===================================================================
 --- sys.orig/arch/mvme68k/mvme68k/conf.c
 +++ sys/arch/mvme68k/mvme68k/conf.c
-@@ -215,6 +215,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_lkm_dummy(),		/* 51 */
+@@ -219,6 +219,27 @@ struct cdevsw	cdevsw[] =
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 53: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 53 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++      N N N N N N N /* 54-60 */
++N N N N N N N N N N /* 61-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -208,14 +351,30 @@ Index: sys/arch/mvme88k/mvme88k/conf.c
 ===================================================================
 --- sys.orig/arch/mvme88k/mvme88k/conf.c
 +++ sys/arch/mvme88k/mvme88k/conf.c
-@@ -201,6 +201,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_notdef(),			/* 51 */
+@@ -204,6 +204,27 @@ struct cdevsw	cdevsw[] =
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 53: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 53 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++      N N N N N N N /* 54-60 */
++N N N N N N N N N N /* 61-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -224,14 +383,30 @@ Index: sys/arch/mvmeppc/mvmeppc/conf.c
 ===================================================================
 --- sys.orig/arch/mvmeppc/mvmeppc/conf.c
 +++ sys/arch/mvmeppc/mvmeppc/conf.c
-@@ -178,6 +178,11 @@ struct cdevsw cdevsw[] = {
- 	cdev_bio_init(NBIO,bio),	/* 53: ioctl tunnel */
+@@ -181,6 +181,27 @@ struct cdevsw cdevsw[] = {
  	cdev_disk_init(NRAID,raid),	/* 54: RAIDframe disk driver */
  	cdev_ptm_init(NPTY,ptm),	/* 55: pseudo-tty ptm device */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 56: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 56 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++            N N N N /* 57-60 */
++N N N N N N N N N N /* 61-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int nchrdev = sizeof cdevsw / sizeof cdevsw[0];
@@ -240,14 +415,29 @@ Index: sys/arch/sgi/sgi/conf.c
 ===================================================================
 --- sys.orig/arch/sgi/sgi/conf.c
 +++ sys/arch/sgi/sgi/conf.c
-@@ -189,6 +189,11 @@ cdev_wsdisplay_init(NWSDISPLAY, wsdispla
- 	cdev_notdef(),			/* 51: */
- #endif
- 	cdev_ptm_init(NPTY,ptm),	/* 52: pseudo-tty ptm device */
+@@ -211,6 +211,26 @@ struct cdevsw	cdevsw[] =
+ 	cdev_tty_init(NUCOM,ucom),	/* 66: USB tty */
+ 	cdev_hotplug_init(NHOTPLUG,hotplug), /* 67: devices hotplugging */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 68: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N /* 53 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++                N N /* 69-70 */
++N N N N N N N N N N /* 71-80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  
@@ -256,13 +446,23 @@ Index: sys/arch/sparc/sparc/conf.c
 ===================================================================
 --- sys.orig/arch/sparc/sparc/conf.c
 +++ sys/arch/sparc/sparc/conf.c
-@@ -266,6 +266,10 @@ struct cdevsw	cdevsw[] =
- 	cdev_disk_init(NRAID,raid),     /* 123: RAIDframe disk driver */
+@@ -268,6 +268,20 @@ struct cdevsw	cdevsw[] =
  	cdev_bio_init(NBIO,bio),	/* 124: ioctl tunnel */
  	cdev_ptm_init(NPTY,ptm),	/* 125: pseudo-tty ptm device */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 128: vscsi */
 +#define N cdev_notdef(),
-+N N /* 126 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++                N N /* 129-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -271,13 +471,23 @@ Index: sys/arch/sparc64/sparc64/conf.c
 ===================================================================
 --- sys.orig/arch/sparc64/sparc64/conf.c
 +++ sys/arch/sparc64/sparc64/conf.c
-@@ -282,6 +282,10 @@ struct cdevsw	cdevsw[] =
- 	cdev_tty_init(NPCONS,pcons),	/* 122: PROM console */
- 	cdev_ptm_init(NPTY,ptm),	/* 123: pseudo-tty ptm device */
- 	cdev_hotplug_init(NHOTPLUG,hotplug), /* 124: devices hot plugging */
+@@ -291,6 +291,20 @@ struct cdevsw	cdevsw[] =
+ 	cdev_tty_init(NSBBC,sbbc),	/* 126: SBBC console */
+ 	cdev_tty_init(NVCCTTY,vcctty),	/* 127: virtual console concentrator */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 128: vscsi */
 +#define N cdev_notdef(),
-+N N N /* 125 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++                N N /* 129-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -286,14 +496,28 @@ Index: sys/arch/vax/vax/conf.c
 ===================================================================
 --- sys.orig/arch/vax/vax/conf.c
 +++ sys/arch/vax/vax/conf.c
-@@ -437,6 +437,11 @@ struct cdevsw	cdevsw[] =
- 	cdev_notdef(),			/* 74 */
+@@ -440,6 +440,25 @@ struct cdevsw	cdevsw[] =
  #endif
  	cdev_ptm_init(NPTY,ptm),	/* 75: pseudo-tty ptm device */
+ 	cdev_vscsi_init(NVSCSI,vscsi),	/* 78: vscsi */
 +#define N cdev_notdef(),
-+N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N N
-+N N N N N N N N N N N N /* 76 .. 127 */
-+        cdev_rpldev_init(),             /* 128: rpldev */
++                N N /* 79, 80 */
++N N N N N N N N N N /* 81-90 */
++N N N N N N N N N N /* 91-100 */
++N N N N N N N N N N /* 101-110 */
++N N N N N N N N N N /* 111-120 */
++N N N N N N N N N N /* 121-130 */
++N N N N N N N N N N /* 131-140 */
++N N N N N N N N N N /* 141-150 */
++N N N N N N N N N N /* 151-160 */
++N N N N N N N N N N /* 161-170 */
++N N N N N N N N N N /* 171-180 */
++N N N N N N N N N N /* 181-190 */
++N N N N N N N N N N /* 191-200 */
++N N N N N N N N N N /* 201-210 */
++N N N N N N N N N N /* 211-220 */
++N N N N N N N       /* 221-227 */
++	cdev_rpldev_init(),		/* 228: rpldev */
 +#undef N
  };
  int	nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
@@ -302,8 +526,8 @@ Index: sys/conf/files
 ===================================================================
 --- sys.orig/conf/files
 +++ sys/conf/files
-@@ -693,6 +693,7 @@ file kern/tty_nmea.c			nmea			needs-flag
- file kern/tty_msts.c			msts			needs-flag
+@@ -723,6 +723,7 @@ file kern/tty_msts.c			msts			needs-flag
+ file kern/tty_endrun.c			endrun			needs-flag
  file kern/tty_subr.c
  file kern/tty_tty.c
 +file kern/rpldev.c
@@ -314,10 +538,9 @@ Index: sys/kern/rpldev.c
 ===================================================================
 --- /dev/null
 +++ sys/kern/rpldev.c
-@@ -0,0 +1,362 @@
+@@ -0,0 +1,361 @@
 +/*
-+ *	ttyrpld/k_openbsd-4.3/rpldev.c
-+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
++ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
 + *
 + *	Redistribution and use in source and binary forms, with or without
 + *	modification, are permitted provided that the following conditions
@@ -695,7 +918,7 @@ Index: sys/kern/tty.c
  static int ttnread(struct tty *);
  static void ttyblock(struct tty *);
  void ttyunblock(struct tty *);
-@@ -168,6 +175,39 @@ int tty_count;
+@@ -168,6 +175,35 @@ int tty_count;
  
  int64_t tk_cancc, tk_nin, tk_nout, tk_rawcc;
  
@@ -704,7 +927,6 @@ Index: sys/kern/tty.c
 +	typeof(rpl_open) tmp = rpl_open;
 +	if (tmp != NULL)
 +		tmp(tty);
-+	return;
 +}
 +
 +static inline void rpldhk_read1(char c, const struct tty *tty)
@@ -712,7 +934,6 @@ Index: sys/kern/tty.c
 +	typeof(rpl_read) tmp = rpl_read;
 +	if (tmp != NULL)
 +		tmp(&c, 1, tty);
-+	return;
 +}
 +
 +static inline void rpldhk_write(const char *buf, size_t size,
@@ -721,7 +942,6 @@ Index: sys/kern/tty.c
 +	typeof(rpl_write) tmp = rpl_write;
 +	if (tmp != NULL)
 +		tmp(buf, size, tty);
-+	return;
 +}
 +
 +static inline void rpldhk_lclose(const struct tty *tty)
@@ -729,13 +949,12 @@ Index: sys/kern/tty.c
 +	typeof(rpl_lclose) tmp = rpl_lclose;
 +	if (tmp != NULL)
 +		tmp(tty);
-+	return;
 +}
 +
  /*
   * Initial open of tty, or (re)entry to standard tty line discipline.
   */
-@@ -187,6 +227,7 @@ ttyopen(dev_t device, struct tty *tp)
+@@ -187,6 +223,7 @@ ttyopen(dev_t device, struct tty *tp)
  	}
  	CLR(tp->t_state, TS_WOPEN);
  	splx(s);
@@ -743,7 +962,7 @@ Index: sys/kern/tty.c
  	return (0);
  }
  
-@@ -205,6 +246,7 @@ ttyclose(struct tty *tp)
+@@ -205,6 +242,7 @@ ttyclose(struct tty *tp)
  
  	ttyflush(tp, FREAD | FWRITE);
  
@@ -751,7 +970,7 @@ Index: sys/kern/tty.c
  	tp->t_gen++;
  	tp->t_pgrp = NULL;
  	if (tp->t_session)
-@@ -1580,6 +1622,7 @@ read:
+@@ -1584,6 +1622,7 @@ read:
   		error = ureadc(c, uio);
  		if (error)
  			break;
@@ -759,10 +978,10 @@ Index: sys/kern/tty.c
   		if (uio->uio_resid == 0)
  			break;
  		/*
-@@ -1738,6 +1781,7 @@ loop:
- 				cc = 0;
- 				break;
+@@ -1746,6 +1785,7 @@ loop:
  			}
+ 			if (cc > obufcc)
+ 				obufcc = cc;
 +			rpldhk_write(cp, cc, tp);
  		}
  		/*
@@ -771,7 +990,7 @@ Index: sys/sys/conf.h
 ===================================================================
 --- sys.orig/sys/conf.h
 +++ sys/sys/conf.h
-@@ -284,6 +284,22 @@ extern struct cdevsw cdevsw[];
+@@ -277,6 +277,22 @@ extern struct cdevsw cdevsw[];
  	dev_init(c,n,write), dev_init(c,n,ioctl), (dev_type_stop((*))) enodev, \
  	0, (dev_type_poll((*))) enodev, (dev_type_mmap((*))) enodev }
  

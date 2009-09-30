@@ -10,7 +10,7 @@ changed significantly between ttyrpld releases.
 ├────────────────┼────────────────┼────────────────────────────┤
 │Linux           │2.50            │2.50                        │
 │FreeBSD         │2.50            │2.50                        │
-│OpenBSD         │2.50            │modules not really supported│
+│OpenBSD         │-               │2.60                        │
 │NetBSD          │2.50            │2.60                        │
 
 
@@ -22,6 +22,7 @@ HEAD
 Changes:
 - doc: move changelog to text/plain
 - rpldev: NetBSD 5.0.1 support
+- rpldev: OpenBSD 4.5 support
 
 
 v2.52 (2008-09-07)
