@@ -216,7 +216,7 @@ static int rpldhc_read(const char *buf, size_t count, const struct queue *q)
 		return 0;
 
 	p.dev   = TTY_DEVNR(q);
-	p.size  = LE_16(count);
+	p.size  = LE_32(count);
 	p.event = RPLEVT_READ;
 	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
@@ -231,7 +231,7 @@ static int rpldhc_write(const char *buf, size_t count, const struct queue *q)
 		return 0;
 
 	p.dev   = TTY_DEVNR(q);
-	p.size  = LE_16(count);
+	p.size  = LE_32(count);
 	p.event = RPLEVT_WRITE;
 	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);

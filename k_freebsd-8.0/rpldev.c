@@ -185,7 +185,7 @@ static int rpldhc_rw(const struct tty *tty, const struct uio *uio,
 	for (i = 0; i < uio->uio_iovcnt; ++i) {
 		iov     = &uio->uio_iov[i];
 		p.dev   = TTY_DEVNR(tty);
-		p.size  = htole16(iov->iov_len);
+		p.size  = htole32(iov->iov_len);
 		p.event = event;
 		p.magic = RPLMAGIC_SIG;
 		fill_time(&p.time);

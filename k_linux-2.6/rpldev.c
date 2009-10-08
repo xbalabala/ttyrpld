@@ -179,7 +179,8 @@ static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
 		return circular_put_packet(&p, NULL, 0);
 	}
 
-	p.size = cpu_to_le16(len = strlen(full_dev));
+	len    = strlen(full_dev);
+	p.size = cpu_to_le32(len);
 	return circular_put_packet(&p, full_dev, len);
 }
 
@@ -199,7 +200,7 @@ static int rpldhc_read(const char __user *buf, size_t count,
 		return 0;
 
 	p.dev   = TTY_DEVNR(tty);
-	p.size  = cpu_to_le16(count);
+	p.size  = cpu_to_le32(count);
 	p.event = RPLEVT_READ;
 	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
@@ -229,7 +230,7 @@ static int rpldhc_write(const char __user *buf, size_t count,
 		return 0;
 
 	p.dev   = TTY_DEVNR(tty);
-	p.size  = cpu_to_le16(count);
+	p.size  = cpu_to_le32(count);
 	p.event = RPLEVT_WRITE;
 	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);

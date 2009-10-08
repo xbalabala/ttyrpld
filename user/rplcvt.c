@@ -22,6 +22,13 @@
 #include "lib.h"
 
 /* Definitions */
+enum {
+	F_NONE,
+	F_RPLDSK1_32,
+	F_RPLDSK1_64,
+	F_RPLDSK2,
+};
+
 struct rpldsk1_packet32 {
 	uint16_t size;
 	uint8_t event, magic;
@@ -40,15 +47,38 @@ struct rpldsk1_packet64 {
 	} time;
 };
 
+struct rpldsk2_packet {
+	uint16_t size;
+	uint8_t event, magic;
+	struct rpltime time;
+} __PACKED;
+
 /* Functions */
 static bool rplcvt_get_options(int *, const char ***);
-static void rplcvt_32(int);
-static void rplcvt_64(int);
+static void rplcvt1_32(int);
+static void rplcvt1_64(int);
 
 /* Variables */
-static unsigned int rplcvt_bitness;
+static char *rplcvt_format;
 
 //-----------------------------------------------------------------------------
+static void rplcvt2(int fd)
+{
+	struct rpldsk2_packet old;
+	struct rpldsk_packet new;
+	ssize_t ret;
+
+	while ((ret = read(fd, &old, sizeof(old))) == sizeof(old)) {
+		new.size         = old.size;
+		new.event        = old.event;
+		new.magic        = old.magic;
+		new.time.tv_sec  = old.time.tv_sec;
+		new.time.tv_usec = old.time.tv_usec;
+		write(STDOUT_FILENO, &new, sizeof(new));
+		read_through(fd, STDOUT_FILENO, new.size);
+	}
+}
+
 int main(int argc, const char **argv)
 {
 	int fd;
@@ -70,13 +100,14 @@ int main(int argc, const char **argv)
 		}
 	}
 
-	if (rplcvt_bitness == 32) {
-		rplcvt_32(fd);
-	} else if (rplcvt_bitness == 64) {
-		rplcvt_64(fd);
+	if (strcmp(rplcvt_format, "2") == 0) {
+		rplcvt2(fd);
+	} else if (strcmp(rplcvt_format, "1@32") == 0) {
+		rplcvt1_32(fd);
+	} else if (strcmp(rplcvt_format, "1@64") == 0) {
+		rplcvt1_64(fd);
 	} else {
-		fprintf(stderr, "%s: You need to specify either --32 "
-		        "or --64\n", *argv);
+		fprintf(stderr, "%s: Unknown format specified with -F\n", *argv);
 		return EXIT_FAILURE;
 	}
 
@@ -89,17 +120,21 @@ int main(int argc, const char **argv)
 static bool rplcvt_get_options(int *argc, const char ***argv)
 {
 	struct HXoption options_table[] = {
-		{.ln = "32", .type = HXTYPE_VAL, .ptr = &rplcvt_bitness,
-		 .val = 32, .help = "Select 32-bit decoder"},
-		{.ln = "64", .type = HXTYPE_VAL, .ptr = &rplcvt_bitness,
-		 .val = 64, .help = "Select 64-bit decoder"},
+		{.sh = 'F', .type = HXTYPE_STRING, .ptr = &rplcvt_format,
+		 .help = "Input format (\"1@32\", \"1@64\", \"2\")"},
 		HXOPT_AUTOHELP,
 		HXOPT_TABLEEND,
 	};
-	return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) > 0;
+	if (HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) <= 0)
+		return false;
+	if (rplcvt_format == NULL) {
+		fprintf(stderr, "The -F option is mandatory\n");
+		return false;
+	}
+	return true;
 }
 
-static void rplcvt_32(int fd)
+static void rplcvt1_32(int fd)
 {
 	struct rpldsk1_packet32 old;
 	struct rpldsk_packet new;
@@ -116,7 +151,7 @@ static void rplcvt_32(int fd)
 	}
 }
 
-static void rplcvt_64(int fd)
+static void rplcvt1_64(int fd)
 {
 	struct rpldsk1_packet64 old;
 	struct rpldsk_packet new;
@@ -132,3 +167,4 @@ static void rplcvt_64(int fd)
 		read_through(fd, STDOUT_FILENO, new.size);
 	}
 }
+

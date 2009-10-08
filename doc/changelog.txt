@@ -25,6 +25,7 @@ Changes:
 - rpldev: OpenBSD 4.5 support
 - rpldev: Linux 2.6.31 support
 - rpldev: FreeBSD 8.0 support
+- packet: increase the "size" field to 32 bits
 
 
 v2.52 (2008-09-07)

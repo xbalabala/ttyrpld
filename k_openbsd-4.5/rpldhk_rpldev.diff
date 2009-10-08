@@ -17,14 +17,14 @@
  arch/sparc64/sparc64/conf.c |   14 +
  arch/vax/vax/conf.c         |   19 ++
  conf/files                  |    1 
- kern/rpldev.c               |  362 ++++++++++++++++++++++++++++++++++++++++++++
+ kern/rpldev.c               |  357 ++++++++++++++++++++++++++++++++++++++++++++
  kern/tty.c                  |   40 ++++
  sys/conf.h                  |   16 +
  sys/rpl_ioctl.h             |   31 +++
  sys/rpl_packet.h            |   51 ++++++
  sys/rpldev.h                |   19 ++
  sys/rpldhk.h                |   17 ++
- 25 files changed, 846 insertions(+)
+ 25 files changed, 841 insertions(+)
 
 Index: sys/arch/alpha/alpha/conf.c
 ===================================================================
@@ -538,7 +538,7 @@ Index: sys/kern/rpldev.c
 ===================================================================
 --- /dev/null
 +++ sys/kern/rpldev.c
-@@ -0,0 +1,361 @@
+@@ -0,0 +1,357 @@
 +/*
 + *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
 + *
@@ -626,10 +626,9 @@ Index: sys/kern/rpldev.c
 +{
 +	struct rpldev_packet p;
 +
++	p.evmagic.n = htob32(RPLEVT_OPEN);
 +	p.dev   = TTY_DEVNR(tty);
 +	p.size  = 0;
-+	p.event = RPLEVT_OPEN;
-+	p.magic = RPLMAGIC_SIG;
 +	fill_time(&p.time);
 +	return circular_put_packet(&p, NULL, 0);
 +}
@@ -641,10 +640,9 @@ Index: sys/kern/rpldev.c
 +	if (count == 0)
 +		return 0;
 +
++	p.evmagic.n = htob32(RPLEVT_READ);
 +	p.dev   = TTY_DEVNR(tty);
-+	p.size  = htole16(count);
-+	p.event = RPLEVT_READ;
-+	p.magic = RPLMAGIC_SIG;
++	p.size  = htole32(count);
 +	fill_time(&p.time);
 +	return circular_put_packet(&p, buf, count);
 +}
@@ -656,10 +654,9 @@ Index: sys/kern/rpldev.c
 +	if (count == 0)
 +		return 0;
 +
++	p.evmagic.n = htobe32(RPLEVT_WRITE);
 +	p.dev   = TTY_DEVNR(tty);
-+	p.size  = htole16(count);
-+	p.event = RPLEVT_WRITE;
-+	p.magic = RPLMAGIC_SIG;
++	p.size  = htole32(count);
 +	fill_time(&p.time);
 +	return circular_put_packet(&p, buf, count);
 +}
@@ -668,10 +665,9 @@ Index: sys/kern/rpldev.c
 +{
 +	struct rpldev_packet p;
 +
++	p.evmagic.n = htobe32(RPLEVT_LCLOSE);
 +	p.dev   = TTY_DEVNR(tty);
 +	p.size  = 0;
-+	p.event = RPLEVT_LCLOSE;
-+	p.magic = RPLMAGIC_SIG;
 +	fill_time(&p.time);
 +	return circular_put_packet(&p, NULL, 0);
 +}
@@ -1093,13 +1089,13 @@ Index: sys/sys/rpl_packet.h
 +
 +struct rpldev_packet {
 +	uint32_t dev;
-+	uint16_t size;
++	uint32_t size;
 +	uint8_t event, magic;
 +	struct rpltime time;
 +} __PACKED;
 +
 +struct rpldsk_packet {
-+	uint16_t size;
++	uint32_t size;
 +	uint8_t event, magic;
 +	struct rpltime time;
 +} __PACKED;
