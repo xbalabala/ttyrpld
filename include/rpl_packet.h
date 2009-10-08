@@ -36,10 +36,10 @@ struct rpltime {
 };
 
 struct rpldev_packet {
-	uint32_t dev;
 	uint32_t size;
 	uint8_t event, magic;
 	struct rpltime time;
+	uint32_t dev;
 } __PACKED;
 
 struct rpldsk_packet {

@@ -438,7 +438,7 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 	SWAB1(&packet->size);
 	SWAB1(&packet->time.tv_sec);
 	SWAB1(&packet->time.tv_usec);
-	write(tty->fd, &packet->size, sizeof(struct rpldsk_packet));
+	write(tty->fd, packet, sizeof(struct rpldsk_packet));
 	write(tty->fd, buffer, have);
  out:
 	free(buffer);
