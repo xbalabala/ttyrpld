@@ -11,9 +11,6 @@
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#ifdef HAVE_ALLOCA
-#	include <alloca.h>
-#endif
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -323,9 +320,15 @@ static void evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 	 * - Find out about UID changes on the device and start a new logfile
 	 *   if owner has changed.
 	 */
-	char *sdev = alloca(packet->size + 1);
+	char *sdev;
 	bool owner_changed = false, fill_it = false;
 	struct stat sb;
+
+	sdev = malloc(packet->size + 1);
+	if (sdev == NULL) {
+		perror("malloc");
+		return;
+	}
 
 	read(fd, sdev, packet->size);
 	sdev[packet->size] = '\0';
@@ -343,6 +346,7 @@ static void evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 
 	if (fill_it)
 		fill_info(tty, sdev);
+	free(sdev);
 	if (owner_changed)
 		log_open(tty);
 }
@@ -418,13 +422,16 @@ static void log_open(struct tty *tty)
 
 static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 {
-	char *buffer = alloca(packet->size);
+	char *buffer;
 	ssize_t have;
 
+	buffer = malloc(packet->size + 1);
+	if (buffer == NULL)
+		return;
 	if (tty->fd < 0)
 		log_open(tty);
 	if ((have = read(fd, buffer, packet->size)) <= 0)
-		return;
+		goto out;
 	if (have != packet->size)
 		packet->size = have;
 
@@ -433,20 +440,25 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 	SWAB1(&packet->time.tv_usec);
 	write(tty->fd, &packet->size, sizeof(struct rpldsk_packet));
 	write(tty->fd, buffer, have);
+ out:
+	free(buffer);
 }
 
 //-----------------------------------------------------------------------------
 static int check_parent_directory(const hxmc_t *s)
 {
-	char *path = alloca(strlen(s) + 1), *p;
+	char *path, *p;
+	int ret;
 
-	strcpy(path, s);
-	if ((p = strrchr(path, '/')) == NULL)
+	if ((p = strrchr(s, '/')) == NULL)
 		/* Current dirctory, no more dir checks needed */
 		return 1;
 
-	*p = '\0';
-	return HX_mkdir(path); /* `mkdir -p` */
+	path = HX_strdup(s);
+	path[p-s] = '\0';
+	ret = HX_mkdir(path); /* `mkdir -p` */
+	free(path);
+	return ret;
 }
 
 static void fill_info(struct tty *tty, const char *aux_sdev)

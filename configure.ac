@@ -7,7 +7,6 @@ AM_INIT_AUTOMAKE([-Wall foreign subdir-objects])
 AC_PROG_CC
 AM_PROG_CC_C_O
 
-AC_CHECK_HEADERS([alloca.h])
 AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_LIBS="$ttyreplay_LIBS -lrt"])
 AC_CHECK_LIB([socket], [accept], [rpld_LIBS="$rpld_LIBS -lsocket -lnsl"])
 AC_CHECK_LIB([intl], [gettext], [regular_LIBS="$regular_LIBS -lintl"])
