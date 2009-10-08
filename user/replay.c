@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +64,8 @@ static void e_proc(int, struct rpldsk_packet *, struct pctrl_info *, char *,
 	struct rpltime *, long *);
 
 static unsigned long calc_ovcorr(unsigned long, int);
-static bool find_next_packet(int, const struct pctrl_info *);
+static bool find_next_packet(struct rpldsk_packet *, int,
+	const struct pctrl_info *);
 static bool get_options(int *, const char ***);
 static void getopt_jump(const struct HXoptcb *);
 static void getopt_msec(const struct HXoptcb *);
@@ -170,24 +172,22 @@ static int replay_file(int fd, const char *name)
 	while ((ret = read_waitfm(fd, &packet,
 	    sizeof(struct rpldsk_packet), &ps)) == sizeof(struct rpldsk_packet))
 	{
-		if (packet.magic != RPLMAGIC_SIG) {
-			fprintf(stderr, _("\n" "<Packet inconsistency! "
+ redo:
+		packet.evmagic.n = be32_to_cpu(packet.evmagic.n);
+		if ((packet.evmagic.n & RPLEVT_MASK) != RPLEVT_NONE) {
+			fprintf(stderr, _("\n" "<Stream inconsistency! "
 			        "Trying to find next valid packet.>\n"));
 			tick = 0;
-			/*
-			 * If read() in find_next_packet() generates an error,
-			 * it will be catched when the condition is
-			 * re-evaulated upon continue.
-			 */
-			find_next_packet(fd, &ps);
-			continue;
+			if (!find_next_packet(&packet, fd, &ps))
+				continue;
+			goto redo;
 		}
 
 		packet.size = le32_to_cpu(packet.size);
 		packet.time.tv_sec  = le64_to_cpu(packet.time.tv_sec);
 		packet.time.tv_usec = le32_to_cpu(packet.time.tv_usec);
 
-		switch (packet.event) {
+		switch (packet.evmagic.n) {
 		case RPLEVT_WRITE:
 			e_proc(fd, &packet, &ps, &tick, &stamp, &skew);
 			break;
@@ -343,128 +343,32 @@ static unsigned long calc_ovcorr(unsigned long ad, int rd)
 	return av;
 }
 
-static bool find_next_packet(int fd, const struct pctrl_info *ps)
+static bool find_next_packet(struct rpldsk_packet *packet, int fd,
+    const struct pctrl_info *ps)
 {
-	/* Interesting, there is more algorithmic code than simple
-	code in ttyreplay. Outstanding. */
-#define LZ           sizeof(struct rpldsk_packet)
-#define BZ           (2 * LZ)
-#define MAGIC_OFFSET offsetof(struct rpldsk_packet, magic)
-	char buf[BZ];
-	struct rpldsk_packet *packet = static_cast(void *, buf);
-	size_t s;
-	unsigned int ok = 0;
+#define LZ           HXsizeof_member(struct rpldsk_packet, evmagic.n)
+	unsigned int rem;
+	uint32_t magic;
+	void *start;
 
-	if (read_waitfm(fd, buf, BZ, ps) < BZ)
+	if (read_waitfm(fd, packet, sizeof(packet->evmagic), ps) <
+	    sizeof(packet->evmagic))
 		return false;
 
-	while (true) {
-		char *ptr;
-
-		/*
-		 * Indeed, the many read() calls get more and more data from
-		 * the stream without displaying it. Anyway, if we found a way
-		 * into this function, there is a reason to it.
-		 */
-
-		if ((ptr = memchr(buf, RPLMAGIC_SIG, BZ)) != NULL &&
-		    ptr - buf >= MAGIC_OFFSET) {
-			/*
-			 * A magic byte has been found and the packet start is
-			 * complete
-			 */
-			char *ctx = reinterpret_cast(char *,
-			            containerof(ptr, struct rpldsk_packet, magic));
-			if (ctx != buf) {
-				size_t cnt = buf + BZ - ctx;
-				ctx = memmove(buf, ctx, cnt);
-				if (read_waitfm(fd, buf + cnt, BZ - cnt, ps) < BZ - cnt)
-					return false;
-			}
-		} else if (ptr != NULL) {
-			/*
-			 * Magic byte, but of no use. Discard it, and fill up
-			 * with new data from the descriptor.
-			 */
-			size_t cnt = buf + BZ - ptr - 1;
-			memmove(buf, ptr + 1, cnt);
-			if (read_waitfm(fd, buf + cnt, BZ - cnt, ps) < BZ - cnt)
-				return false;
-			continue;
-		} else {
-			/*
-			 * No magic byte, but since it might be just the next
-			 * byte in the stream, only read LZ bytes.
-			 */
-			memmove(buf, buf + BZ - LZ, BZ - LZ);
-			if (read_waitfm(fd, buf + LZ, BZ - LZ, ps) < BZ - LZ)
-				return false;
-			continue;
-		}
-
-		s = packet->size;
-		if (s > 4096) {
-			/*
-			 * The default tty buffer size is 4096, and any size
-			 * above this is questionable at all. Start with a new
-			 * slate.
-			 */
-			ok = 0;
-			memmove(buf, buf + LZ, BZ - LZ);
-			if (read_waitfm(fd, buf, BZ, ps) < BZ)
-				return false;
-			continue;
-		}
-
-		if (s < LZ) {
-			memmove(buf, buf + LZ + s, BZ - LZ - s);
-			if (read_waitfm(fd, buf + BZ - LZ - s, LZ + s, ps) < LZ + s)
-				return false;
-		} else {
-			/*
-			 * There is no header (according to .size) in our buffer, so we
-			 * can blindly munge lots of data.
-			 */
-			if (!read_nullfm(fd, s - LZ) || read_waitfm(fd, buf, BZ, ps) < BZ)
-				return false;
-		}
-
-		if ((ptr = memchr(buf, RPLMAGIC_SIG, MAGIC_OFFSET + 1)) == NULL ||
-		    ptr - buf != MAGIC_OFFSET) {
-			/*
-			 * If the size field does not match up with the next
-			 * magic byte, drop it all.
-			 */
-			ok = 0;
-			continue;
-		}
-
-		if (++ok >= 2)
-			break;
+	magic = be32_to_cpu(packet->evmagic.n);
+	while ((magic & RPLEVT_MASK) == RPLEVT_NONE) {
+		packet->evmagic.n = magic = cpu_to_be32(magic << CHAR_BIT);
+		if (!read_waitfm(fd, &packet->evmagic.m[
+		    ARRAY_SIZE(packet->evmagic.m)-1], 1, ps) != 1)
+			return false;
+		magic = be32_to_cpu(magic);
 	}
 
 	fprintf(stderr, _("\n" "<Found packet boundary>\n"));
-
-	/* Finally adjust the read pointer to a packet boundary */
-	if ((s = packet->size) < 16) {
-		/*
-		 * Mmhkay, there is another header other than the current
-		 * (packet) in the buffer. Crap, another one gone.
-		 */
-		memmove(buf, buf + LZ + s, BZ - LZ - s);
-		if (read_waitfm(fd, buf + BZ - LZ - s, s, ps) < s ||
-		    !read_nullfm(fd, packet->size))
-			return false;
-	} else {
-		/* Just subtract what we have already read into the buffer */
-		if (!read_nullfm(fd, s - LZ))
-			return false;
-	}
-
-	return true;
-#undef BZ
+	start = static_cast(void *, packet) + sizeof(packet->evmagic);
+	rem   = sizeof(*packet) - sizeof(packet->evmagic);
+	return read_waitfm(fd, start, rem, ps) == rem;
 #undef LZ
-#undef MAGIC_OFFSET
 }
 
 static bool get_options(int *argc, const char ***argv)
@@ -573,6 +477,7 @@ static ssize_t read_waitfm(int fd, void *buf, size_t count,
 
 static bool seek_to_end(int fd, const struct pctrl_info *ps)
 {
+	struct rpldsk_packet dummy;
 	off_t a, b;
 
 	a = lseek(fd, 0, SEEK_END);
@@ -603,7 +508,7 @@ static bool seek_to_end(int fd, const struct pctrl_info *ps)
 		return false;
 	}
 
-	return find_next_packet(fd, ps);
+	return find_next_packet(&dummy, fd, ps);
 }
 
 /*  usleep_ovcorr

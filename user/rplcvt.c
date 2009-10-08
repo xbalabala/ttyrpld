@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/user/rplcvt.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2007 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2007 - 2009
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -20,6 +19,21 @@
 #include <libHX/option.h>
 #include "../include/rpl_packet.h"
 #include "lib.h"
+
+enum {
+	EVT2_NONE       = 0x00,
+	EVT2_OPEN       = 0x01,
+	EVT2_READ       = 0x02,
+	EVT2_WRITE      = 0x03,
+	EVT2_MAGIC      = 0x4A,
+	EVT2_LCLOSE     = 0x64,
+	EVT2_ID_PROG    = 0xF0,
+	EVT2_ID_DEVPATH = 0xF1,
+	EVT2_ID_TIME    = 0xF2,
+	EVT2_ID_USER    = 0xF3,
+	EVT2_max,
+	MAGIC_SIG2      = 0xEE,
+};
 
 /* Definitions */
 enum {
@@ -60,6 +74,18 @@ static void rplcvt1_64(int);
 
 /* Variables */
 static char *rplcvt_format;
+static const uint32_t ev2_to_ev3[] = {
+	[EVT2_NONE]       = cpu_to_be32(RPLEVT_NONE),
+	[EVT2_OPEN]       = cpu_to_be32(RPLEVT_OPEN),
+	[EVT2_READ]       = cpu_to_be32(RPLEVT_READ),
+	[EVT2_WRITE]      = cpu_to_be32(RPLEVT_WRITE),
+	[EVT2_MAGIC]      = cpu_to_be32(RPLEVT_NONE),
+	[EVT2_LCLOSE]     = cpu_to_be32(RPLEVT_LCLOSE),
+	[EVT2_ID_PROG]    = cpu_to_be32(RPLEVT_ID_PROG),
+	[EVT2_ID_DEVPATH] = cpu_to_be32(RPLEVT_ID_DEVPATH),
+	[EVT2_ID_TIME]    = cpu_to_be32(RPLEVT_ID_TIME),
+	[EVT2_ID_USER]    = cpu_to_be32(RPLEVT_ID_USER),
+};
 
 //-----------------------------------------------------------------------------
 static void rplcvt2(int fd)
@@ -69,9 +95,8 @@ static void rplcvt2(int fd)
 	ssize_t ret;
 
 	while ((ret = read(fd, &old, sizeof(old))) == sizeof(old)) {
+		new.evmagic.n    = ev2_to_ev3[old.event];
 		new.size         = old.size;
-		new.event        = old.event;
-		new.magic        = old.magic;
 		new.time.tv_sec  = old.time.tv_sec;
 		new.time.tv_usec = old.time.tv_usec;
 		write(STDOUT_FILENO, &new, sizeof(new));
@@ -141,9 +166,8 @@ static void rplcvt1_32(int fd)
 	ssize_t ret;
 
 	while ((ret = read(fd, &old, sizeof(old))) == sizeof(old)) {
+		new.evmagic.n    = ev2_to_ev3[old.event];
 		new.size         = old.size;
-		new.event        = old.event;
-		new.magic        = old.magic;
 		new.time.tv_sec  = old.time.tv_sec;
 		new.time.tv_usec = old.time.tv_usec;
 		write(STDOUT_FILENO, &new, sizeof(new));
@@ -158,9 +182,8 @@ static void rplcvt1_64(int fd)
 	ssize_t ret;
 
 	while ((ret = read(fd, &old, sizeof(old))) == sizeof(old)) {
+		new.evmagic.n    = ev2_to_ev3[old.event];
 		new.size         = old.size;
-		new.event        = old.event;
-		new.magic        = old.magic;
 		new.time.tv_sec  = old.time.tv_sec;
 		new.time.tv_usec = old.time.tv_usec;
 		write(STDOUT_FILENO, &new, sizeof(new));

@@ -16,18 +16,17 @@
 #endif
 
 enum {
-	RPLEVT_NONE       = 0x00,
-	RPLEVT_OPEN       = 0x01,
-	RPLEVT_READ       = 0x02,
-	RPLEVT_WRITE      = 0x03,
-	RPLEVT_MAGIC      = 0x4A,
-	RPLEVT_LCLOSE     = 0x64,
-	RPLEVT_ID_PROG    = 0xF0,
-	RPLEVT_ID_DEVPATH = 0xF1,
-	RPLEVT_ID_TIME    = 0xF2,
-	RPLEVT_ID_USER    = 0xF3,
+	RPLEVT_MASK       = 0x727033E0,
+	RPLEVT_NONE       = 0x72703340, /* "rp3@" */
+	RPLEVT_OPEN       = 0x72703341, /* "rp3A" */
+	RPLEVT_READ       = 0x72703342, /* "rp3B" */
+	RPLEVT_WRITE      = 0x72703343, /* "rp3C" */
+	RPLEVT_LCLOSE     = 0x72703344, /* "rp3D" */
+	RPLEVT_ID_PROG    = 0x72703345, /* "rp3E" */
+	RPLEVT_ID_DEVPATH = 0x72703346, /* "rp3F" */
+	RPLEVT_ID_TIME    = 0x72703347, /* "rp3G" */
+	RPLEVT_ID_USER    = 0x72703348, /* "rp3H" */
 	RPLEVT_max,
-	RPLMAGIC_SIG      = 0xEE,
 };
 
 struct rpltime {
@@ -35,16 +34,21 @@ struct rpltime {
 	uint32_t tv_usec;
 };
 
+union rpldev_evmagic {
+	uint32_t n;
+	char m[4];
+};
+
 struct rpldev_packet {
+	union rpldev_evmagic evmagic;
 	uint32_t size;
-	uint8_t event, magic;
 	struct rpltime time;
 	uint32_t dev;
 } __PACKED;
 
 struct rpldsk_packet {
+	union rpldev_evmagic evmagic;
 	uint32_t size;
-	uint8_t event, magic;
 	struct rpltime time;
 } __PACKED;
 

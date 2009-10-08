@@ -51,9 +51,12 @@ an external function in the rpldev kernel module is called, which
 transfers the tty buffer into so-called packets, which are then
 returned as /dev/rpl is read.
 .PP
-A packet consists of a device number, magic byte (always 0xEE), size
+A packet consists of the event type (which also contains a magic number
+for file identification), device number, size
 of the data, timestamp, and of course, the data itself. All fields
-are little-endian and packed, i.e. there are no alignment gaps. It
+are little-endian and packed, i.e. there are no alignment gaps.
+When using \fIevmagic\fP however, it must be interpreted as big-endian.
+The purpose is to have the magic string "rp3@". The struct
 can be represented in this C struct:
 .PP
 .nf
@@ -62,11 +65,16 @@ struct rpltime {
 	uint32_t tv_usec;
 };
 
+union rpldev_evmagic {
+	uint32_t evmagic; /*BE*/
+	char magic[4];
+};
+
 struct rpldev_packet {
-	uint32_t size;
-	uint8_t event, magic;
-	struct rpltime time;
-	uint32_t dev;
+	union rpldev_evmagic evmagic;
+	uint32_t size; /*LE*/
+	struct rpltime time; /*LE*/
+	uint32_t dev; /*LE*/
 } __attribute__((packed));
 .fi
 .PP
@@ -89,19 +97,26 @@ involved, since BSD uses an 8/24 split, so minors greater than 1048575 will be
 truncated. This should not pose a problem, as one million devices is already
 more than a system could ever have in a meaningful way.
 .PP
-The following event types exist:
+The following event types exist.
 .IP \(bu 4
-RPLEVT_OPEN = 0x01
+RPLEVT_NONE = 0x7270334E, /* "rp3@" */
+.IP
+RPLEVT_OPEN = 0x72703341, /* "rp3A" */
 .IP \(bu 4
-RPLEVT_READ = 0x02,
+RPLEVT_READ = 0x72703342, /* "rp3B" */
 .IP \(bu 4
-RPLEVT_WRITE = 0x03,
+RPLEVT_WRITE = 0x72703343, /* "rp3C" */
 .IP \(bu 4
-RPLEVT_LCLOSE = 0x64,
+RPLEVT_LCLOSE = 0x72703344, /* "rp3D" */
 .PP
 RPLEVT_OPEN, RPLEVT_READ and RPLEVT_WRITE are generated whenever an open(),
 read() or write() is done, respectively. RPLEVT_LCLOSE is generated when the
 last file descriptor to the tty is closed.
+.PP
+RPLEVT_NONE are no-ops. The kernel modules will not output this type, but
+rpld(8) will add it at the start of a logfile to ease identification by
+file(1). rpld outputs the ident by setting \fIsize\fP to 0 (because there is
+no data following) and the time field is filled with 0xFA.
 .PP
 During an open() on a tty line (Linux only), the filename of the accessed
 dentry is extracted and passed to rpld within the payload, for convenience, so

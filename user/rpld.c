@@ -188,17 +188,18 @@ static void mainloop(int fd)
 		break;
 	}
 
+	packet.evmagic.n = be32_to_cpu(packet.evmagic.n);
 	packet.dev  = le32_to_cpu(packet.dev);
 	packet.size = le32_to_cpu(packet.size);
 	packet.time.tv_sec  = le64_to_cpu(packet.time.tv_sec);
 	packet.time.tv_usec = le32_to_cpu(packet.time.tv_usec);
 
-	if (packet.magic != RPLMAGIC_SIG) {
+	if ((packet.evmagic.n & RPLEVT_MASK) != RPLEVT_NONE) {
 		++Stats.badpack;
 		if (rate_limit(C_BADPACKET, 2))
 			notify(LOG_WARNING,
-			       _("Bogus packet (magic is 0x%02X)!\n"),
-			       packet.magic);
+			       _("Bogus packet (evmagic is 0x%08x)!\n"),
+			       packet.evmagic.n);
 		continue;
 	}
 
@@ -228,19 +229,20 @@ static void mainloop(int fd)
 //-----------------------------------------------------------------------------
 static bool packet_preprox(struct rpldev_packet *packet)
 {
+#define E(x) ((x) & ~RPLEVT_MASK)
 	static unsigned long *const tab[] = {
-		[RPLEVT_OPEN]   = &Stats.open,
-		[RPLEVT_READ]   = &Stats.read,
-		[RPLEVT_WRITE]  = &Stats.write,
-		[RPLEVT_LCLOSE] = &Stats.lclose,
-		[RPLEVT_max]    = NULL,
+		[E(RPLEVT_OPEN)]   = &Stats.open,
+		[E(RPLEVT_READ)]   = &Stats.read,
+		[E(RPLEVT_WRITE)]  = &Stats.write,
+		[E(RPLEVT_LCLOSE)] = &Stats.lclose,
+		[E(RPLEVT_max)]    = NULL,
 	};
 
-	if (packet->event < RPLEVT_max && tab[packet->event] != NULL)
-		++*tab[packet->event];
+	if (packet->evmagic.n < RPLEVT_max && tab[E(packet->evmagic.n)] != NULL)
+		++*tab[E(packet->evmagic.n)];
 
 	/* General packet classification (first stage drop) */
-	switch (packet->event) {
+	switch (packet->evmagic.n) {
 	/* These will be processed */
 	case RPLEVT_OPEN:
 	case RPLEVT_LCLOSE:
@@ -256,12 +258,13 @@ static bool packet_preprox(struct rpldev_packet *packet)
 	default:
 		if (rate_limit(C_PKTTYPE, 2))
 			notify(LOG_WARNING,
-			       _("Unknown packet type 0x%02X\n"),
-			       packet->event);
+			       _("Unknown packet type 0x%08x\n"),
+			       packet->evmagic.n);
 		return false;
 	} /* switch */
 
 	return true;
+#undef E
 }
 
 static bool packet_process(struct rpldev_packet *packet,
@@ -273,7 +276,7 @@ static bool packet_process(struct rpldev_packet *packet,
 	}
 
 	if (tty->status != IFP_ACTIVATE) {
-		switch (packet->event) {
+		switch (packet->evmagic.n) {
 			case RPLEVT_READ:
 				tty->in += packet->size;
 				break;
@@ -284,7 +287,7 @@ static bool packet_process(struct rpldev_packet *packet,
 		return false;
 	}
 
-	switch (packet->event) {
+	switch (packet->evmagic.n) {
 		case RPLEVT_OPEN:
 			evt_open(packet, tty, fd);
 			return true;
@@ -301,8 +304,8 @@ static bool packet_process(struct rpldev_packet *packet,
 			break;
 		default:
 			notify(LOG_ERR, _("Should never get here! (%s:%d) "
-			       "Forgot to code something? (event=%d)\n"),
-			       __FILE__, __LINE__, packet->event);
+			       "Forgot to code something? (event=%x)\n"),
+			       __FILE__, __LINE__, packet->evmagic.n);
 			break;
 	}
 
@@ -353,7 +356,7 @@ static void evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 
 static void log_open(struct tty *tty)
 {
-	struct rpldsk_packet p = {.magic = RPLMAGIC_SIG, .time = {-1, -1}};
+	struct rpldsk_packet p;
 	struct tm now_tm, *nowp;
 	char buf[MAXFNLEN];
 	time_t now_sec;
@@ -370,24 +373,18 @@ static void log_open(struct tty *tty)
 	tty->fd = open(tty->log, O_WRONLY | O_CREAT | O_APPEND,
 	          S_IRUSR | S_IWUSR);
 
-	/*
-	 * Add an optional magic packet for file(1) to recognize.
-	 * (RPLEVT_ID_PROG may contain _anything_, while RPLEVT_MAGIC is fixed.
-	 * See share/ttyrpld.magic.)
-	 */
-	HX_strlcpy(buf, "RPL2_50", sizeof(buf)); /* STRING FIXED */
-	p.event = RPLEVT_MAGIC;
-	s = strlen(buf) + 1; /* include '\0' in stream */
-	p.size = cpu_to_le32(s);
+	/* Add an optional magic packet for file(1) to recognize. */
+	p.evmagic.n = cpu_to_be32(RPLEVT_NONE);
+	p.size = 0;
+	memset(&p.time, 0xFA, sizeof(p.time));
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
-	write(tty->fd, buf, s);
 
 	/*
 	 * Add an optional ident header to record the program and version which
 	 * this logfile was created with.
 	 */
 	HX_strlcpy(buf, "ttyrpld " TTYRPLD_VERSION, sizeof(buf));
-	p.event = RPLEVT_ID_PROG;
+	p.evmagic.n = cpu_to_be32(RPLEVT_ID_PROG);
 	s = strlen(buf) + 1;
 	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
@@ -397,14 +394,14 @@ static void log_open(struct tty *tty)
 	now_sec = time(NULL);
 	nowp = localtime_r(&now_sec, &now_tm);
 	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", nowp);
-	p.event = RPLEVT_ID_TIME;
+	p.evmagic.n = cpu_to_be32(RPLEVT_ID_TIME);
 	s = strlen(buf) + 1;
 	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
 	write(tty->fd, buf, s);
 
 	/* ... and the full path name of the tty for reference. */
-	p.event = RPLEVT_ID_DEVPATH;
+	p.evmagic.n = cpu_to_be32(RPLEVT_ID_DEVPATH);
 	s = strlen(tty->full_dev) + 1;
 	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
@@ -413,7 +410,7 @@ static void log_open(struct tty *tty)
 	/* ... as well as the username (or UID) the tty belongs to */
 	if (getnamefromuid(tty->uid, buf, sizeof(buf)) == NULL)
 		snprintf(buf, sizeof(buf), "%ld", static_cast(long, tty->uid));
-	p.event = RPLEVT_ID_USER;
+	p.evmagic.n = cpu_to_be32(RPLEVT_ID_USER);
 	s = strlen(buf) + 1;
 	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
@@ -434,6 +431,9 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 		goto out;
 	if (have != packet->size)
 		packet->size = have;
+
+	/* flip it back */
+	packet->evmagic.n = cpu_to_be32(packet->evmagic.n);
 
 	packet->size = cpu_to_le32(packet->size);
 	packet->time.tv_sec  = cpu_to_le64(packet->time.tv_sec);

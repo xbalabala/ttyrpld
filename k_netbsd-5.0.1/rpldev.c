@@ -135,10 +135,9 @@ static int rpldhc_open(const struct tty *tty)
 {
 	struct rpldev_packet p;
 
+	p.evmagic.n = htobe32(RPLEVT_OPEN);
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = RPLEVT_OPEN;
-	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }
@@ -150,10 +149,9 @@ static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 	if (count == 0)
 		return 0;
 
+	p.evmagic.n = htobe32(RPLEVT_READ);
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = htole32(count);
-	p.event = RPLEVT_READ;
-	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -165,10 +163,9 @@ static int rpldhc_write(const char *buf, size_t count, const struct tty *tty)
 	if (count == 0)
 		return 0;
 
+	p.evmagic.n = htobe32(RPLEVT_WRITE);
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = htole32(count);
-	p.event = RPLEVT_WRITE;
-	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -177,10 +174,9 @@ static int rpldhc_lclose(const struct tty *tty)
 {
 	struct rpldev_packet p;
 
+	p.evmagic.n = htobe32(RPLEVT_LCLOSE);
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = RPLEVT_LCLOSE;
-	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }

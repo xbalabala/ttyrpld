@@ -164,9 +164,8 @@ static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
 
 	SKIP_PTM(tty);
 
+	p.evmagic.n = cpu_to_be32(RPLEVT_OPEN);
 	p.dev   = TTY_DEVNR(tty);
-	p.event = RPLEVT_OPEN;
-	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 
 	/*
@@ -199,10 +198,9 @@ static int rpldhc_read(const char __user *buf, size_t count,
 	if (count == 0)
 		return 0;
 
+	p.evmagic.n = cpu_to_be32(RPLEVT_READ);
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = cpu_to_le32(count);
-	p.event = RPLEVT_READ;
-	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -229,10 +227,9 @@ static int rpldhc_write(const char __user *buf, size_t count,
 	if (count == 0)
 		return 0;
 
+	p.evmagic.n = cpu_to_be32(RPLEVT_WRITE);
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = cpu_to_le32(count);
-	p.event = RPLEVT_WRITE;
-	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -245,10 +242,9 @@ static int rpldhc_lclose(const struct tty_struct *tty,
 	if (IS_PTY_MASTER(tty))
 		tty = other;
 
+	p.evmagic.n = cpu_to_be32(RPLEVT_LCLOSE);
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = RPLEVT_LCLOSE;
-	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }

@@ -26,6 +26,7 @@ Changes:
 - rpldev: Linux 2.6.31 support
 - rpldev: FreeBSD 8.0 support
 - packet: increase the "size" field to 32 bits
+- packet: combine "magic" and "event" fields, and move to front
 
 
 v2.52 (2008-09-07)
