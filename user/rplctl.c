@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/user/rplctl.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -141,7 +140,7 @@ static void read_reply(int fd)
 		fd_set rd;
 
 		recv(fd, &reply_size, sizeof(uint32_t), MSG_WAITALL);
-		SWAB1(&reply_size);
+		reply_size = le32_to_cpu(reply_size);
 		if (reply_size == 0)
 			break;
 
@@ -163,7 +162,7 @@ static void read_reply(int fd)
 static void send_int(int fd, unsigned char req, uint32_t dev)
 {
 	send_wait(fd, &req, sizeof(unsigned char));
-	SWAB1(&dev);
+	dev = cpu_to_le32(dev);
 	send_wait(fd, &dev, sizeof(uint32_t));
 	read_reply(fd);
 }

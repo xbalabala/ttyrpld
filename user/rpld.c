@@ -188,10 +188,10 @@ static void mainloop(int fd)
 		break;
 	}
 
-	SWAB1(&packet.dev);
-	SWAB1(&packet.size);
-	SWAB1(&packet.time.tv_sec);
-	SWAB1(&packet.time.tv_usec);
+	packet.dev  = le32_to_cpu(packet.dev);
+	packet.size = le32_to_cpu(packet.size);
+	packet.time.tv_sec  = le64_to_cpu(packet.time.tv_sec);
+	packet.time.tv_usec = le32_to_cpu(packet.time.tv_usec);
 
 	if (packet.magic != RPLMAGIC_SIG) {
 		++Stats.badpack;
@@ -377,8 +377,8 @@ static void log_open(struct tty *tty)
 	 */
 	HX_strlcpy(buf, "RPL2_50", sizeof(buf)); /* STRING FIXED */
 	p.event = RPLEVT_MAGIC;
-	s = p.size = strlen(buf) + 1; /* include '\0' in stream */
-	SWAB1(&p.size);
+	s = strlen(buf) + 1; /* include '\0' in stream */
+	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
 	write(tty->fd, buf, s);
 
@@ -388,8 +388,8 @@ static void log_open(struct tty *tty)
 	 */
 	HX_strlcpy(buf, "ttyrpld " TTYRPLD_VERSION, sizeof(buf));
 	p.event = RPLEVT_ID_PROG;
-	s = p.size = strlen(buf) + 1;
-	SWAB1(&p.size);
+	s = strlen(buf) + 1;
+	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
 	write(tty->fd, buf, s);
 
@@ -398,15 +398,15 @@ static void log_open(struct tty *tty)
 	nowp = localtime_r(&now_sec, &now_tm);
 	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", nowp);
 	p.event = RPLEVT_ID_TIME;
-	s = p.size = strlen(buf) + 1;
-	SWAB1(&p.size);
+	s = strlen(buf) + 1;
+	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
 	write(tty->fd, buf, s);
 
 	/* ... and the full path name of the tty for reference. */
 	p.event = RPLEVT_ID_DEVPATH;
-	s = p.size = strlen(tty->full_dev) + 1;
-	SWAB1(&p.size);
+	s = strlen(tty->full_dev) + 1;
+	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
 	write(tty->fd, tty->full_dev, s);
 
@@ -414,8 +414,8 @@ static void log_open(struct tty *tty)
 	if (getnamefromuid(tty->uid, buf, sizeof(buf)) == NULL)
 		snprintf(buf, sizeof(buf), "%ld", static_cast(long, tty->uid));
 	p.event = RPLEVT_ID_USER;
-	s = p.size = strlen(buf) + 1;
-	SWAB1(&p.size);
+	s = strlen(buf) + 1;
+	p.size = cpu_to_le32(s);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
 	write(tty->fd, buf, s);
 }
@@ -435,9 +435,9 @@ static void log_write(struct rpldev_packet *packet, struct tty *tty, int fd)
 	if (have != packet->size)
 		packet->size = have;
 
-	SWAB1(&packet->size);
-	SWAB1(&packet->time.tv_sec);
-	SWAB1(&packet->time.tv_usec);
+	packet->size = cpu_to_le32(packet->size);
+	packet->time.tv_sec  = cpu_to_le64(packet->time.tv_sec);
+	packet->time.tv_usec = cpu_to_le32(packet->time.tv_usec);
 	write(tty->fd, packet, sizeof(struct rpldsk_packet));
 	write(tty->fd, buffer, have);
  out:

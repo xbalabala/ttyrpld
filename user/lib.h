@@ -1,7 +1,5 @@
 /*
- *	ttyrpld/user/lib.h
- *	Copyright © CC Computer Consultants GmbH, 2004 - 2008
- *	Contact: Jan Engelhardt <jengelh [at] computergmbh de>
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -31,7 +29,6 @@ extern void load_locale(const char *);
 extern ssize_t read_through(int, int, size_t);
 extern ssize_t read_wait(int, void *, size_t, const struct pctrl_info *);
 extern off_t G_skip(int, off_t, int);
-extern void swab_be(void *, size_t);
 
 static inline unsigned int min_uint(unsigned int a, unsigned int b)
 {

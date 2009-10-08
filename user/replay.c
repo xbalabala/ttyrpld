@@ -183,9 +183,9 @@ static int replay_file(int fd, const char *name)
 			continue;
 		}
 
-		SWAB1(&packet.size);
-		SWAB1(&packet.time.tv_sec);
-		SWAB1(&packet.time.tv_usec);
+		packet.size = le32_to_cpu(packet.size);
+		packet.time.tv_sec  = le64_to_cpu(packet.time.tv_sec);
+		packet.time.tv_usec = le32_to_cpu(packet.time.tv_usec);
 
 		switch (packet.event) {
 		case RPLEVT_WRITE:

@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/user/lib.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -169,16 +168,4 @@ off_t G_skip(int fd, off_t offset, int do_wait)
 	}
 
 	return 0;
-}
-
-void swab_be(void *srcp, size_t count)
-{
-	char *movp = srcp, x;
-
-	while (count) {
-		x = *movp++;
-		movp[0] = movp[1];
-		*++movp = x;
-		count -= 2;
-	}
 }

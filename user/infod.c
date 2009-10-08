@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/user/infod.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -100,7 +99,7 @@ static void *client_thread(void *arg)
 
 		ret |= !RECEIVE_FULL(fd, &req, sizeof(unsigned char));
 		ret |= !RECEIVE_FULL(fd, &gint, sizeof(gint));
-		SWAB1(&gint);
+		gint = le32_to_cpu(gint);
 		if (ret || req == IFP_NONE)
 			break;
 
@@ -325,8 +324,8 @@ static int skprintf(int fd, const char *fmt, ...)
 	uint32_t le, s;
 
 	va_start(argp, fmt);
-	le = s = vsnprintf(buf, sizeof(buf), fmt, argp);
-	SWAB1(&le);
+	s  = vsnprintf(buf, sizeof(buf), fmt, argp);
+	le = cpu_to_le32(s);
 	send_wait(fd, &le, sizeof(uint32_t));
 	send_wait(fd, buf, s);
 
