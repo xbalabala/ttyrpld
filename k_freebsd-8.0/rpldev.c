@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/k_freebsd-6.2/rpldev.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	Redistribution and use in source and binary forms, with or without
  *	modification, are permitted provided that the following conditions
@@ -53,7 +52,11 @@
 
 #define IO_NDELAY 0x10 /* from sys/vnode.h -- inclusion problems */
 
-#if __FreeBSD_version >= 600000
+#if __FreeBSD_version >= 800062
+#	define TTY_DEVNR(tty) \
+		htole32(mkdev_26(major(dev2udev((tty)->t_dev)), \
+		        minor(dev2udev((tty)->t_dev))))
+#elif __FreeBSD_version >= 600000
 #	define TTY_DEVNR(tty) \
 		htole32(mkdev_26(umajor(dev2udev((tty)->t_dev)), \
 		        uminor(dev2udev((tty)->t_dev))))
@@ -69,8 +72,8 @@ static int kmd_unload(void);
 
 /* Stage 2 functions */
 static int rpldhc_open(const struct tty *);
-static int rpldhc_read(const char *, size_t, const struct tty *);
-static int rpldhc_write(const char *, size_t, const struct tty *);
+static int rpldhc_read(const struct tty *, const struct uio *, int);
+static int rpldhc_write(const struct tty *, const struct uio *, int);
 static int rpldhc_lclose(const struct tty *);
 
 /* Stage 3 functions */
@@ -169,34 +172,40 @@ static int rpldhc_open(const struct tty *tty)
 	return circular_put_packet(&p, NULL, 0);
 }
 
-static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
+static int rpldhc_rw(const struct tty *tty, const struct uio *uio,
+    unsigned int event)
 {
+	const struct iovec *iov;
 	struct rpldev_packet p;
+	int i, ret;
 
-	if (tty == NULL || count == 0)
+	if (tty == NULL)
 		return 0;
 
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = htole16(count);
-	p.event = EVT_READ;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, buf, count);
+	for (i = 0; i < uio->uio_iovcnt; ++i) {
+		iov     = &uio->uio_iov[i];
+		p.dev   = TTY_DEVNR(tty);
+		p.size  = htole16(iov->iov_len);
+		p.event = event;
+		p.magic = MAGIC_SIG;
+		fill_time(&p.time);
+		ret = circular_put_packet(&p, iov->iov_base, iov->iov_len);
+		if (ret != 0)
+			return ret;
+	}
+	return 0;
 }
 
-static int rpldhc_write(const char *buf, size_t count, const struct tty *tty)
+static int rpldhc_read(const struct tty *tty, const struct uio *uio,
+    int ioflag)
 {
-	struct rpldev_packet p;
+	return rpldhc_rw(tty, uio, EVT_READ);
+}
 
-	if (tty == NULL || count == 0)
-		return 0;
-
-	p.dev   = TTY_DEVNR(tty);
-	p.size  = htole16(count);
-	p.event = EVT_WRITE;
-	p.magic = MAGIC_SIG;
-	fill_time(&p.time);
-	return circular_put_packet(&p, buf, count);
+static int rpldhc_write(const struct tty *tty, const struct uio *uio,
+    int ioflag)
+{
+	return rpldhc_rw(tty, uio, EVT_WRITE);
 }
 
 static int rpldhc_lclose(const struct tty *tty)

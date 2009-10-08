@@ -1,0 +1,6 @@
+@
+*.kld
+*.ko
+
+/export_syms
+/machine

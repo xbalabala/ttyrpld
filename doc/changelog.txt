@@ -9,7 +9,7 @@ changed significantly between ttyrpld releases.
 │Operating system│(rpldhk) changed│last time rpldev changed:   │
 ├────────────────┼────────────────┼────────────────────────────┤
 │Linux           │2.50            │2.60                        │
-│FreeBSD         │2.50            │2.50                        │
+│FreeBSD         │2.60            │2.60                        │
 │OpenBSD         │-               │2.60                        │
 │NetBSD          │2.50            │2.60                        │
 
@@ -24,6 +24,7 @@ Changes:
 - rpldev: NetBSD 5.0.1 support
 - rpldev: OpenBSD 4.5 support
 - rpldev: Linux 2.6.31 support
+- rpldev: FreeBSD 8.0 support
 
 
 v2.52 (2008-09-07)

@@ -1,0 +1,125 @@
+---
+ kern/tty.c   |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ sys/rpldhk.h |   16 ++++++++++++++++
+ 2 files changed, 62 insertions(+)
+
+Index: sys/kern/tty.c
+===================================================================
+--- sys.orig/kern/tty.c	2009-08-03 10:13:06.000000000 +0200
++++ sys/kern/tty.c	2009-10-08 14:29:15.237916000 +0200
+@@ -67,6 +67,13 @@
+ 
+ static MALLOC_DEFINE(M_TTY, "tty", "tty device");
+ 
++#include <sys/rpldhk.h>
++#include <sys/types.h>
++int (*rpl_open)(const struct tty *);
++int (*rpl_read)(const struct tty *, const struct uio *, int);
++int (*rpl_write)(const struct tty *, const struct uio *, int);
++int (*rpl_lclose)(const struct tty *);
++
+ static void tty_rel_free(struct tty *tp);
+ 
+ static TAILQ_HEAD(, tty) tty_list = TAILQ_HEAD_INITIALIZER(tty_list);
+@@ -210,6 +217,40 @@
+ 	tty_rel_free(tp);
+ }
+ 
++static inline void rpldhk_open(const struct tty *tty)
++{
++	__typeof__(rpl_open) tmp = rpl_open;
++	if (tmp != NULL)
++		tmp(tty);
++	return;
++}
++
++static inline void rpldhk_read(const struct tty *tty, const struct uio *uio,
++    int ioflag)
++{
++	__typeof__(rpl_read) tmp = rpl_read;
++	if (tmp != NULL)
++		tmp(tty, uio, ioflag);
++	return;
++}
++
++static inline void rpldhk_write(const struct tty *tty, const struct uio *uio,
++    int ioflag)
++{
++	__typeof__(rpl_write) tmp = rpl_write;
++	if (tmp != NULL)
++		tmp(tty, uio, ioflag);
++	return;
++}
++
++static inline void rpldhk_lclose(const struct tty *tty)
++{
++	__typeof__(rpl_lclose) tmp = rpl_lclose;
++	if (tmp != NULL)
++		tmp(tty);
++	return;
++}
++
+ /*
+  * Operations that are exposed through the character device in /dev.
+  */
+@@ -296,6 +337,7 @@
+ 	else
+ 		tp->t_flags |= TF_OPENED_IN;
+ 
++	rpldhk_open(tp);
+ done:	tp->t_flags &= ~TF_OPENCLOSE;
+ 	cv_broadcast(&tp->t_dcdwait);
+ 	ttydev_leave(tp);
+@@ -338,6 +380,7 @@
+ 	cv_broadcast(&tp->t_dcdwait);
+ 
+ 	ttydev_leave(tp);
++	rpldhk_lclose(tp);
+ 
+ 	return (0);
+ }
+@@ -422,6 +465,7 @@
+ 		goto done;
+ 	}
+ 
++	rpldhk_read(tp, uio, ioflag);
+ 	error = ttydisc_read(tp, uio, ioflag);
+ 	tty_unlock(tp);
+ 
+@@ -452,6 +496,7 @@
+ 
+ 	if (ioflag & IO_NDELAY && tp->t_flags & TF_BUSY_OUT) {
+ 		/* Allow non-blocking writes to bypass serialization. */
++		rpldhk_write(tp, uio, ioflag);
+ 		error = ttydisc_write(tp, uio, ioflag);
+ 	} else {
+ 		/* Serialize write() calls. */
+@@ -461,6 +506,7 @@
+ 				goto done;
+ 		}
+  
++		rpldhk_write(tp, uio, ioflag);
+  		tp->t_flags |= TF_BUSY_OUT;
+ 		error = ttydisc_write(tp, uio, ioflag);
+  		tp->t_flags &= ~TF_BUSY_OUT;
+Index: sys/sys/rpldhk.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ sys/sys/rpldhk.h	2009-10-08 14:06:08.423989487 +0200
+@@ -0,0 +1,16 @@
++#ifndef _SYS_RPLDHK_H
++#define _SYS_RPLDHK_H 1
++
++#ifdef _KERNEL
++
++struct tty;
++struct uio;
++
++extern int (*rpl_open)(const struct tty *);
++extern int (*rpl_read)(const struct tty *, const struct uio *, int);
++extern int (*rpl_write)(const struct tty *, const struct uio *, int);
++extern int (*rpl_lclose)(const struct tty *);
++
++#endif /* _KERNEL */
++
++#endif /* _SYS_RPLDHK_H */
