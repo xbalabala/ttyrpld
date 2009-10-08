@@ -91,17 +91,17 @@ more than a system could ever have in a meaningful way.
 .PP
 The following event types exist:
 .IP \(bu 4
-EVT_OPEN = 0x01
+RPLEVT_OPEN = 0x01
 .IP \(bu 4
-EVT_READ = 0x02,
+RPLEVT_READ = 0x02,
 .IP \(bu 4
-EVT_WRITE = 0x03,
+RPLEVT_WRITE = 0x03,
 .IP \(bu 4
-EVT_LCLOSE = 0x64,
+RPLEVT_LCLOSE = 0x64,
 .PP
-EVT_OPEN, EVT_READ and EVT_WRITE are generated whenever an open(), read() or
-write() is done, respectively. EVT_LCLOSE is generated when the last file
-descriptor to the tty is closed.
+RPLEVT_OPEN, RPLEVT_READ and RPLEVT_WRITE are generated whenever an open(),
+read() or write() is done, respectively. RPLEVT_LCLOSE is generated when the
+last file descriptor to the tty is closed.
 .PP
 During an open() on a tty line (Linux only), the filename of the accessed
 dentry is extracted and passed to rpld within the payload, for convenience, so

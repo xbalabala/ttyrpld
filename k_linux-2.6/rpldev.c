@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/k_linux-2.6/rpldev.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -166,8 +165,8 @@ static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
 	SKIP_PTM(tty);
 
 	p.dev   = TTY_DEVNR(tty);
-	p.event = EVT_OPEN;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_OPEN;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 
 	/*
@@ -201,8 +200,8 @@ static int rpldhc_read(const char __user *buf, size_t count,
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = cpu_to_le16(count);
-	p.event = EVT_READ;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_READ;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -215,12 +214,12 @@ static int rpldhc_write(const char __user *buf, size_t count,
 	 * There are two ways an application can use a tty:
 	 *
 	 * 1. noecho mode (the case with interactive shells) Shells print chars
-	 *    as they see fit, thus generating EVT_READ for you hitting a key,
-	 *    and EVT_WRITE for the shell displaying it.
+	 *    as they see fit, thus generating RPLEVT_READ for you hitting a
+	 *    key, and RPLEVT_WRITE for the shell displaying it.
 	 *
 	 * 2. echo mode (cat waiting for EOF on stdin) The _tty driver_ echoes
-	 *    _single_ chars back. This generates EVT_READ for your keyboard
-	 *    interaction, plus _one_ EVT_WRITE when an end-of-line is
+	 *    _single_ chars back. This generates RPLEVT_READ for your keyboard
+	 *    interaction, plus _one_ RPLEVT_WRITE when an end-of-line is
 	 *    received.
 	 */
 	struct rpldev_packet p;
@@ -231,8 +230,8 @@ static int rpldhc_write(const char __user *buf, size_t count,
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = cpu_to_le16(count);
-	p.event = EVT_WRITE;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_WRITE;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -247,8 +246,8 @@ static int rpldhc_lclose(const struct tty_struct *tty,
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = EVT_LCLOSE;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_LCLOSE;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }

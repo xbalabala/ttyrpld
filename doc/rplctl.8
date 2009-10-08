@@ -87,17 +87,17 @@ should) be ignored by programs querying infod. The second is the status line
 about rpld. The sscanf formula is "%lu %lu %lu %lu %llu %llu %lu %lu". The
 fields are (in this order):
 .IP \(bu 4
-EVT_OPEN \(em number of open() operation on any tty
+RPLEVT_OPEN \(em number of open() operation on any tty
 .IP \(bu 4
-EVT_LCLOSE \(em final tty closes
+RPLEVT_LCLOSE \(em final tty closes
 .IP \(bu 4
-EVT_READ \(em payload bytecount
+RPLEVT_READ \(em payload bytecount
 .IP \(bu 4
-EVT_WRITE \(em payload bytecount
+RPLEVT_WRITE \(em payload bytecount
 .IP \(bu 4
-EVT_READ \(em packets read from rpldev
+RPLEVT_READ \(em packets read from rpldev
 .IP \(bu 4
-EVT_WRITE \(em packets read from rpldev
+RPLEVT_WRITE \(em packets read from rpldev
 .IP \(bu 4
 packets considered bad (i.e. bad magic) \(em might be more than there are
 actually damaged, because the algorithm needs to find something that looks
@@ -115,9 +115,9 @@ minor number
 .IP \(bu 4
 mnemonic string for the major/minor number
 .IP \(bu 4
-EVT_READ payload bytecount
+RPLEVT_READ payload bytecount
 .IP \(bu 4
-EVT_WRITE payload bytecount
+RPLEVT_WRITE payload bytecount
 .IP \(bu 4
 full filename being written to (this is different from the human-readable
 output which only shows it in part)

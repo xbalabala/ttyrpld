@@ -78,9 +78,9 @@ protocol.</p>
 <br />
 &nbsp; &nbsp; p.dev &nbsp; = TTY_DEVNR(tty);<br />
 &nbsp; &nbsp; p.size &nbsp;= cpu_to_le16(count);<br />
-&nbsp; &nbsp; p.event = EVT_READ;<br />
-&nbsp; &nbsp; p.magic = MAGIC_SIG;<br />
-&nbsp; &nbsp; fill_time(&p.time);<br />
+&nbsp; &nbsp; p.event = RPLEVT_READ;<br />
+&nbsp; &nbsp; p.magic = RPLMAGIC_SIG;<br />
+&nbsp; &nbsp; fill_time(&amp;p.time);<br />
 &nbsp; &nbsp; <b>return</b> circular_put_packet(&amp;p, buf, count);<br />
 }</code></p>
 

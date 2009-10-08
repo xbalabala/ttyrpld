@@ -166,8 +166,8 @@ static int rpldhc_open(const struct tty *tty)
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = EVT_OPEN;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_OPEN;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }
@@ -187,7 +187,7 @@ static int rpldhc_rw(const struct tty *tty, const struct uio *uio,
 		p.dev   = TTY_DEVNR(tty);
 		p.size  = htole16(iov->iov_len);
 		p.event = event;
-		p.magic = MAGIC_SIG;
+		p.magic = RPLMAGIC_SIG;
 		fill_time(&p.time);
 		ret = circular_put_packet(&p, iov->iov_base, iov->iov_len);
 		if (ret != 0)
@@ -199,13 +199,13 @@ static int rpldhc_rw(const struct tty *tty, const struct uio *uio,
 static int rpldhc_read(const struct tty *tty, const struct uio *uio,
     int ioflag)
 {
-	return rpldhc_rw(tty, uio, EVT_READ);
+	return rpldhc_rw(tty, uio, RPLEVT_READ);
 }
 
 static int rpldhc_write(const struct tty *tty, const struct uio *uio,
     int ioflag)
 {
-	return rpldhc_rw(tty, uio, EVT_WRITE);
+	return rpldhc_rw(tty, uio, RPLEVT_WRITE);
 }
 
 static int rpldhc_lclose(const struct tty *tty)
@@ -214,8 +214,8 @@ static int rpldhc_lclose(const struct tty *tty)
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = EVT_LCLOSE;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_LCLOSE;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }

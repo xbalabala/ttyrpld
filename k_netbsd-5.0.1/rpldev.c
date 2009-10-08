@@ -1,5 +1,5 @@
 /*
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	Redistribution and use in source and binary forms, with or without
  *	modification, are permitted provided that the following conditions
@@ -137,8 +137,8 @@ static int rpldhc_open(const struct tty *tty)
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = EVT_OPEN;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_OPEN;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }
@@ -152,8 +152,8 @@ static int rpldhc_read(const char *buf, size_t count, const struct tty *tty)
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = htole16(count);
-	p.event = EVT_READ;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_READ;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -167,8 +167,8 @@ static int rpldhc_write(const char *buf, size_t count, const struct tty *tty)
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = htole16(count);
-	p.event = EVT_WRITE;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_WRITE;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -179,8 +179,8 @@ static int rpldhc_lclose(const struct tty *tty)
 
 	p.dev   = TTY_DEVNR(tty);
 	p.size  = 0;
-	p.event = EVT_LCLOSE;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_LCLOSE;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }

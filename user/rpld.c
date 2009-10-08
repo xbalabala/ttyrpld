@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/user/rpld.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -197,7 +196,7 @@ static void mainloop(int fd)
 	SWAB1(&packet.time.tv_sec);
 	SWAB1(&packet.time.tv_usec);
 
-	if (packet.magic != MAGIC_SIG) {
+	if (packet.magic != RPLMAGIC_SIG) {
 		++Stats.badpack;
 		if (rate_limit(C_BADPACKET, 2))
 			notify(LOG_WARNING,
@@ -233,28 +232,28 @@ static void mainloop(int fd)
 static bool packet_preprox(struct rpldev_packet *packet)
 {
 	static unsigned long *const tab[] = {
-		[EVT_OPEN]   = &Stats.open,
-		[EVT_READ]   = &Stats.read,
-		[EVT_WRITE]  = &Stats.write,
-		[EVT_LCLOSE] = &Stats.lclose,
-		[EVT_max]    = NULL,
+		[RPLEVT_OPEN]   = &Stats.open,
+		[RPLEVT_READ]   = &Stats.read,
+		[RPLEVT_WRITE]  = &Stats.write,
+		[RPLEVT_LCLOSE] = &Stats.lclose,
+		[RPLEVT_max]    = NULL,
 	};
 
-	if (packet->event < EVT_max && tab[packet->event] != NULL)
+	if (packet->event < RPLEVT_max && tab[packet->event] != NULL)
 		++*tab[packet->event];
 
 	/* General packet classification (first stage drop) */
 	switch (packet->event) {
 	/* These will be processed */
-	case EVT_OPEN:
-	case EVT_LCLOSE:
+	case RPLEVT_OPEN:
+	case RPLEVT_LCLOSE:
 		break;
 
 	/* The following roll their own and will also be processed... */
-	case EVT_READ:
+	case RPLEVT_READ:
 		Stats.in += packet->size;
 		break;
-	case EVT_WRITE:
+	case RPLEVT_WRITE:
 		Stats.out += packet->size;
 		break;
 	default:
@@ -278,10 +277,10 @@ static bool packet_process(struct rpldev_packet *packet,
 
 	if (tty->status != IFP_ACTIVATE) {
 		switch (packet->event) {
-			case EVT_READ:
+			case RPLEVT_READ:
 				tty->in += packet->size;
 				break;
-			case EVT_WRITE:
+			case RPLEVT_WRITE:
 				tty->out += packet->size;
 				break;
 		}
@@ -289,18 +288,18 @@ static bool packet_process(struct rpldev_packet *packet,
 	}
 
 	switch (packet->event) {
-		case EVT_OPEN:
+		case RPLEVT_OPEN:
 			evt_open(packet, tty, fd);
 			return true;
-		case EVT_READ:
+		case RPLEVT_READ:
 			tty->in += packet->size;
 			log_write(packet, tty, fd);
 			return true;
-		case EVT_WRITE:
+		case RPLEVT_WRITE:
 			tty->out += packet->size;
 			log_write(packet, tty, fd);
 			return true;
-		case EVT_LCLOSE:
+		case RPLEVT_LCLOSE:
 			log_close(tty);
 			break;
 		default:
@@ -350,7 +349,7 @@ static void evt_open(struct rpldev_packet *packet, struct tty *tty, int fd)
 
 static void log_open(struct tty *tty)
 {
-	struct rpldsk_packet p = {.magic = MAGIC_SIG, .time = {-1, -1}};
+	struct rpldsk_packet p = {.magic = RPLMAGIC_SIG, .time = {-1, -1}};
 	struct tm now_tm, *nowp;
 	char buf[MAXFNLEN];
 	time_t now_sec;
@@ -368,12 +367,12 @@ static void log_open(struct tty *tty)
 	          S_IRUSR | S_IWUSR);
 
 	/*
-	 * Add an optional magic packet for file(1) to recognize. (EVT_ID_PROG
-	 * may contain _anything_, while EVT_MAGIC is fixed. See
-	 * share/ttyrpld.magic.)
+	 * Add an optional magic packet for file(1) to recognize.
+	 * (RPLEVT_ID_PROG may contain _anything_, while RPLEVT_MAGIC is fixed.
+	 * See share/ttyrpld.magic.)
 	 */
 	HX_strlcpy(buf, "RPL2_50", sizeof(buf)); /* STRING FIXED */
-	p.event = EVT_MAGIC;
+	p.event = RPLEVT_MAGIC;
 	s = p.size = strlen(buf) + 1; /* include '\0' in stream */
 	SWAB1(&p.size);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
@@ -384,7 +383,7 @@ static void log_open(struct tty *tty)
 	 * this logfile was created with.
 	 */
 	HX_strlcpy(buf, "ttyrpld " TTYRPLD_VERSION, sizeof(buf));
-	p.event = EVT_ID_PROG;
+	p.event = RPLEVT_ID_PROG;
 	s = p.size = strlen(buf) + 1;
 	SWAB1(&p.size);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
@@ -394,14 +393,14 @@ static void log_open(struct tty *tty)
 	now_sec = time(NULL);
 	nowp = localtime_r(&now_sec, &now_tm);
 	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", nowp);
-	p.event = EVT_ID_TIME;
+	p.event = RPLEVT_ID_TIME;
 	s = p.size = strlen(buf) + 1;
 	SWAB1(&p.size);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
 	write(tty->fd, buf, s);
 
 	/* ... and the full path name of the tty for reference. */
-	p.event = EVT_ID_DEVPATH;
+	p.event = RPLEVT_ID_DEVPATH;
 	s = p.size = strlen(tty->full_dev) + 1;
 	SWAB1(&p.size);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));
@@ -410,7 +409,7 @@ static void log_open(struct tty *tty)
 	/* ... as well as the username (or UID) the tty belongs to */
 	if (getnamefromuid(tty->uid, buf, sizeof(buf)) == NULL)
 		snprintf(buf, sizeof(buf), "%ld", static_cast(long, tty->uid));
-	p.event = EVT_ID_USER;
+	p.event = RPLEVT_ID_USER;
 	s = p.size = strlen(buf) + 1;
 	SWAB1(&p.size);
 	write(tty->fd, &p, sizeof(struct rpldsk_packet));

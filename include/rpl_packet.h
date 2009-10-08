@@ -16,18 +16,18 @@
 #endif
 
 enum {
-	EVT_NONE       = 0x00,
-	EVT_OPEN       = 0x01,
-	EVT_READ       = 0x02,
-	EVT_WRITE      = 0x03,
-	EVT_MAGIC      = 0x4A,
-	EVT_LCLOSE     = 0x64,
-	EVT_ID_PROG    = 0xF0,
-	EVT_ID_DEVPATH = 0xF1,
-	EVT_ID_TIME    = 0xF2,
-	EVT_ID_USER    = 0xF3,
-	EVT_max,
-	MAGIC_SIG      = 0xEE,
+	RPLEVT_NONE       = 0x00,
+	RPLEVT_OPEN       = 0x01,
+	RPLEVT_READ       = 0x02,
+	RPLEVT_WRITE      = 0x03,
+	RPLEVT_MAGIC      = 0x4A,
+	RPLEVT_LCLOSE     = 0x64,
+	RPLEVT_ID_PROG    = 0xF0,
+	RPLEVT_ID_DEVPATH = 0xF1,
+	RPLEVT_ID_TIME    = 0xF2,
+	RPLEVT_ID_USER    = 0xF3,
+	RPLEVT_max,
+	RPLMAGIC_SIG      = 0xEE,
 };
 
 struct rpltime {

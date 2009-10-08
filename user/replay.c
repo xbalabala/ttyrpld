@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/user/replay.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -171,7 +170,7 @@ static int replay_file(int fd, const char *name)
 	while ((ret = read_waitfm(fd, &packet,
 	    sizeof(struct rpldsk_packet), &ps)) == sizeof(struct rpldsk_packet))
 	{
-		if (packet.magic != MAGIC_SIG) {
+		if (packet.magic != RPLMAGIC_SIG) {
 			fprintf(stderr, _("\n" "<Packet inconsistency! "
 			        "Trying to find next valid packet.>\n"));
 			tick = 0;
@@ -189,35 +188,35 @@ static int replay_file(int fd, const char *name)
 		SWAB1(&packet.time.tv_usec);
 
 		switch (packet.event) {
-		case EVT_WRITE:
+		case RPLEVT_WRITE:
 			e_proc(fd, &packet, &ps, &tick, &stamp, &skew);
 			break;
-		case EVT_ID_PROG:
+		case RPLEVT_ID_PROG:
 			fprintf(stderr, "\e[1;37;41m%s ", _("Created using")); /* ] */
 			read_through(fd, STDERR_FILENO, packet.size);
 			fprintf(stderr, "\e[0m\n"); /* ] */
 			break;
-		case EVT_ID_DEVPATH:
+		case RPLEVT_ID_DEVPATH:
 			fprintf(stderr, "\e[1;37;41m%s: ", _("Device path")); /* ] */
 			read_through(fd, STDERR_FILENO, packet.size);
 			fprintf(stderr, "\e[0m\n"); /* ] */
 			break;
-		case EVT_ID_TIME:
+		case RPLEVT_ID_TIME:
 			fprintf(stderr, "\e[1;37;41m%s ", _("Recorded on")); /* ] */
 			read_through(fd, STDERR_FILENO, packet.size);
 			fprintf(stderr, "\e[0m\n"); /* ] */
 			break;
-		case EVT_ID_USER:
+		case RPLEVT_ID_USER:
 			fprintf(stderr, "\e[1;37;41m%s: ", _("User")); /* ] */
 			read_through(fd, STDERR_FILENO, packet.size);
 			fprintf(stderr, "\e[0m\n"); /* ] */
 			break;
-		case EVT_LCLOSE:
+		case RPLEVT_LCLOSE:
 			fprintf(stderr, "\n\e[1;37;42m%s\e[0m\n", /* ]] */
 			        _("<tty device has been closed>"));
 			read_nullfm(fd, packet.size);
 			break;
-		case EVT_READ:
+		case RPLEVT_READ:
 			if (ps.echo) {
 				printf("\e[1;37;45m"); /* ] */
 				e_proc(fd, &packet, &ps, &tick, &stamp, &skew);
@@ -368,7 +367,7 @@ static bool find_next_packet(int fd, const struct pctrl_info *ps)
 		 * into this function, there is a reason to it.
 		 */
 
-		if ((ptr = memchr(buf, MAGIC_SIG, BZ)) != NULL &&
+		if ((ptr = memchr(buf, RPLMAGIC_SIG, BZ)) != NULL &&
 		    ptr - buf >= MAGIC_OFFSET) {
 			/*
 			 * A magic byte has been found and the packet start is
@@ -430,7 +429,7 @@ static bool find_next_packet(int fd, const struct pctrl_info *ps)
 				return false;
 		}
 
-		if ((ptr = memchr(buf, MAGIC_SIG, MAGIC_OFFSET + 1)) == NULL ||
+		if ((ptr = memchr(buf, RPLMAGIC_SIG, MAGIC_OFFSET + 1)) == NULL ||
 		    ptr - buf != MAGIC_OFFSET) {
 			/*
 			 * If the size field does not match up with the next
@@ -485,7 +484,7 @@ static bool get_options(int *argc, const char ***argv)
         {.sh = 'f', .type = HXTYPE_VAL, .ptr = &Opt.follow, .val = FM_CATCHUP,
          .help = _("Catch-up follow mode (play file, switch to live feed on EOF)")},
         {.sh = 'j', .type = HXTYPE_LONG, .ptr = &Opt.skval, .cb = getopt_skip,
-         .help = _("Skip the given number of EVT_WRITE packets")},
+         .help = _("Skip the given number of RPLEVT_WRITE packets")},
         {.sh = 'm', .type = HXTYPE_LONG, .cb = getopt_msec,
          .help = _("Maximum delay to wait between packets"), .htyp = _("msec")},
         {.sh = 't', .type = HXTYPE_NONE | HXOPT_INC, .ptr = &Opt.showtime,

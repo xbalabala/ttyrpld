@@ -1,6 +1,5 @@
 /*
- *	ttyrpld/k_solaris-11/rpldev.c
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2006 - 2008
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2006 - 2009
  *
  *	The contents of this file are subject to the terms of the Common
  *	Development and Distribution License, Version 1.0 only (the "License").
@@ -203,8 +202,8 @@ static int rpldhc_open(const struct queue *q)
 
 	p.dev   = TTY_DEVNR(q);
 	p.size  = 0;
-	p.event = EVT_OPEN;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_OPEN;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }
@@ -218,8 +217,8 @@ static int rpldhc_read(const char *buf, size_t count, const struct queue *q)
 
 	p.dev   = TTY_DEVNR(q);
 	p.size  = LE_16(count);
-	p.event = EVT_READ;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_READ;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -233,8 +232,8 @@ static int rpldhc_write(const char *buf, size_t count, const struct queue *q)
 
 	p.dev   = TTY_DEVNR(q);
 	p.size  = LE_16(count);
-	p.event = EVT_WRITE;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_WRITE;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, buf, count);
 }
@@ -245,8 +244,8 @@ static int rpldhc_lclose(const struct queue *q)
 
 	p.dev   = TTY_DEVNR(q);
 	p.size  = 0;
-	p.event = EVT_LCLOSE;
-	p.magic = MAGIC_SIG;
+	p.event = RPLEVT_LCLOSE;
+	p.magic = RPLMAGIC_SIG;
 	fill_time(&p.time);
 	return circular_put_packet(&p, NULL, 0);
 }
