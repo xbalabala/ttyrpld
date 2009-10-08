@@ -52,6 +52,7 @@ static int rpldhc_lclose(const struct queue *);
 static int rpldev_open(dev_t *, int, int, struct cred *);
 static int rpldev_close(dev_t, int, int, struct cred *);
 static int rpldev_read(dev_t, struct uio *, struct cred *);
+static int rpldev_ioctl(dev_t, int, intptr_t, int, struct cred *, int *);
 static int rpldev_chpoll(dev_t, short, int, short *, struct pollhead **);
 
 /* Functions */
@@ -61,7 +62,7 @@ static inline size_t avail_W(void);
 static inline int circular_get(struct uio *, size_t);
 static inline void circular_put(const void *, size_t);
 static int circular_put_packet(struct rpldev_packet *, const void *, size_t);
-static inline void fill_time(struct timeval *);
+static inline void fill_time(struct rpltime *);
 static inline unsigned int min_uint(unsigned int, unsigned int);
 static inline uint32_t mkdev_26(unsigned long, unsigned long);
 
@@ -478,19 +479,20 @@ static int circular_put_packet(struct rpldev_packet *p, const void *buf,
 	return count;
 }
 
-static void fill_time(struct timeval *tv)
+static void fill_time(struct rpltime *x)
 {
-	uniqtime(tv);
+	struct timeval tv;
+	uniqtime(&tv);
 
-	if (sizeof(tv->tv_sec) == sizeof(uint32_t))
-		tv->tv_sec = LE_32(tv->tv_sec);
-	else if (sizeof(tv->tv_sec) == sizeof(uint64_t))
-		tv->tv_sec = LE_64(tv->tv_sec);
+	if (sizeof(tv.tv_sec) == sizeof(uint32_t))
+		x->tv_sec = LE_32(tv.tv_sec);
+	else if (sizeof(tv.tv_sec) == sizeof(uint64_t))
+		x->tv_sec = LE_64(tv.tv_sec);
 
-	if (sizeof(tv->tv_usec) == sizeof(uint32_t))
-		tv->tv_usec = LE_32(tv->tv_usec);
-	else if (sizeof(tv->tv_usec) == sizeof(uint64_t))
-		tv->tv_usec = LE_64(tv->tv_usec);
+	if (sizeof(tv.tv_usec) == sizeof(uint32_t))
+		x->tv_usec = LE_32(tv.tv_usec);
+	else if (sizeof(tv.tv_usec) == sizeof(uint64_t))
+		x->tv_usec = LE_64(tv.tv_usec);
 }
 
 static inline unsigned int min_uint(unsigned int a, unsigned int b)
