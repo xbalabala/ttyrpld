@@ -1,11 +1,11 @@
 ---
  drivers/char/pty.c          |    2 +-
  drivers/char/rpldhk_ttyio.h |   59 +++++++++++++++++++++++++++++++++++
- drivers/char/tty_io.c       |   29 +++++++++++++++--
+ drivers/char/tty_io.c       |   30 +++++++++++++++--
  include/linux/rpldhk.h      |   18 ++++++++++
  include/linux/tty.h         |    2 +-
  security/Kconfig            |    8 +++++
- 6 files changed, 112 insertions(+), 6 deletions(-)
+ 6 files changed, 113 insertions(+), 6 deletions(-)
  create mode 100644 drivers/char/rpldhk_ttyio.h
  create mode 100644 include/linux/rpldhk.h
 
@@ -24,7 +24,7 @@ index b33d668..48df1f6 100644
  	if (IS_ERR(tty)) {
 diff --git a/drivers/char/rpldhk_ttyio.h b/drivers/char/rpldhk_ttyio.h
 new file mode 100644
-index 0000000..4497f0c
+index 0000000..46cae25
 --- /dev/null
 +++ b/drivers/char/rpldhk_ttyio.h
 @@ -0,0 +1,59 @@
@@ -88,7 +88,7 @@ index 0000000..4497f0c
 +
 +#endif /* CONFIG_RPLDHK */
 diff --git a/drivers/char/tty_io.c b/drivers/char/tty_io.c
-index a3afa0c..d88a894 100644
+index a3afa0c..e402d98 100644
 --- a/drivers/char/tty_io.c
 +++ b/drivers/char/tty_io.c
 @@ -107,6 +107,19 @@
@@ -123,19 +123,20 @@ index a3afa0c..d88a894 100644
  	return i;
  }
  
-@@ -1066,8 +1081,10 @@ static ssize_t tty_write(struct file *file, const char __user *buf,
+@@ -1066,8 +1081,11 @@ static ssize_t tty_write(struct file *file, const char __user *buf,
  	ld = tty_ldisc_ref_wait(tty);
  	if (!ld->ops->write)
  		ret = -EIO;
 -	else
 +	else {
  		ret = do_tty_write(ld->ops->write, tty, file, buf, count);
-+		rpldhk_write(buf, ret, tty);
++		if (ret > 0)
++			rpldhk_write(buf, ret, tty);
 +	}
  	tty_ldisc_deref(ld);
  	return ret;
  }
-@@ -1296,7 +1313,7 @@ static int tty_reopen(struct tty_struct *tty)
+@@ -1296,7 +1314,7 @@ static int tty_reopen(struct tty_struct *tty)
   */
  
  struct tty_struct *tty_init_dev(struct tty_driver *driver, int idx,
@@ -144,7 +145,7 @@ index a3afa0c..d88a894 100644
  {
  	struct tty_struct *tty;
  	int retval;
-@@ -1645,6 +1662,8 @@ void tty_release_dev(struct file *filp)
+@@ -1645,6 +1663,8 @@ void tty_release_dev(struct file *filp)
  	if (!tty_closing || (o_tty && !o_tty_closing))
  		return;
  
@@ -153,7 +154,7 @@ index a3afa0c..d88a894 100644
  #ifdef TTY_DEBUG_HANGUP
  	printk(KERN_DEBUG "freeing tty structure...");
  #endif
-@@ -1761,7 +1780,7 @@ got_driver:
+@@ -1761,7 +1781,7 @@ got_driver:
  		if (retval)
  			tty = ERR_PTR(retval);
  	} else
@@ -162,7 +163,7 @@ index a3afa0c..d88a894 100644
  
  	mutex_unlock(&tty_mutex);
  	tty_driver_kref_put(driver);
-@@ -1817,6 +1836,7 @@ got_driver:
+@@ -1817,6 +1837,7 @@ got_driver:
  		__proc_set_tty(current, tty);
  	spin_unlock_irq(&current->sighand->siglock);
  	mutex_unlock(&tty_mutex);
@@ -170,7 +171,7 @@ index a3afa0c..d88a894 100644
  	return 0;
  }
  
-@@ -3093,6 +3113,7 @@ static int __init tty_init(void)
+@@ -3093,6 +3114,7 @@ static int __init tty_init(void)
  #ifdef CONFIG_VT
  	vty_init(&console_fops);
  #endif
@@ -216,7 +217,7 @@ index e8c6c91..77f66a7 100644
  extern int tty_init_termios(struct tty_struct *tty);
  
 diff --git a/security/Kconfig b/security/Kconfig
-index 4c86534..4a1ba8c 100644
+index 4c86534..ce0c78e 100644
 --- a/security/Kconfig
 +++ b/security/Kconfig
 @@ -4,6 +4,14 @@
