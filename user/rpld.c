@@ -136,7 +136,7 @@ int main(int argc, const char **argv)
 	memset(&Stats, 0, sizeof(Stats));
 
 	if (GOpt.verbose) {
-		printf("# rpld " TTYRPLD_VERSION "\n");
+		printf("# rpld " PACKAGE_VERSION "\n");
 		printf(_(
 		       "This program comes with ABSOLUTELY NO WARRANTY; it is free software and you\n"
 		       "you are welcome to redistribute it under certain conditions; for details see\n"
@@ -394,7 +394,7 @@ static void log_open(struct tty *tty)
 	 * Add an optional ident header to record the program and version which
 	 * this logfile was created with.
 	 */
-	HX_strlcpy(buf, "ttyrpld " TTYRPLD_VERSION, sizeof(buf));
+	HX_strlcpy(buf, "ttyrpld " PACKAGE_VERSION, sizeof(buf));
 	p.evmagic.n = cpu_to_be32(RPLEVT_ID_PROG);
 	s = strlen(buf) + 1;
 	p.size = cpu_to_le32(s);

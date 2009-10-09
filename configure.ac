@@ -1,5 +1,5 @@
 
-AC_INIT([ttyrpld], [2.52])
+AC_INIT([ttyrpld], [2.60])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_INSTALL
@@ -10,7 +10,7 @@ AM_PROG_CC_C_O
 AC_CHECK_LIB([rt], [nanosleep], [ttyreplay_LIBS="$ttyreplay_LIBS -lrt"])
 AC_CHECK_LIB([socket], [accept], [rpld_LIBS="$rpld_LIBS -lsocket -lnsl"])
 AC_CHECK_LIB([intl], [gettext], [regular_LIBS="$regular_LIBS -lintl"])
-PKG_CHECK_MODULES([libHX], [libHX >= 2.0])
+PKG_CHECK_MODULES([libHX], [libHX >= 3.0])
 
 AC_PATH_PROG([MSGFMT], [gmsgfmt])
 if [[ -z "$MSGFMT" ]]; then

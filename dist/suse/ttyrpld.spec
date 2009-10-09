@@ -1,6 +1,6 @@
 
 Name:		ttyrpld
-Version:	2.52
+Version:	2.60
 Release:	0
 Group:		Productivity/Security
 Summary:	Kernel-based tty screen- and keylogger
@@ -12,28 +12,21 @@ URL:		http://ttyrpld.sf.net/
 
 Source:		http://downloads.sf.net/ttyrpld/ttyrpld-%version.tar.bz2
 BuildRoot:	%_tmppath/%name-%version-build
-BuildRequires:	gettext-devel, libHX-devel >= 1.25, php5, perl >= 5.8.0
-BuildRequires:	pkg-config, w3m
+BuildRequires:	gettext-devel, libHX-devel >= 3.0
+BuildRequires:	pkg-config >= 0.19
 %if 0%kernel
-BuildRequires:	kernel-source, kernel-syms
+BuildRequires:	kernel-syms
 
-%suse_kernel_module_package
+%kernel_module_package
 %endif
 
 %description
 ttyrpld is a multi-os kernel-level tty keylogger and screenlogger with
 (a)synchronous replay support.
 
-Authors:
---------
-	Jan Engelhardt
-
-%package doc
-Group:          Documentation/HTML
-Summary:        Documentation for ttyrpld
-
-%description doc
-Documentation for ttyrpld.
+Author(s):
+----------
+	Jan Engelhardt <jengelh [at] medozas de>
 
 %if 0%kernel
 %package KMP
@@ -45,11 +38,13 @@ This package contains the ttyrpld kernel module (rpldev) for ttyrpld.
 The rpldhk kernel module needs to be built into the kernel already.
 %endif
 
-%debug_package
 %prep
 %setup -q
 
 %build
+if [ ! -e configure ]; then
+	./autogen.sh;
+fi;
 %configure
 make %{?jobs:-j%jobs};
 mkdir obj;
@@ -58,20 +53,21 @@ ln -s ../include obj/include;
 	for flavor in %flavors_to_build; do
 		rm -Rf "obj/$flavor";
 		cp -r k_linux-2.6 "obj/$flavor";
-		make -C "/usr/src/linux-obj/%_target_cpu/$flavor" M="$PWD/obj/$flavor";
+		make -C "/usr/src/linux-obj/%_target_cpu/$flavor" \
+			M="$PWD/obj/$flavor" %{?jobs:-j%jobs};
 	done;
 %endif
 
 %install
 b="%buildroot";
 rm -Rf "$b";
-mkdir "$b";
+mkdir -p "$b";
 make install DESTDIR="$b";
 export INSTALL_MOD_PATH="$b";
 %if 0%kernel
 	for flavor in %flavors_to_build; do
 		make -C "/usr/src/linux-obj/%_target_cpu/$flavor" \
-			M="$PWD/obj/$flavor" modules_install;
+			M="$PWD/obj/$flavor" modules_install %{?jobs:-j%jobs};
 	done;
 %endif
 
@@ -81,8 +77,10 @@ ln -s "%_initrddir/rpld" "$b/%_sbindir/rcrpld";
 %preun
 %stop_on_removal rpld
 
-%postun
+%post
 %restart_on_update rpld
+
+%postun
 %insserv_cleanup
 
 %files
@@ -92,6 +90,9 @@ ln -s "%_initrddir/rpld" "$b/%_sbindir/rcrpld";
 %_bindir/*
 %_sbindir/*
 %_datadir/locale/*/LC_MESSAGES/%name.mo
+%_mandir/*/*
 
-%files doc
-%doc doc/*.css doc/*.html doc/*.txt doc/*.png
+%changelog
+* Mon Sep 21 2009 - jengelh
+- package latest git snapshot so that we can move from libHX18 to libHX22
+  and get fixes for Linux 2.6.31-RT

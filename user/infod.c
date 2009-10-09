@@ -6,6 +6,7 @@
  *	Lesser General Public License as published by the Free Software
  *	Foundation; either version 2 or 3 of the License.
  */
+#include "config.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -181,7 +182,7 @@ static void getinfo_text_all(int fd)
 	skprintf(fd,
 	"=========================================================="
 	"================\n"
-	"  (bytes)     %9llu %9llu ttyrpld " TTYRPLD_VERSION "/" ARCH "\n"
+	"  (bytes)     %9llu %9llu ttyrpld " PACKAGE_VERSION "/" ARCH "\n"
 	"  (packets)   %9lu %9lu\n"
 	"----------------------------------------------------------"
 	"----------------\n",
@@ -231,7 +232,7 @@ static void getinfo_bin_all(int fd)
 	const struct HXmap_node *node;
 	struct HXmap_trav *trav;
 
-	skprintf(fd, "ttyrpld " TTYRPLD_VERSION "\n" "format 4\n"
+	skprintf(fd, "ttyrpld " PACKAGE_VERSION "\n" "format 4\n"
 	         "%lu %lu %lu %lu %llu %llu %lu\n",
 	         Stats.open, Stats.lclose, Stats.read, Stats.write,
 	         Stats.in, Stats.out, Stats.badpack);

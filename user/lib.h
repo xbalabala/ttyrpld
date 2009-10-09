@@ -21,7 +21,6 @@
 #define _(s) gettext(s)
 
 #define MAXFNLEN 256
-#define TTYRPLD_VERSION "2.18"
 
 struct pctrl_info;
 

@@ -6,6 +6,7 @@
  *	Lesser General Public License as published by the Free Software
  *	Foundation; either version 2 or 3 of the License.
  */
+#include "config.h"
 #include <sys/stat.h>
 #include <sys/time.h> /* µsec def, gettimeofday() */
 #include <sys/types.h>
@@ -89,7 +90,7 @@ int main(int argc, const char **argv)
 	if (!get_options(&argc, &argv))
 		return EXIT_FAILURE;
 
-	fprintf(stderr, "> ttyreplay " TTYRPLD_VERSION "\n");
+	fprintf(stderr, "> ttyreplay " PACKAGE_VERSION "\n");
 	fprintf(stderr, _(
 	        "This program comes with ABSOLUTELY NO WARRANTY; it is free software and you\n"
 	        "you are welcome to redistribute it under certain conditions; for details see\n"
