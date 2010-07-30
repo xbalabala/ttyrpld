@@ -26,7 +26,7 @@ ttyrpld is a multi-os kernel-level tty keylogger and screenlogger with
 
 Author(s):
 ----------
-	Jan Engelhardt <jengelh [at] medozas de>
+	Jan Engelhardt
 
 %if 0%kernel
 %package KMP
@@ -46,7 +46,7 @@ if [ ! -e configure ]; then
 	./autogen.sh;
 fi;
 %configure
-make %{?jobs:-j%jobs};
+make %{?_smp_mflags};
 mkdir obj;
 ln -s ../include obj/include;
 %if 0%kernel
@@ -54,7 +54,7 @@ ln -s ../include obj/include;
 		rm -Rf "obj/$flavor";
 		cp -r k_linux-2.6 "obj/$flavor";
 		make -C "/usr/src/linux-obj/%_target_cpu/$flavor" \
-			M="$PWD/obj/$flavor" %{?jobs:-j%jobs};
+			M="$PWD/obj/$flavor" %{?_smp_mflags};
 	done;
 %endif
 
@@ -67,7 +67,7 @@ export INSTALL_MOD_PATH="$b";
 %if 0%kernel
 	for flavor in %flavors_to_build; do
 		make -C "/usr/src/linux-obj/%_target_cpu/$flavor" \
-			M="$PWD/obj/$flavor" modules_install %{?jobs:-j%jobs};
+			M="$PWD/obj/$flavor" modules_install %{?_smp_mflags};
 	done;
 %endif
 
