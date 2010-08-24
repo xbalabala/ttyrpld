@@ -1,5 +1,5 @@
 /*
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
+ *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2010
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -632,7 +632,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	HXformat_add(catalog, "TIME", fmtime, HXTYPE_STRING);
 	HXformat_add(catalog, "TTY",  sdev,   HXTYPE_STRING);
 	HXformat_add(catalog, "USER", user,   HXTYPE_STRING);
-	HXformat_aprintf(catalog, &tty->log, GOpt.ofmt);
+	HXformat2_aprintf(catalog, &tty->log, GOpt.ofmt);
 	HXformat_free(catalog);
 }
 

@@ -10,9 +10,9 @@
   </tr>
   <tr>
     <td class="t2"><a
-      href="http://jengelh.hopto.org/coding/libHX.php">libHX</a></td>
-    <td class="t2">2.0</li>
-    <td class="t2">2.0</li>
+      href="http://libHX.sf.net/">libHX</a></td>
+    <td class="t2">3.6</li>
+    <td class="t2">3.6</li>
   </tr>
   <tr>
     <td class="t1">GNU C Compiler</td>
