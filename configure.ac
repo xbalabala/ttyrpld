@@ -22,10 +22,11 @@ AM_CONDITIONAL([GOT_TOOLS_FOR_LOCALE],
 
 CHECK_HAVE_GETPWUID
 
-regular_CFLAGS="-D_FILE_OFFSET_BITS=64 \
-	-D_REENTRANT -Wall -Waggregate-return -Wmissing-declarations \
+regular_CPPFLAGS="-D_FILE_OFFSET_BITS=64 -D_REENTRANT"
+regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
 	-Wformat=2 -pipe"
+AC_SUBST([regaulr_CPPFLAGS])
 AC_SUBST([regular_CFLAGS])
 AC_SUBST([regular_LIBS])
 AC_SUBST([ttyreplay_LIBS])

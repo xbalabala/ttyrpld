@@ -1,6 +1,7 @@
 # -*- Makefile -*-
 
-AM_CFLAGS         = ${regular_CFLAGS} -I${top_srcdir}/include ${libHX_CFLAGS}
+AM_CPPFLAGS       = ${regular_CPPFLAGS} -I${top_srcdir}/include
+AM_CFLAGS         = ${regular_CFLAGS} ${libHX_CFLAGS}
 LDADD             = ${regular_LIBS}
 CLEANFILES        = rplctl${EXEEXT}
 
