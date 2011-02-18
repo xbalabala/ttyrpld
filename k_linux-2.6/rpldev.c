@@ -72,8 +72,7 @@ static int rpldhc_lclose(const struct tty_struct *, const struct tty_struct *);
 static int     rpldev_open(struct inode *, struct file *);
 static ssize_t rpldev_read(struct file *, char __user *, size_t, loff_t *);
 static loff_t  rpldev_seek(struct file *, loff_t, int);
-static int     rpldev_ioctl(struct inode *, struct file *, unsigned int,
-                            unsigned long);
+static long    rpldev_ioctl(struct file *, unsigned int, unsigned long);
 static unsigned int rpldev_poll(struct file *, poll_table *);
 static int rpldev_close(struct inode *, struct file *);
 
@@ -99,13 +98,13 @@ static unsigned int Enable_ioctl_proc = 0;
 
 /* Kernel module info (kmi) stuff */
 static const struct file_operations kmi_fops = {
-	.open    = rpldev_open,
-	.read    = rpldev_read,
-	.llseek  = rpldev_seek,
-	.ioctl   = rpldev_ioctl,
-	.poll    = rpldev_poll,
-	.release = rpldev_close,
-	.owner   = THIS_MODULE,
+	.open           = rpldev_open,
+	.read           = rpldev_read,
+	.llseek         = rpldev_seek,
+	.unlocked_ioctl = rpldev_ioctl,
+	.poll           = rpldev_poll,
+	.release        = rpldev_close,
+	.owner          = THIS_MODULE,
 };
 static struct miscdevice kmi_miscinfo = {
 	.minor = MISC_DYNAMIC_MINOR,
@@ -368,8 +367,7 @@ static loff_t rpldev_seek(struct file *filp, loff_t offset, int origin) {
 	return ret;
 }
 
-static int rpldev_ioctl(struct inode *inode, struct file *filp,
-    unsigned int cmd, unsigned long arg)
+static long rpldev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	int ret = 0;
 

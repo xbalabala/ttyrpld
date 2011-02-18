@@ -18,6 +18,7 @@ HEAD
 ====
 Changes:
 - Update to libHX 3.6
+- rpldev: Linux 2.6.37 (exclusive) support
 
 
 v2.60 (2009-10-09)

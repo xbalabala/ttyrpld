@@ -1,32 +1,31 @@
 ---
- drivers/char/pty.c          |    2 +-
- drivers/char/rpldhk_ttyio.h |   59 +++++++++++++++++++++++++++++++++++
- drivers/char/tty_io.c       |   30 +++++++++++++++--
- include/linux/rpldhk.h      |   18 ++++++++++
- include/linux/tty.h         |    2 +-
- security/Kconfig            |    8 +++++
- 6 files changed, 113 insertions(+), 6 deletions(-)
+ drivers/tty/pty.c          |    2 -
+ drivers/tty/rpldhk_ttyio.h |   59 +++++++++++++++++++++++++++++++++++++++++++++
+ drivers/tty/tty_io.c       |   29 +++++++++++++++++++---
+ include/linux/rpldhk.h     |   18 +++++++++++++
+ include/linux/tty.h        |    2 -
+ security/Kconfig           |    8 ++++++
+ 6 files changed, 112 insertions(+), 6 deletions(-)
  create mode 100644 drivers/char/rpldhk_ttyio.h
  create mode 100644 include/linux/rpldhk.h
 
-diff --git a/drivers/char/pty.c b/drivers/char/pty.c
-index b33d668..48df1f6 100644
---- a/drivers/char/pty.c
-+++ b/drivers/char/pty.c
-@@ -637,7 +637,7 @@ static int __ptmx_open(struct inode *inode, struct file *filp)
- 		return index;
+Index: linux-2.6.36/drivers/tty/pty.c
+===================================================================
+--- linux-2.6.36.orig/drivers/tty/pty.c
++++ linux-2.6.36/drivers/tty/pty.c
+@@ -666,7 +666,7 @@ static int ptmx_open(struct inode *inode
  
  	mutex_lock(&tty_mutex);
+ 	tty_lock();
 -	tty = tty_init_dev(ptm_driver, index, 1);
 +	tty = tty_init_dev(ptm_driver, index, 1, filp);
  	mutex_unlock(&tty_mutex);
  
  	if (IS_ERR(tty)) {
-diff --git a/drivers/char/rpldhk_ttyio.h b/drivers/char/rpldhk_ttyio.h
-new file mode 100644
-index 0000000..46cae25
+Index: linux-2.6.36/drivers/tty/rpldhk_ttyio.h
+===================================================================
 --- /dev/null
-+++ b/drivers/char/rpldhk_ttyio.h
++++ linux-2.6.36/drivers/tty/rpldhk_ttyio.h
 @@ -0,0 +1,59 @@
 +#include <linux/types.h>
 +
@@ -87,11 +86,11 @@ index 0000000..46cae25
 +}
 +
 +#endif /* CONFIG_RPLDHK */
-diff --git a/drivers/char/tty_io.c b/drivers/char/tty_io.c
-index a3afa0c..e402d98 100644
---- a/drivers/char/tty_io.c
-+++ b/drivers/char/tty_io.c
-@@ -107,6 +107,19 @@
+Index: linux-2.6.36/drivers/tty/tty_io.c
+===================================================================
+--- linux-2.6.36.orig/drivers/tty/tty_io.c
++++ linux-2.6.36/drivers/tty/tty_io.c
+@@ -108,6 +108,19 @@
  #include <linux/kmod.h>
  #include <linux/nsproxy.h>
  
@@ -111,7 +110,7 @@ index a3afa0c..e402d98 100644
  #undef TTY_DEBUG_HANGUP
  
  #define TTY_PARANOIA_CHECK 1
-@@ -893,8 +906,10 @@ static ssize_t tty_read(struct file *file, char __user *buf, size_t count,
+@@ -959,8 +972,10 @@ static ssize_t tty_read(struct file *fil
  	else
  		i = -EIO;
  	tty_ldisc_deref(ld);
@@ -123,20 +122,19 @@ index a3afa0c..e402d98 100644
  	return i;
  }
  
-@@ -1066,8 +1081,11 @@ static ssize_t tty_write(struct file *file, const char __user *buf,
+@@ -1133,8 +1148,10 @@ static ssize_t tty_write(struct file *fi
  	ld = tty_ldisc_ref_wait(tty);
  	if (!ld->ops->write)
  		ret = -EIO;
 -	else
 +	else {
  		ret = do_tty_write(ld->ops->write, tty, file, buf, count);
-+		if (ret > 0)
-+			rpldhk_write(buf, ret, tty);
++		rpldhk_write(buf, ret, tty);
 +	}
  	tty_ldisc_deref(ld);
  	return ret;
  }
-@@ -1296,7 +1314,7 @@ static int tty_reopen(struct tty_struct *tty)
+@@ -1369,7 +1386,7 @@ static int tty_reopen(struct tty_struct
   */
  
  struct tty_struct *tty_init_dev(struct tty_driver *driver, int idx,
@@ -145,16 +143,16 @@ index a3afa0c..e402d98 100644
  {
  	struct tty_struct *tty;
  	int retval;
-@@ -1645,6 +1663,8 @@ void tty_release_dev(struct file *filp)
- 	if (!tty_closing || (o_tty && !o_tty_closing))
- 		return;
+@@ -1758,6 +1775,8 @@ int tty_release(struct inode *inode, str
+ 		return 0;
+ 	}
  
 +	rpldhk_lclose(tty, o_tty);
 +
  #ifdef TTY_DEBUG_HANGUP
  	printk(KERN_DEBUG "freeing tty structure...");
  #endif
-@@ -1761,7 +1781,7 @@ got_driver:
+@@ -1881,7 +1900,7 @@ got_driver:
  		if (retval)
  			tty = ERR_PTR(retval);
  	} else
@@ -163,27 +161,26 @@ index a3afa0c..e402d98 100644
  
  	mutex_unlock(&tty_mutex);
  	tty_driver_kref_put(driver);
-@@ -1817,6 +1837,7 @@ got_driver:
- 		__proc_set_tty(current, tty);
+@@ -1952,6 +1971,7 @@ got_driver:
  	spin_unlock_irq(&current->sighand->siglock);
+ 	tty_unlock();
  	mutex_unlock(&tty_mutex);
 +	rpldhk_open(tty, filp);
  	return 0;
  }
  
-@@ -3093,6 +3114,7 @@ static int __init tty_init(void)
+@@ -3267,6 +3287,7 @@ int __init tty_init(void)
  #ifdef CONFIG_VT
  	vty_init(&console_fops);
  #endif
 +	printk(KERN_INFO "rpldhk 2.40, by Jan Engelhardt, 2004 - 2009\n");
  	return 0;
  }
- module_init(tty_init);
-diff --git a/include/linux/rpldhk.h b/include/linux/rpldhk.h
-new file mode 100644
-index 0000000..f2b26c1
+ 
+Index: linux-2.6.36/include/linux/rpldhk.h
+===================================================================
 --- /dev/null
-+++ b/include/linux/rpldhk.h
++++ linux-2.6.36/include/linux/rpldhk.h
 @@ -0,0 +1,18 @@
 +#ifndef _LINUX_RPLDHK_H
 +#define _LINUX_RPLDHK_H
@@ -203,23 +200,23 @@ index 0000000..f2b26c1
 +#endif /* __KERNEL__ */
 +
 +#endif /* _LINUX_RPLDHK_H */
-diff --git a/include/linux/tty.h b/include/linux/tty.h
-index e8c6c91..77f66a7 100644
---- a/include/linux/tty.h
-+++ b/include/linux/tty.h
-@@ -430,7 +430,7 @@ extern void free_tty_struct(struct tty_struct *tty);
+Index: linux-2.6.36/include/linux/tty.h
+===================================================================
+--- linux-2.6.36.orig/include/linux/tty.h
++++ linux-2.6.36/include/linux/tty.h
+@@ -472,7 +472,7 @@ extern void free_tty_struct(struct tty_s
  extern void initialize_tty_struct(struct tty_struct *tty,
  		struct tty_driver *driver, int idx);
  extern struct tty_struct *tty_init_dev(struct tty_driver *driver, int idx,
 -								int first_ok);
-+	int first_ok, struct file *filp);
- extern void tty_release_dev(struct file *filp);
++								int first_ok, struct file *filp);
+ extern int tty_release(struct inode *inode, struct file *filp);
  extern int tty_init_termios(struct tty_struct *tty);
  
-diff --git a/security/Kconfig b/security/Kconfig
-index 4c86534..ce0c78e 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
+Index: linux-2.6.36/security/Kconfig
+===================================================================
+--- linux-2.6.36.orig/security/Kconfig
++++ linux-2.6.36/security/Kconfig
 @@ -4,6 +4,14 @@
  
  menu "Security options"
@@ -235,5 +232,3 @@ index 4c86534..ce0c78e 100644
  config KEYS
  	bool "Enable access key retention support"
  	help
--- 
-# Created with git-export-patch
