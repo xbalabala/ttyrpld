@@ -622,7 +622,8 @@ static void tv_delta(const struct rpltime *past, const struct rpltime *now,
     struct timeval *dest)
 {
 	unsigned long sec = now->tv_sec - past->tv_sec;
-	long acc = now->tv_usec - past->tv_usec;
+	long acc = static_cast(long, now->tv_usec) -
+	           static_cast(long, past->tv_usec);
 
 	if (acc < 0) {
 		dest->tv_sec  = sec - 1;
