@@ -17,7 +17,7 @@ changed significantly between ttyrpld releases.
 HEAD
 ====
 Changes:
-- Update to libHX 3.6
+- build: update to libHX 3.12 API
 - rpldev: Linux 2.6.37 (exclusive) support
 
 

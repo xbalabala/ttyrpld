@@ -533,7 +533,7 @@ static int check_parent_directory(const hxmc_t *s)
 
 	path = HX_strdup(s);
 	path[p-s] = '\0';
-	ret = HX_mkdir(path); /* `mkdir -p` */
+	ret = HX_mkdir(path, S_IRWXU); /* `mkdir -p` */
 	free(path);
 	return ret;
 }
@@ -632,7 +632,7 @@ static void fill_info(struct tty *tty, const char *aux_sdev)
 	HXformat_add(catalog, "TIME", fmtime, HXTYPE_STRING);
 	HXformat_add(catalog, "TTY",  sdev,   HXTYPE_STRING);
 	HXformat_add(catalog, "USER", user,   HXTYPE_STRING);
-	HXformat2_aprintf(catalog, &tty->log, GOpt.ofmt);
+	HXformat_aprintf(catalog, &tty->log, GOpt.ofmt);
 	HXformat_free(catalog);
 }
 
@@ -863,7 +863,8 @@ static bool get_options(int *argc, const char ***argv)
 	        HXOPT_TABLEEND,
 	};
 
-	return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) > 0;
+	return HX_getopt(options_table, argc, argv, HXOPT_USAGEONERR) ==
+	       HXOPT_ERR_SUCCESS;
 }
 
 static void getopt_config(const struct HXoptcb *cbi)

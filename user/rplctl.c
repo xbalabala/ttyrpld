@@ -54,7 +54,7 @@ int rplctl_main(int argc, const char **argv)
 		return EXIT_FAILURE;
 	}
 
-	if (get_options(&argc, &argv) <= 0)
+	if (get_options(&argc, &argv) != HXOPT_ERR_SUCCESS)
 		return EXIT_FAILURE;
 
 	if (!Got_arg) {
@@ -220,7 +220,7 @@ static void getopt_proc(const struct HXoptcb *cbi)
 		['X'] = IFP_REMOVE,
 		['Z'] = IFP_ZERO,
 	};
-	switch (cbi->match_sh) {
+	switch (cbi->current->sh) {
 	case 'A':
 	case 'D':
 	case 'S':
@@ -229,7 +229,7 @@ static void getopt_proc(const struct HXoptcb *cbi)
 		Got_arg = true;
 		if ((dev = getdev(cbi->data)) != 0)
 			send_int(Sockfd, mapping[static_cast(int,
-			         cbi->match_sh)], dev);
+			         cbi->current->sh)], dev);
 		break;
 	}
 	case 'L': {
@@ -241,7 +241,7 @@ static void getopt_proc(const struct HXoptcb *cbi)
 	case 'Z': {
 		uint32_t dev = (cbi->data != NULL) ? getdev(cbi->data) : 0;
 		Got_arg = true;
-		send_int(Sockfd, mapping[static_cast(int, cbi->match_sh)], dev);
+		send_int(Sockfd, mapping[static_cast(int, cbi->current->sh)], dev);
 		break;
 	}
 	} /* switch */
