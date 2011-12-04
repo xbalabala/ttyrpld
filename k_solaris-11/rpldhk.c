@@ -9,12 +9,6 @@
  *	You can obtain a copy of the license in the file "LICENSE.CDDL".
  *	See the License for the specific language governing permissions
  *	and limitations under the License.
- *
- *	When distributing Covered Code, include this CDDL HEADER in each
- *	file and include the License file.
- *	If applicable, add the following below this CDDL HEADER, with the
- *	fields enclosed by brackets "[]" replaced with your own identifying
- *	information: Portions Copyright [yyyy] [name of copyright owner]
  */
 #include <sys/types.h>
 #include <sys/ccompile.h>
