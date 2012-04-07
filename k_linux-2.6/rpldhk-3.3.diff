@@ -9,11 +9,11 @@
  create mode 100644 drivers/char/rpldhk_ttyio.h
  create mode 100644 include/linux/rpldhk.h
 
-Index: linux-2.6.36/drivers/tty/pty.c
+Index: linux-3.3/drivers/tty/pty.c
 ===================================================================
---- linux-2.6.36.orig/drivers/tty/pty.c
-+++ linux-2.6.36/drivers/tty/pty.c
-@@ -666,7 +666,7 @@ static int ptmx_open(struct inode *inode
+--- linux-3.3.orig/drivers/tty/pty.c
++++ linux-3.3/drivers/tty/pty.c
+@@ -677,7 +677,7 @@ static int ptmx_open(struct inode *inode
  
  	mutex_lock(&tty_mutex);
  	tty_lock();
@@ -22,10 +22,10 @@ Index: linux-2.6.36/drivers/tty/pty.c
  	mutex_unlock(&tty_mutex);
  
  	if (IS_ERR(tty)) {
-Index: linux-2.6.36/drivers/tty/rpldhk_ttyio.h
+Index: linux-3.3/drivers/tty/rpldhk_ttyio.h
 ===================================================================
 --- /dev/null
-+++ linux-2.6.36/drivers/tty/rpldhk_ttyio.h
++++ linux-3.3/drivers/tty/rpldhk_ttyio.h
 @@ -0,0 +1,59 @@
 +#include <linux/types.h>
 +
@@ -86,11 +86,11 @@ Index: linux-2.6.36/drivers/tty/rpldhk_ttyio.h
 +}
 +
 +#endif /* CONFIG_RPLDHK */
-Index: linux-2.6.36/drivers/tty/tty_io.c
+Index: linux-3.3/drivers/tty/tty_io.c
 ===================================================================
---- linux-2.6.36.orig/drivers/tty/tty_io.c
-+++ linux-2.6.36/drivers/tty/tty_io.c
-@@ -108,6 +108,19 @@
+--- linux-3.3.orig/drivers/tty/tty_io.c
++++ linux-3.3/drivers/tty/tty_io.c
+@@ -106,6 +106,19 @@
  #include <linux/kmod.h>
  #include <linux/nsproxy.h>
  
@@ -110,7 +110,7 @@ Index: linux-2.6.36/drivers/tty/tty_io.c
  #undef TTY_DEBUG_HANGUP
  
  #define TTY_PARANOIA_CHECK 1
-@@ -959,8 +972,10 @@ static ssize_t tty_read(struct file *fil
+@@ -975,8 +988,10 @@ static ssize_t tty_read(struct file *fil
  	else
  		i = -EIO;
  	tty_ldisc_deref(ld);
@@ -122,7 +122,7 @@ Index: linux-2.6.36/drivers/tty/tty_io.c
  	return i;
  }
  
-@@ -1133,8 +1148,10 @@ static ssize_t tty_write(struct file *fi
+@@ -1151,8 +1166,10 @@ static ssize_t tty_write(struct file *fi
  	ld = tty_ldisc_ref_wait(tty);
  	if (!ld->ops->write)
  		ret = -EIO;
@@ -134,7 +134,7 @@ Index: linux-2.6.36/drivers/tty/tty_io.c
  	tty_ldisc_deref(ld);
  	return ret;
  }
-@@ -1369,7 +1386,7 @@ static int tty_reopen(struct tty_struct
+@@ -1386,7 +1403,7 @@ static int tty_reopen(struct tty_struct
   */
  
  struct tty_struct *tty_init_dev(struct tty_driver *driver, int idx,
@@ -143,16 +143,16 @@ Index: linux-2.6.36/drivers/tty/tty_io.c
  {
  	struct tty_struct *tty;
  	int retval;
-@@ -1758,6 +1775,8 @@ int tty_release(struct inode *inode, str
+@@ -1785,6 +1802,8 @@ int tty_release(struct inode *inode, str
  		return 0;
  	}
  
 +	rpldhk_lclose(tty, o_tty);
 +
  #ifdef TTY_DEBUG_HANGUP
- 	printk(KERN_DEBUG "freeing tty structure...");
+ 	printk(KERN_DEBUG "%s: freeing tty structure...\n", __func__);
  #endif
-@@ -1881,7 +1900,7 @@ got_driver:
+@@ -1950,7 +1969,7 @@ retry_open:
  		if (retval)
  			tty = ERR_PTR(retval);
  	} else
@@ -160,27 +160,27 @@ Index: linux-2.6.36/drivers/tty/tty_io.c
 +		tty = tty_init_dev(driver, index, 0, filp);
  
  	mutex_unlock(&tty_mutex);
- 	tty_driver_kref_put(driver);
-@@ -1952,6 +1971,7 @@ got_driver:
+ 	if (driver)
+@@ -2017,6 +2036,7 @@ retry_open:
  	spin_unlock_irq(&current->sighand->siglock);
  	tty_unlock();
  	mutex_unlock(&tty_mutex);
 +	rpldhk_open(tty, filp);
  	return 0;
- }
- 
-@@ -3267,6 +3287,7 @@ int __init tty_init(void)
+ err_unlock:
+ 	tty_unlock();
+@@ -3405,6 +3425,7 @@ int __init tty_init(void)
  #ifdef CONFIG_VT
  	vty_init(&console_fops);
  #endif
-+	printk(KERN_INFO "rpldhk 2.40, by Jan Engelhardt, 2004 - 2009\n");
++	printk(KERN_INFO "rpldhk 2.40, by Jan Engelhardt, 2004-2012\n");
  	return 0;
  }
  
-Index: linux-2.6.36/include/linux/rpldhk.h
+Index: linux-3.3/include/linux/rpldhk.h
 ===================================================================
 --- /dev/null
-+++ linux-2.6.36/include/linux/rpldhk.h
++++ linux-3.3/include/linux/rpldhk.h
 @@ -0,0 +1,18 @@
 +#ifndef _LINUX_RPLDHK_H
 +#define _LINUX_RPLDHK_H
@@ -200,23 +200,23 @@ Index: linux-2.6.36/include/linux/rpldhk.h
 +#endif /* __KERNEL__ */
 +
 +#endif /* _LINUX_RPLDHK_H */
-Index: linux-2.6.36/include/linux/tty.h
+Index: linux-3.3/include/linux/tty.h
 ===================================================================
---- linux-2.6.36.orig/include/linux/tty.h
-+++ linux-2.6.36/include/linux/tty.h
-@@ -472,7 +472,7 @@ extern void free_tty_struct(struct tty_s
- extern void initialize_tty_struct(struct tty_struct *tty,
+--- linux-3.3.orig/include/linux/tty.h
++++ linux-3.3/include/linux/tty.h
+@@ -481,7 +481,7 @@ extern void initialize_tty_struct(struct
  		struct tty_driver *driver, int idx);
+ extern void deinitialize_tty_struct(struct tty_struct *tty);
  extern struct tty_struct *tty_init_dev(struct tty_driver *driver, int idx,
 -								int first_ok);
 +								int first_ok, struct file *filp);
  extern int tty_release(struct inode *inode, struct file *filp);
  extern int tty_init_termios(struct tty_struct *tty);
  
-Index: linux-2.6.36/security/Kconfig
+Index: linux-3.3/security/Kconfig
 ===================================================================
---- linux-2.6.36.orig/security/Kconfig
-+++ linux-2.6.36/security/Kconfig
+--- linux-3.3.orig/security/Kconfig
++++ linux-3.3/security/Kconfig
 @@ -4,6 +4,14 @@
  
  menu "Security options"

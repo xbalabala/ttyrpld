@@ -18,7 +18,7 @@ HEAD
 ====
 Changes:
 - build: update to libHX 3.12 API
-- rpldev: Linux 2.6.37 (exclusive) support
+- rpldev: Linux 3.3 patch
 
 
 v2.60 (2009-10-09)
