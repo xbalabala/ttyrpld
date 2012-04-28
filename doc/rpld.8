@@ -101,9 +101,10 @@ working directory of rpld) and the name of the log files. Note that the working
 directory of rpld depends on where it was started from, e.g. with startproc,
 the CWD is mostly the root path (/). It is wise to use absolute paths here. The
 available printf-style tags are below.\(em Directories will be created as
-needed (if permission allows). Thus, you can have /var/log/rpl/%u/%d.%t.%l, and
-it will automatically create %u, provided that /var/log/rpl is writable for the
-user running rpld.
+needed (if permission allows). Thus, you can have
+/var/log/rpl/%(USER)/%(DATE).%(TIME).%(TTY) it will automatically
+create the user directory, provided that /var/log/rpl is writable for
+the user running rpld.
 .TP
 \fBUSER=\fP\fIuser\fP
 User to change to after all initialization. Make sure that the user can create
@@ -118,17 +119,17 @@ value is /var/run/.rplinfod_socket.
 .SS "OFMT tags"
 .PP
 .TP
-\fB%d\fP
-Time when tty was opened (usually when someone logs in or an xterm was opened).
-In "YYYYMMDD" format.
+\fB%(DATE)\fP, \fB%(TIME)\fP
+Date (in YYYYMMDD) and time (in HHMMSS format) when tty was opened (usually
+when someone logs in or an xterm was opened).
 .TP
-\fB%l\fP
+\fB%(TTY)\fP
 Terminal (line) the user logged on. The string is taken from a string database.
 Typical strings are tty* for virtual consoles, pts-* for pseudo-terminals,
 ttyS* for serial lines. If there is no matching string entry, the device number
 is used in square brackets, e.g. [240:0].
 .TP
-\fB%u\fP
+\fB%(USER)\fP
 User who owned the tty when it was opened. If the device could not be
 stat(2)'ed, %u will be substituted by "NONE". If the UID could not be
 translated into a name, the UID is spit out instead.
