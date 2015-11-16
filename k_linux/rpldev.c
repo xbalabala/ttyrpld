@@ -1,5 +1,5 @@
 /*
- *	Copyright © Jan Engelhardt <jengelh [at] medozas de>, 2004 - 2009
+ *	Copyright Jan Engelhardt, 2004-2011,2015
  *
  *	This file is part of ttyrpld. ttyrpld is free software; you can
  *	redistribute it and/or modify it under the terms of the GNU
@@ -25,11 +25,7 @@
 #include <linux/vmalloc.h>
 #include <linux/rpldhk.h>
 #include <asm/byteorder.h>
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)
-#	include <linux/semaphore.h>
-#else
-#	include <asm/semaphore.h>
-#endif
+#include <linux/semaphore.h>
 #include <asm/uaccess.h>
 #include "../include/rpl_ioctl.h"
 #include "../include/rpl_packet.h"
@@ -149,11 +145,7 @@ module_exit(rpldev_exit);
 static inline char *d_path0(const struct file *filp, char *dev,
     unsigned int size)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 25)
-	return d_path(filp->f_dentry, filp->f_vfsmnt, dev, size);
-#else
-	return d_path((struct path *)&filp->f_path, dev, size);
-#endif
+	return d_path(&filp->f_path, dev, size);
 }
 
 static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
@@ -172,7 +164,7 @@ static int rpldhc_open(const struct tty_struct *tty, const struct file *filp)
 	 * "/dev/tty" is an evil case, because its ownership is not the same as
 	 * that of a better node, e.g. /dev/tty1. Do not pass it to userspace.
 	 */
-	if (filp->f_dentry->d_inode->i_rdev == MKDEV(TTYAUX_MAJOR, 0) ||
+	if (filp->f_path.dentry->d_inode->i_rdev == MKDEV(TTYAUX_MAJOR, 0) ||
 	    IS_ERR(full_dev = d_path0(filp, dev, sizeof(dev))))	{
 		p.size = 0;
 		return circular_put_packet(&p, NULL, 0);
@@ -328,7 +320,7 @@ static ssize_t rpldev_read(struct file *filp, char __user *buf, size_t count,
 
  out:
 	up(&Buffer_lock);
-	filp->f_dentry->d_inode->i_atime = CURRENT_TIME;
+	filp->f_path.dentry->d_inode->i_atime = CURRENT_TIME;
 	return (ret != 0) ? ret : count;
 }
 
@@ -348,7 +340,7 @@ static loff_t rpldev_seek(struct file *filp, loff_t offset, int origin) {
 			goto out;
 		BufRP = BufWP;
 		up(&Buffer_lock);
-		filp->f_dentry->d_inode->i_atime = CURRENT_TIME;
+		filp->f_path.dentry->d_inode->i_atime = CURRENT_TIME;
 		return 0;
 	}
 
@@ -363,7 +355,7 @@ static loff_t rpldev_seek(struct file *filp, loff_t offset, int origin) {
 	ret = 0;
  out:
 	up(&Buffer_lock);
-	filp->f_dentry->d_inode->i_atime = CURRENT_TIME;
+	filp->f_path.dentry->d_inode->i_atime = CURRENT_TIME;
 	return ret;
 }
 
